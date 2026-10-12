@@ -5,8 +5,8 @@ import { AutoWikiBrand } from './components/AutoWikiBrand.jsx'
 import { Toaster } from './components/ui/sonner.jsx'
 import Chat from './pages/Chat.jsx'
 import Home from './pages/Home.jsx'
-import Landing from './pages/Landing.jsx'
 
+const Landing = lazy(() => import('./pages/Landing.jsx'))
 const Wiki = lazy(() => import('./pages/Wiki.jsx'))
 
 const navigation = [
@@ -19,7 +19,14 @@ export default function App() {
   const { pathname } = useLocation()
 
   if (pathname === '/') {
-    return <><Landing /><Toaster richColors closeButton /></>
+    return (
+      <>
+        <Suspense fallback={<p className="landing-loading" role="status">Loading AutoWiki…</p>}>
+          <Landing />
+        </Suspense>
+        <Toaster richColors closeButton />
+      </>
+    )
   }
 
   return (
@@ -37,7 +44,7 @@ export default function App() {
           </nav>
         </div>
       </header>
-      <main className="app-main">
+      <main className={pathname === '/workspace' ? 'app-main app-main--workspace' : 'app-main'}>
         <Suspense fallback={<p className="text-sm text-muted-foreground" role="status">Loading workspace…</p>}>
           <Routes>
             <Route path="/workspace" element={<Home />} />

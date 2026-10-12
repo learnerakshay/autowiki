@@ -1,124 +1,438 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
+import { useGSAP } from '@gsap/react'
+import gsap from 'gsap'
 import { Link } from 'react-router-dom'
-import { ArrowRight, BookOpenText, Database, GitFork, LoaderCircle } from 'lucide-react'
+import {
+  AlertCircle,
+  ArrowRight,
+  BookOpenText,
+  CheckCircle2,
+  Database,
+  FileText,
+  Files,
+  GitBranch,
+  GitFork,
+  ListTree,
+  LoaderCircle,
+  MessageSquareText,
+} from 'lucide-react'
+
 import { postJson } from '../api.js'
-import { EmptyState } from '../components/EmptyState.jsx'
-import { ErrorNotice } from '../components/ErrorNotice.jsx'
-import { HomeSkeleton } from '../components/JobSkeleton.jsx'
 import { JobStatus } from '../components/JobStatus.jsx'
-import { PageHeading } from '../components/PageHeading.jsx'
 import { Button } from '../components/ui/button.jsx'
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card.jsx'
 import { Input } from '../components/ui/input.jsx'
 import { Label } from '../components/ui/label.jsx'
 import { useJobNotifications } from '../hooks/useJobNotifications.js'
 import { useJobPoll } from '../useJobPoll.js'
 
+const workflowSteps = [
+  {
+    icon: GitBranch,
+    title: 'Repository',
+    description: 'AutoWiki reads the public source tree and its relationships.',
+  },
+  {
+    icon: ListTree,
+    title: 'Wiki outline',
+    description: 'The generator organizes the system into coherent chapters.',
+  },
+  {
+    icon: BookOpenText,
+    title: 'Documentation',
+    description: 'Explanations and diagrams become a navigable technical wiki.',
+  },
+]
+
+const jobCopy = {
+  idle: {
+    title: 'Ready when you are',
+    description: 'Submit a repository to begin this workflow.',
+  },
+  submitting: {
+    title: 'Starting the job',
+    description: 'AutoWiki is handing the repository to the generation service.',
+  },
+  pending: {
+    title: 'Work is in progress',
+    description: 'This status comes directly from the backend. You can start the other workflow independently.',
+  },
+  completed: {
+    title: 'Job complete',
+    description: 'The repository has finished processing.',
+  },
+  failed: {
+    title: 'Job failed',
+    description: 'The backend could not complete this request.',
+  },
+  unavailable: {
+    title: 'Status unavailable',
+    description: 'AutoWiki could not retrieve this job. In-memory jobs can be lost when the server restarts.',
+  },
+}
+
+function InlineError({ children }) {
+  return (
+    <p className="workspace-inline-error" role="alert">
+      <AlertCircle aria-hidden="true" size={16} />
+      <span>{children}</span>
+    </p>
+  )
+}
+
+function WorkspaceJobCard({ kind, jobId, repo, job, error, submitting }) {
+  const panelRef = useRef(null)
+  const isWiki = kind === 'wiki'
+  const state = submitting
+    ? 'submitting'
+    : error
+      ? 'unavailable'
+      : jobId
+        ? job?.status || 'pending'
+        : 'idle'
+  const copy = jobCopy[state] || jobCopy.pending
+  const status = state === 'idle'
+    ? 'neutral'
+    : state === 'completed'
+      ? 'completed'
+      : state === 'failed'
+        ? 'failed'
+        : state === 'unavailable'
+          ? 'failed'
+          : 'pending'
+  const statusLabel = state === 'idle' ? 'Ready' : state === 'unavailable' ? 'Unavailable' : undefined
+  const Icon = state === 'completed'
+    ? CheckCircle2
+    : state === 'failed' || state === 'unavailable'
+      ? AlertCircle
+      : state === 'idle'
+        ? isWiki ? FileText : Database
+        : LoaderCircle
+
+  useGSAP(() => {
+    if (!panelRef.current) return
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      gsap.set(panelRef.current, { clearProps: 'all' })
+      return
+    }
+
+    gsap.fromTo(
+      panelRef.current,
+      { opacity: 0.64, y: 4 },
+      { opacity: 1, y: 0, duration: 0.22, ease: 'power2.out', clearProps: 'transform' },
+    )
+  }, { scope: panelRef, dependencies: [jobId, state] })
+
+  const chapterCount = Array.isArray(job?.chapters) ? job.chapters.length : 0
+
+  return (
+    <section
+      ref={panelRef}
+      className={`workspace-job workspace-job--${state}`}
+      aria-label={`${isWiki ? 'Wiki generation' : 'Repository indexing'} status`}
+    >
+      <div className="workspace-job__topline">
+        <JobStatus status={status}>
+          {statusLabel || `${state.charAt(0).toUpperCase()}${state.slice(1)}`}
+        </JobStatus>
+        {jobId ? <code title={jobId}>{jobId}</code> : null}
+      </div>
+
+      <div className="workspace-job__body">
+        <span className="workspace-job__icon" aria-hidden="true">
+          <Icon size={19} />
+        </span>
+        <div>
+          <h3>{copy.title}</h3>
+          <p>{job?.error || copy.description}</p>
+          {repo && jobId ? <p className="workspace-job__repo">{repo}</p> : null}
+        </div>
+      </div>
+
+      {(state === 'submitting' || state === 'pending') && (
+        <div className="workspace-activity" aria-hidden="true">
+          <span />
+        </div>
+      )}
+
+      {state === 'completed' && isWiki ? (
+        <div className="workspace-result-grid workspace-result-grid--single">
+          <div>
+            <strong>{chapterCount}</strong>
+            <span>{chapterCount === 1 ? 'generated chapter' : 'generated chapters'}</span>
+          </div>
+        </div>
+      ) : null}
+
+      {state === 'completed' && !isWiki ? (
+        <>
+          <div className="workspace-result-grid">
+            <div>
+              <strong>{job?.fileCount ?? 0}</strong>
+              <span>source files read</span>
+            </div>
+            <div>
+              <strong>{job?.chunkCount ?? 0}</strong>
+              <span>searchable chunks</span>
+            </div>
+          </div>
+          <p className={`workspace-result-note ${job?.saved === false ? 'workspace-result-note--warning' : ''}`}>
+            {job?.saved === false
+              ? 'The index was processed but was not saved for repository-grounded Q&A.'
+              : job?.truncated
+                ? 'The searchable index was saved, with large source content truncated to service limits.'
+                : 'The searchable index was saved and is ready for repository-grounded Q&A.'}
+          </p>
+        </>
+      ) : null}
+
+      {(jobId || (state === 'completed' && !isWiki)) && (
+        <div className="workspace-job__footer">
+          {isWiki && jobId ? (
+            <Button asChild size="sm">
+              <Link to={`/wiki?jobId=${encodeURIComponent(jobId)}`}>
+                View wiki
+                <ArrowRight aria-hidden="true" size={15} />
+              </Link>
+            </Button>
+          ) : null}
+          {!isWiki && state === 'completed' && job?.saved !== false ? (
+            <Button asChild size="sm" variant="outline">
+              <Link to="/chat">
+                Open Chat
+                <MessageSquareText aria-hidden="true" size={15} />
+              </Link>
+            </Button>
+          ) : null}
+        </div>
+      )}
+    </section>
+  )
+}
+
 export default function Home() {
-  const [repo, setRepo] = useState('octocat/Hello-World')
-  const [message, setMessage] = useState('')
+  const pageRef = useRef(null)
+  const [repo, setRepo] = useState('')
+  const [touched, setTouched] = useState(false)
   const [indexJobId, setIndexJobId] = useState('')
   const [wikiJobId, setWikiJobId] = useState('')
-  const [busyAction, setBusyAction] = useState('')
-  const { job: indexJob, error: indexPollError } = useJobPoll('index', indexJobId)
-  const { job: wikiJob, error: wikiPollError } = useJobPoll('wiki', wikiJobId)
+  const [indexRepo, setIndexRepo] = useState('')
+  const [wikiRepo, setWikiRepo] = useState('')
+  const [submitting, setSubmitting] = useState({ index: false, wiki: false })
+  const [submitErrors, setSubmitErrors] = useState({ index: '', wiki: '' })
 
-  useJobNotifications(indexJob, indexJobId, { completed: 'Repository index is ready', failed: 'Repository indexing failed' })
-  useJobNotifications(wikiJob, wikiJobId, { completed: 'Repository wiki is ready', failed: 'Wiki generation failed' })
+  const indexState = useJobPoll('index', indexJobId)
+  const wikiState = useJobPoll('wiki', wikiJobId)
+
+  useJobNotifications(indexState.job, indexJobId, {
+    completed: 'Repository index is ready',
+    failed: 'Repository indexing failed',
+  })
+  useJobNotifications(wikiState.job, wikiJobId, {
+    completed: 'Wiki is ready',
+    failed: 'Wiki generation failed',
+  })
+
+  useGSAP(() => {
+    const media = gsap.matchMedia()
+
+    media.add('(prefers-reduced-motion: no-preference)', () => {
+      const timeline = gsap.timeline({ defaults: { ease: 'power2.out' } })
+      timeline
+        .from('.workspace-intro > *', { opacity: 0, y: 12, duration: 0.32, stagger: 0.045 })
+        .from('.workspace-command-grid > *', { opacity: 0, y: 12, duration: 0.3, stagger: 0.06 }, '-=0.16')
+        .from('.workspace-assurance > *', { opacity: 0, y: 6, duration: 0.24, stagger: 0.04 }, '-=0.14')
+        .to('.workspace-workflow', { '--workflow-progress': '100%', duration: 0.58, ease: 'power1.inOut' }, '-=0.2')
+    })
+
+    return () => media.revert()
+  }, { scope: pageRef })
+
+  const repoMissing = touched && !repo.trim()
+  const anySubmitting = submitting.index || submitting.wiki
 
   async function submit(action) {
-    setBusyAction(action)
-    setMessage('')
-    setIndexJobId('')
-    setWikiJobId('')
+    const normalizedRepo = repo.trim()
+    setTouched(true)
+
+    if (!normalizedRepo) return
+
+    setSubmitting((current) => ({ ...current, [action]: true }))
+    setSubmitErrors((current) => ({ ...current, [action]: '' }))
+
     try {
-      const result = await postJson(`/api/${action}`, { repo })
-      if (action === 'wiki') {
-        setWikiJobId(result.jobId)
-      } else {
+      const result = await postJson(`/api/${action}`, { repo: normalizedRepo })
+
+      if (action === 'index') {
+        setIndexRepo(normalizedRepo)
         setIndexJobId(result.jobId)
+      } else {
+        setWikiRepo(normalizedRepo)
+        setWikiJobId(result.jobId)
       }
-    } catch (error) {
-      setMessage(error.message)
+    } catch (requestError) {
+      setSubmitErrors((current) => ({
+        ...current,
+        [action]: requestError.message || `Unable to start ${action}.`,
+      }))
     } finally {
-      setBusyAction('')
+      setSubmitting((current) => ({ ...current, [action]: false }))
     }
   }
 
-  const indexing = indexJob?.status === 'pending'
-  const generating = wikiJob?.status === 'pending'
-
   return (
-    <section className="page-stack">
-      <PageHeading title="Turn a repository into a technical wiki" description="Generate a structured, browsable guide from a GitHub repository. Indexing remains available separately to support repository-grounded Q&A." />
+    <div ref={pageRef} className="workspace-page">
+      <header className="workspace-intro">
+        <p className="workspace-eyebrow">
+          <GitFork aria-hidden="true" size={15} />
+          Repository intelligence
+        </p>
+        <h1>What will we document today?</h1>
+        <p>
+          Turn a public GitHub repository into a structured technical wiki, or index its source for repository-grounded Q&amp;A.
+        </p>
+      </header>
 
-      <Card className="max-w-3xl">
-        <CardHeader>
-          <CardTitle>Repository source</CardTitle>
-          <p className="text-sm leading-6 text-muted-foreground">Enter a public repository in GitHub owner/repository format.</p>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="home-repo">GitHub repository</Label>
-            <Input id="home-repo" value={repo} onChange={(event) => setRepo(event.target.value)} placeholder="owner/repo" autoComplete="off" />
+      <div className="workspace-command-grid">
+        <section className="workspace-primary" aria-labelledby="wiki-workflow-title">
+          <div className="workspace-section-heading">
+            <span className="workspace-section-icon" aria-hidden="true">
+              <BookOpenText size={22} />
+            </span>
+            <div>
+              <p className="workspace-kicker">Primary workflow</p>
+              <h2 id="wiki-workflow-title">Generate a technical wiki</h2>
+            </div>
           </div>
-          <div className="flex flex-col gap-2.5 sm:flex-row">
-            <Button disabled={Boolean(busyAction) || generating || !repo.trim()} onClick={() => submit('wiki')}>
-              {busyAction === 'wiki' ? <LoaderCircle className="animate-spin" aria-hidden="true" /> : <BookOpenText aria-hidden="true" />}
-              {busyAction === 'wiki' ? 'Starting wiki…' : 'Generate Wiki'}
-            </Button>
-            <Button variant="secondary" disabled={Boolean(busyAction) || indexing || !repo.trim()} onClick={() => submit('index')}>
-              {busyAction === 'index' ? <LoaderCircle className="animate-spin" aria-hidden="true" /> : <Database aria-hidden="true" />}
-              {busyAction === 'index' ? 'Starting index…' : 'Index Repository'}
-            </Button>
-          </div>
-          <p className="max-w-[68ch] border-t border-border pt-4 text-sm leading-6 text-muted-foreground">
-            Generate Wiki creates chapters, explanations, and technical diagrams. Index Repository prepares source context for grounded questions in Chat.
-          </p>
-        </CardContent>
-      </Card>
 
-      {message && <JobStatus status="neutral">{message}</JobStatus>}
-      {indexJobId && <p className="job-reference">Index job <code>{indexJobId}</code></p>}
-      {indexing && <div className="space-y-3"><JobStatus status="pending"><span>indexing...</span></JobStatus><HomeSkeleton /></div>}
-      {indexPollError && <ErrorNotice title="Index status unavailable" error={indexPollError} recovery="Check the connection, then try indexing the repository again." />}
-      {indexJob?.status === 'failed' && <ErrorNotice title="Indexing failed" error={indexJob.error} recovery="Confirm the repository is public and correctly named, then try indexing it again." />}
-      {indexJob?.status === 'completed' && (
-        <Card className="max-w-3xl">
-          <CardHeader className="flex-row items-center justify-between gap-4">
-            <CardTitle>Repository indexed</CardTitle>
-            <JobStatus status="completed">completed</JobStatus>
-          </CardHeader>
-          <CardContent>
-            <dl className="result-grid">
-              <div><dt>Files</dt><dd>{indexJob.fileCount}</dd></div>
-              <div><dt>Chunks</dt><dd>{indexJob.chunkCount}</dd></div>
-              <div><dt>Saved</dt><dd>{String(indexJob.saved)}</dd></div>
-              <div><dt>Truncated</dt><dd>{String(indexJob.truncated)}</dd></div>
-            </dl>
-          </CardContent>
-        </Card>
-      )}
-      {wikiJobId && (
-        <Card className="max-w-3xl bg-surface-subtle p-4 shadow-none">
-          <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
-            <div className="min-w-0">
-              <div className="flex flex-wrap items-center gap-2">
-                <JobStatus status={wikiJob?.status ?? 'pending'}>{wikiJob?.status === 'completed' ? 'completed' : wikiJob?.status === 'failed' ? 'failed' : 'generating...'}</JobStatus>
-                <span className="job-reference">Wiki job <code>{wikiJobId}</code></span>
+          <form
+            className="workspace-form"
+            onSubmit={(event) => {
+              event.preventDefault()
+              submit('wiki')
+            }}
+          >
+            <Label htmlFor="repo">GitHub repository</Label>
+            <div className={`workspace-input ${repoMissing ? 'workspace-input--invalid' : ''}`}>
+              <GitFork aria-hidden="true" size={18} />
+              <Input
+                id="repo"
+                name="repo"
+                value={repo}
+                onBlur={() => setTouched(true)}
+                onChange={(event) => setRepo(event.target.value)}
+                placeholder="owner/repository"
+                aria-describedby="repo-help repo-error"
+                aria-invalid={repoMissing}
+                autoComplete="off"
+                disabled={anySubmitting}
+              />
+            </div>
+            <div className="workspace-field-message">
+              {repoMissing ? (
+                <InlineError>Enter a repository before starting a job.</InlineError>
+              ) : (
+                <p id="repo-help">Use owner/repository or paste a public GitHub URL. A trailing .git is accepted.</p>
+              )}
+              <span id="repo-error" className="sr-only">
+                {repoMissing ? 'A GitHub repository is required.' : ''}
+              </span>
+            </div>
+
+            {submitErrors.wiki ? <InlineError>{submitErrors.wiki}</InlineError> : null}
+
+            <div className="workspace-primary-action">
+              <Button
+                type="submit"
+                size="lg"
+                disabled={submitting.wiki || wikiState.job?.status === 'pending'}
+              >
+                {submitting.wiki ? <LoaderCircle className="animate-spin" aria-hidden="true" size={18} /> : <BookOpenText aria-hidden="true" size={18} />}
+                Generate Wiki
+              </Button>
+              <p>Creates chapters, technical explanations, and architecture diagrams.</p>
+            </div>
+          </form>
+
+          <WorkspaceJobCard
+            kind="wiki"
+            jobId={wikiJobId}
+            repo={wikiRepo}
+            job={wikiState.job}
+            error={wikiState.error}
+            submitting={submitting.wiki}
+          />
+        </section>
+
+        <aside className="workspace-side" aria-label="Supporting repository workflows">
+          <section className="workspace-workflow" aria-labelledby="workflow-title">
+            <div className="workspace-section-heading workspace-section-heading--compact">
+              <span className="workspace-section-icon" aria-hidden="true">
+                <Files size={20} />
+              </span>
+              <div>
+                <p className="workspace-kicker">How generation works</p>
+                <h2 id="workflow-title">From source to chapters</h2>
               </div>
             </div>
-            <Button asChild variant="secondary" className="shrink-0">
-              <Link to={`/wiki?jobId=${encodeURIComponent(wikiJobId)}`}>View wiki <ArrowRight aria-hidden="true" /></Link>
+            <ol className="workspace-workflow__track">
+              {workflowSteps.map(({ icon: StepIcon, title, description }, index) => (
+                <li key={title}>
+                  <span className="workspace-workflow__marker" aria-hidden="true">
+                    <StepIcon size={16} />
+                  </span>
+                  <div>
+                    <span className="workspace-workflow__number">0{index + 1}</span>
+                    <h3>{title}</h3>
+                    <p>{description}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+            <p className="workspace-workflow__note">Conceptual workflow—not live job progress.</p>
+          </section>
+
+          <section className="workspace-index" aria-labelledby="index-workflow-title">
+            <div className="workspace-section-heading workspace-section-heading--compact">
+              <span className="workspace-section-icon workspace-section-icon--neutral" aria-hidden="true">
+                <Database size={20} />
+              </span>
+              <div>
+                <p className="workspace-kicker">Supporting workflow</p>
+                <h2 id="index-workflow-title">Index for grounded Q&amp;A</h2>
+              </div>
+            </div>
+            <p className="workspace-index__copy">
+              Build a searchable source index for Chat. Indexing is independent from wiki generation and does not create chapters.
+            </p>
+            {submitErrors.index ? <InlineError>{submitErrors.index}</InlineError> : null}
+            <Button
+              type="button"
+              variant="outline"
+              className="workspace-index__button"
+              disabled={!repo.trim() || submitting.index || indexState.job?.status === 'pending'}
+              onClick={() => submit('index')}
+            >
+              {submitting.index ? <LoaderCircle className="animate-spin" aria-hidden="true" size={18} /> : <Database aria-hidden="true" size={18} />}
+              Index Repository
             </Button>
-          </div>
-        </Card>
-      )}
-      {wikiPollError && <ErrorNotice title="Wiki status unavailable" error={wikiPollError} recovery="Open the wiki job to retry checking its status." />}
-      {wikiJob?.status === 'failed' && <ErrorNotice title="Wiki generation failed" error={wikiJob.error} recovery="Confirm the repository can be read, then generate the wiki again." />}
-      {!indexJobId && !wikiJobId && !message && (
-        <EmptyState icon={GitFork} title="Start with one repository" description="Generate its chaptered technical wiki, or index it when you want to ask source-grounded questions in Chat." />
-      )}
-    </section>
+            <WorkspaceJobCard
+              kind="index"
+              jobId={indexJobId}
+              repo={indexRepo}
+              job={indexState.job}
+              error={indexState.error}
+              submitting={submitting.index}
+            />
+          </section>
+        </aside>
+      </div>
+
+      <section className="workspace-assurance" aria-label="Workspace capabilities">
+        <p><CheckCircle2 aria-hidden="true" size={17} /><span><strong>Independent jobs</strong>Wiki and index work can run at the same time.</span></p>
+        <p><ListTree aria-hidden="true" size={17} /><span><strong>Structured output</strong>Chapters organize code into a readable system narrative.</span></p>
+        <p><MessageSquareText aria-hidden="true" size={17} /><span><strong>Grounded answers</strong>Indexing prepares repository context for Chat.</span></p>
+      </section>
+    </div>
   )
 }
