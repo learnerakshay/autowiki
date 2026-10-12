@@ -11,6 +11,12 @@ function toText(content) {
   return String(content ?? "");
 }
 
+/**
+ * Missing vectors are an expected user state (the repository has not been
+ * indexed yet), not an infrastructure failure. Returning an actionable answer
+ * keeps polling successful and tells the caller how to recover, while throwing
+ * would waste Inngest retries on a condition that only indexing can change.
+ */
 export async function askQuestion(repo, question, topK = 5) {
   const docs = await search(repo, question, topK);
 

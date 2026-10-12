@@ -11,6 +11,13 @@ const pc = new Pinecone({
 const UPSERT_BATCH_SIZE = 100;
 const DEFAULT_TOP_K = 5;
 
+/**
+ * One Pinecone namespace per repository prevents retrieval from mixing chunks
+ * belonging to different codebases while still sharing a single index. The
+ * compact `owner-repo` encoding has a known ambiguity: repositories such as
+ * `a-b/c` and `a/b-c` collide, so production code should use an unambiguous
+ * encoding if those names must coexist.
+ */
 function repoToNamespace(repo) {
   return repo.replace("/", "-");
 }

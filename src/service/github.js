@@ -33,6 +33,12 @@ const SKIP_DIRS = [
     "go.sum",
   ]);
 
+  /**
+   * Generated dependencies, lockfiles, binaries, and oversized files add cost
+   * and noise but little explanatory value for code search or wiki generation.
+   * Filtering them before blob downloads reduces GitHub requests, prompt size,
+   * embedding work, and the chance of treating binary data as UTF-8 text.
+   */
   function shouldSkipFile(path, size) {
     const parts = path.split("/");
     const fileName = parts[parts.length - 1];
@@ -61,6 +67,14 @@ const SKIP_DIRS = [
     return { owner, repo, repoKey: `${owner}/${repo}` };
   }
 
+  /**
+   * The 200-file ceiling keeps indexing time, API usage, embedding cost, and
+   * Inngest run size bounded for this local project. `truncated: true` means
+   * either GitHub reported an incomplete recursive tree or more than 200
+   * eligible files remained after filtering, so callers know the repository
+   * was only partially represented; intentionally skipped files alone do not
+   * set the flag.
+   */
   export async function fetchRepoFiles(token , owner , repo){
     const octokit = new Octokit({ auth: token });
 
@@ -80,12 +94,13 @@ const SKIP_DIRS = [
         recursive:"true"
       })
 
+      const items = tree.tree.filter(
+        (item) => item.type === "blob" && !shouldSkipFile(item.path, item.size),
+      );
+      const truncated = Boolean(tree.truncated) || items.length > 200;
       const files = [];
 
-      for (const item of tree.tree) {
-        if (item.type !== "blob") continue;
-        if (shouldSkipFile(item.path, item.size)) continue;
-    
+      for (const item of items.slice(0, 200)) {
         const { data: blob } = await octokit.rest.git.getBlob({
           owner,
           repo,
@@ -96,9 +111,7 @@ const SKIP_DIRS = [
           path: item.path,
           content: Buffer.from(blob.content, "base64").toString("utf8"),
         });
-    
-        if (files.length >= 200) break;
       }
 
-      return files;
+      return { files, truncated };
   }
