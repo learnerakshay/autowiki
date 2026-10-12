@@ -3,7 +3,12 @@ import path from "node:path";
 import { inngest } from "../client.js";
 import { fetchRepoFiles } from "../../service/github.js";
 import { buildOutline, writeChapter } from "../../service/wiki.js";
-import { setJobFailed, setJobResult } from "../../service/jobStore.js";
+import {
+  setJobFailed,
+  setJobProgress,
+  setJobResult,
+  WIKI_JOB_STAGES,
+} from "../../service/jobStore.js";
 
 /**
  * Kept as a named export so the final-failure state transition can be unit
@@ -27,10 +32,14 @@ export const generateWiki = inngest.createFunction(
     const githubToken = process.env.GITHUB_TOKEN;
 
     const { files } = await step.run("fetch-github-files", async () => {
+      setJobProgress(jobId, {
+        stage: WIKI_JOB_STAGES.FETCHING_REPOSITORY,
+      });
       return fetchRepoFiles(githubToken, owner, repo);
     });
 
     const outline = await step.run("build-outline", async () => {
+      setJobProgress(jobId, { stage: WIKI_JOB_STAGES.PLANNING_OUTLINE });
       return buildOutline(files);
     });
 
@@ -38,6 +47,11 @@ export const generateWiki = inngest.createFunction(
     for (let index = 0; index < outline.chapters.length; index += 1) {
       const chapterMeta = outline.chapters[index];
       const chapter = await step.run(`write-chapter-${index + 1}`, async () => {
+        setJobProgress(jobId, {
+          stage: WIKI_JOB_STAGES.GENERATING_CHAPTER,
+          chapter: index + 1,
+          totalChapters: outline.chapters.length,
+        });
         return writeChapter(chapterMeta, files);
       });
       chapters.push(chapter);
@@ -49,6 +63,7 @@ export const generateWiki = inngest.createFunction(
     const result = { repo: repoKey, generatedAt, chapters };
 
     await step.run("persist-wiki-output", async () => {
+      setJobProgress(jobId, { stage: WIKI_JOB_STAGES.SAVING_WIKI });
       const outputDirectory = path.resolve("wiki-output");
       await mkdir(outputDirectory, { recursive: true });
       await writeFile(

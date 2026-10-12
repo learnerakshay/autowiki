@@ -17,6 +17,11 @@ const navigation = [
 
 export default function App() {
   const { pathname } = useLocation()
+  const mainClassName = pathname === '/workspace'
+    ? 'app-main app-main--workspace'
+    : pathname === '/wiki'
+      ? 'app-main app-main--wiki'
+      : 'app-main'
 
   if (pathname === '/') {
     return (
@@ -44,7 +49,7 @@ export default function App() {
           </nav>
         </div>
       </header>
-      <main className={pathname === '/workspace' ? 'app-main app-main--workspace' : 'app-main'}>
+      <main className={mainClassName}>
         <Suspense fallback={<p className="text-sm text-muted-foreground" role="status">Loading workspace…</p>}>
           <Routes>
             <Route path="/workspace" element={<Home />} />

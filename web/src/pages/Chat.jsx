@@ -1,94 +1,310 @@
-import { useState } from 'react'
-import { FileCode2, LoaderCircle, MessageSquareText, Send } from 'lucide-react'
+import { useRef, useState } from 'react'
+import { useGSAP } from '@gsap/react'
+import gsap from 'gsap'
+import { Link, useSearchParams } from 'react-router-dom'
+import {
+  ArrowRight,
+  BookOpenText,
+  Check,
+  Clipboard,
+  FileCode2,
+  GitFork,
+  LoaderCircle,
+  MessageSquareText,
+  Send,
+} from 'lucide-react'
 import { postJson } from '../api.js'
-import { EmptyState } from '../components/EmptyState.jsx'
 import { ErrorNotice } from '../components/ErrorNotice.jsx'
-import { ChatSkeleton } from '../components/JobSkeleton.jsx'
 import { JobStatus } from '../components/JobStatus.jsx'
-import { PageHeading } from '../components/PageHeading.jsx'
-import { Badge } from '../components/ui/badge.jsx'
 import { Button } from '../components/ui/button.jsx'
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card.jsx'
 import { Input } from '../components/ui/input.jsx'
 import { Label } from '../components/ui/label.jsx'
 import { useJobNotifications } from '../hooks/useJobNotifications.js'
 import { useJobPoll } from '../useJobPoll.js'
+import { MarkdownDocument } from './MarkdownDocument.jsx'
+
+const suggestions = [
+  'What is the main purpose of this repository?',
+  'How is the application structured?',
+  'Where is the primary application logic implemented?',
+  'How are errors handled in the codebase?',
+]
 
 export default function Chat() {
-  const [repo, setRepo] = useState('octocat/Hello-World')
-  const [question, setQuestion] = useState('What does this repo do?')
+  const [searchParams] = useSearchParams()
+  const [repo, setRepo] = useState(() => searchParams.get('repo')?.trim() || '')
+  const [question, setQuestion] = useState('')
   const [jobId, setJobId] = useState('')
+  const [submission, setSubmission] = useState(null)
   const [submitError, setSubmitError] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const [copyStatus, setCopyStatus] = useState('idle')
+  const pageRef = useRef(null)
+  const resultRef = useRef(null)
+  const questionRef = useRef(null)
+  const requestRef = useRef(0)
   const { job, error: pollError } = useJobPoll('chat', jobId)
 
   useJobNotifications(job, jobId, { completed: 'Answer is ready', failed: 'Repository question failed' })
 
+  const pending = Boolean(jobId) && job?.status === 'pending'
+  const sources = Array.isArray(job?.sources)
+    ? [...new Set(job.sources.filter((source) => typeof source === 'string' && source.trim()).map((source) => source.trim()))]
+    : []
+  const normalizedRepo = repo.trim()
+  const normalizedQuestion = question.trim()
+  const activeMatchesDraft = submission?.repo === normalizedRepo && submission?.question === normalizedQuestion
+  const draftDiffers = Boolean(submission) && !activeMatchesDraft
+  const currentError = submitError || pollError
+  const stateKey = submitting ? 'submitting' : currentError ? 'error' : job?.status || 'empty'
+
+  useGSAP(() => {
+    const media = gsap.matchMedia()
+    media.add('(prefers-reduced-motion: no-preference)', () => {
+      gsap.fromTo(
+        ['.chat-intro', '.chat-composer', '.chat-index-note'],
+        { autoAlpha: 0.8, y: 6 },
+        { autoAlpha: 1, y: 0, duration: 0.22, stagger: 0.025, ease: 'power3.out', clearProps: 'opacity,visibility,transform' },
+      )
+    })
+    media.add('(prefers-reduced-motion: reduce)', () => {
+      gsap.set(['.chat-intro', '.chat-composer', '.chat-index-note'], { clearProps: 'all' })
+    })
+    return () => media.revert()
+  }, { scope: pageRef })
+
+  useGSAP(() => {
+    if (!resultRef.current) return undefined
+    const media = gsap.matchMedia()
+    media.add('(prefers-reduced-motion: no-preference)', () => {
+      gsap.fromTo(
+        resultRef.current,
+        { autoAlpha: 0.76, y: 8, clipPath: 'inset(0 0 10px 0 round 12px)' },
+        { autoAlpha: 1, y: 0, clipPath: 'inset(0 0 0 0 round 12px)', duration: 0.24, ease: 'power3.out', clearProps: 'opacity,visibility,transform,clipPath' },
+      )
+      if (job?.status === 'completed') {
+        const sourceItems = gsap.utils.toArray('.chat-source-item', pageRef.current)
+        if (sourceItems.length) {
+          gsap.fromTo(
+            sourceItems,
+            { autoAlpha: 0.65, x: 5 },
+            { autoAlpha: 1, x: 0, duration: 0.18, stagger: 0.025, delay: 0.04, ease: 'power3.out', clearProps: 'opacity,visibility,transform' },
+          )
+        }
+      }
+    })
+    media.add('(prefers-reduced-motion: reduce)', () => {
+      gsap.set(resultRef.current, { clearProps: 'all' })
+      const sourceItems = gsap.utils.toArray('.chat-source-item', pageRef.current)
+      if (sourceItems.length) gsap.set(sourceItems, { clearProps: 'all' })
+    })
+    return () => media.revert()
+  }, { scope: pageRef, dependencies: [stateKey, jobId] })
+
   async function submit(event) {
     event.preventDefault()
+    if (!normalizedRepo || !normalizedQuestion || submitting) return
+
+    const requestNumber = requestRef.current + 1
+    requestRef.current = requestNumber
+    const nextSubmission = { repo: normalizedRepo, question: normalizedQuestion }
+
+    setSubmission(nextSubmission)
+    setJobId('')
     setSubmitError('')
+    setCopyStatus('idle')
     setSubmitting(true)
+
     try {
-      const result = await postJson('/api/chat', { repo, question })
-      setJobId(result.jobId)
+      const result = await postJson('/api/chat', nextSubmission)
+      if (requestRef.current === requestNumber) setJobId(result.jobId)
     } catch (error) {
-      setSubmitError(error.message)
+      if (requestRef.current === requestNumber) setSubmitError(error.message)
     } finally {
-      setSubmitting(false)
+      if (requestRef.current === requestNumber) setSubmitting(false)
     }
   }
 
-  const pending = job?.status === 'pending'
+  function selectSuggestion(nextQuestion) {
+    setQuestion(nextQuestion)
+    requestAnimationFrame(() => questionRef.current?.focus())
+  }
+
+  async function copyAnswer() {
+    try {
+      await navigator.clipboard.writeText(String(job?.answer || ''))
+      setCopyStatus('copied')
+    } catch {
+      setCopyStatus('failed')
+    }
+  }
+
+  function askAnother() {
+    requestRef.current += 1
+    setQuestion('')
+    setJobId('')
+    setSubmission(null)
+    setSubmitError('')
+    setCopyStatus('idle')
+    requestAnimationFrame(() => questionRef.current?.focus())
+  }
 
   return (
-    <section className="page-stack">
-      <PageHeading title="Ask the repository" description="Send a focused question and get an answer grounded in the indexed source files." />
-      <Card className="max-w-3xl">
-        <form onSubmit={submit} aria-busy={submitting || pending}>
-          <CardHeader>
-            <CardTitle>New question</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
+    <section ref={pageRef} className="chat-page">
+      <header className="chat-intro">
+        <div className="chat-intro__icon" aria-hidden="true"><MessageSquareText /></div>
+        <div>
+          <h1>Ask better questions about your code.</h1>
+          <p>Explore an indexed GitHub repository with AI-generated answers grounded in retrieved source context.</p>
+        </div>
+      </header>
+
+      <form className="chat-composer" onSubmit={submit} aria-busy={submitting || pending}>
+        <div className="chat-repository-field">
+          <div className="chat-field-heading">
+            <GitFork aria-hidden="true" />
+            <div>
               <Label htmlFor="chat-repo">Repository</Label>
-              <Input id="chat-repo" value={repo} onChange={(event) => setRepo(event.target.value)} autoComplete="off" />
+              <p>Ask questions about an indexed repository.</p>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="chat-question">Question</Label>
-              <textarea id="chat-question" className="textarea" value={question} onChange={(event) => setQuestion(event.target.value)} />
-            </div>
-            <Button disabled={submitting || pending || !repo.trim() || !question.trim()}>
-              {submitting || pending ? <LoaderCircle className="animate-spin" aria-hidden="true" /> : <Send aria-hidden="true" />}
-              {submitting ? 'Sending…' : pending ? 'Answering…' : 'Ask'}
+          </div>
+          <Input
+            id="chat-repo"
+            value={repo}
+            onChange={(event) => setRepo(event.target.value)}
+            placeholder="owner/repository or GitHub URL"
+            autoComplete="off"
+            required
+          />
+          <p className="chat-field-help">Use <code>owner/repository</code> or a public GitHub repository URL. Entering a repository does not index it.</p>
+        </div>
+
+        <div className="chat-question-field">
+          <div className="chat-question-label">
+            <Label htmlFor="chat-question">Question</Label>
+            <span>Each submission is an independent request</span>
+          </div>
+          <textarea
+            ref={questionRef}
+            id="chat-question"
+            className="textarea chat-textarea"
+            value={question}
+            onChange={(event) => setQuestion(event.target.value)}
+            placeholder="Ask about architecture, control flow, implementation details, or error handling…"
+            required
+          />
+
+          <div className="chat-suggestions" aria-label="Example prompts">
+            {suggestions.map((suggestion) => (
+              <button key={suggestion} type="button" onClick={() => selectSuggestion(suggestion)}>
+                {suggestion}
+              </button>
+            ))}
+          </div>
+
+          <div className="chat-composer-footer">
+            <p>Answers use retrieved indexed files. Review the returned paths before relying on implementation details.</p>
+            <Button
+              type="submit"
+              className="chat-ask-button"
+              disabled={submitting || !normalizedRepo || !normalizedQuestion || (pending && activeMatchesDraft)}
+            >
+              {submitting || (pending && activeMatchesDraft) ? <LoaderCircle className="animate-spin" aria-hidden="true" /> : <Send aria-hidden="true" />}
+              {submitting ? 'Sending…' : pending && activeMatchesDraft ? 'Answering…' : 'Ask'}
             </Button>
-          </CardContent>
-        </form>
-      </Card>
-      {jobId && <p className="job-reference">Chat job <code>{jobId}</code></p>}
-      {pending && <div className="space-y-3"><JobStatus status="pending"><span>pending...</span></JobStatus><ChatSkeleton /></div>}
-      {(submitError || pollError) && <ErrorNotice title="Question could not be completed" error={submitError || pollError} recovery="Confirm the repository has been indexed, then try the question again." />}
-      {job?.status === 'failed' && <ErrorNotice title="Question failed" error={job.error} recovery="Review the repository name and question, then submit it again." />}
-      {job?.status === 'completed' && (
-        <Card className="max-w-5xl">
-          <article>
-            <CardHeader className="flex-row items-center justify-between gap-4 border-b border-border">
-              <CardTitle>Answer</CardTitle>
-              <JobStatus status="completed">completed</JobStatus>
-            </CardHeader>
-            <CardContent className="pt-6">
-              <p className="preserve max-w-[72ch] text-[0.9375rem] leading-7 text-foreground">{job.answer}</p>
-              <div className="mt-8 border-t border-border pt-6">
-                <h2 className="text-lg font-semibold tracking-[-0.02em]">Sources</h2>
-                {job.sources.length ? (
-                  <ul className="mt-3 flex flex-wrap gap-2">{job.sources.map((path) => <li key={path}><Badge variant="neutral" className="font-mono font-medium"><FileCode2 aria-hidden="true" className="size-3.5" />{path}</Badge></li>)}</ul>
-                ) : <p className="mt-2 text-sm text-muted-foreground">No sources returned.</p>}
-              </div>
-            </CardContent>
-          </article>
-        </Card>
+          </div>
+        </div>
+      </form>
+
+      {draftDiffers && (pending || job?.status === 'completed') && (
+        <p className="chat-draft-notice" role="status">Composer edits do not alter the active request. Select Ask to replace it.</p>
       )}
-      {!jobId && !submitError && (
-        <EmptyState icon={MessageSquareText} title="Ask from the code, not from memory" description="Choose an indexed repository and ask about its purpose, structure, or implementation. Source paths appear with every completed answer." />
+
+      {!submission && !currentError && (
+        <section className="chat-index-note">
+          <div>
+            <BookOpenText aria-hidden="true" />
+            <div>
+              <h2>Index before asking</h2>
+              <p>Repository indexing powers this Q&amp;A workflow. Wiki generation is a separate flow and remains available without creating a Chat request.</p>
+            </div>
+          </div>
+          <Button asChild variant="secondary"><Link to="/workspace">Open Workspace <ArrowRight aria-hidden="true" /></Link></Button>
+        </section>
+      )}
+
+      {(submitting || pending) && submission && (
+        <section ref={resultRef} className="chat-request-state chat-request-state--pending" aria-labelledby="chat-pending-title">
+          <div className="chat-request-state__topline">
+            <JobStatus status="pending"><span>pending...</span></JobStatus>
+            <code>{submission.repo}</code>
+          </div>
+          <h2 id="chat-pending-title">Working on your question</h2>
+          <p className="chat-submitted-question">{submission.question}</p>
+          <div className="chat-pending-track" aria-hidden="true"><span /></div>
+          <p className="chat-state-help">This is an indeterminate background job. No retrieval stage is inferred before the backend reports a result.</p>
+          {jobId && <details className="chat-job-details"><summary>Job reference</summary><code>{jobId}</code></details>}
+        </section>
+      )}
+
+      {currentError && submission && (
+        <section ref={resultRef} className="chat-request-state" aria-labelledby="chat-error-context">
+          <div className="chat-request-state__topline"><span>Request context</span><code>{submission.repo}</code></div>
+          <h2 id="chat-error-context">{submission.question}</h2>
+          <ErrorNotice title="Question could not be completed" error={currentError} recovery="Confirm the repository has been indexed, then submit the question again." />
+        </section>
+      )}
+
+      {job?.status === 'failed' && submission && (
+        <section ref={resultRef} className="chat-request-state" aria-labelledby="chat-failed-context">
+          <div className="chat-request-state__topline"><JobStatus status="failed">failed</JobStatus><code>{submission.repo}</code></div>
+          <h2 id="chat-failed-context">{submission.question}</h2>
+          <ErrorNotice title="Question failed" error={job.error || 'The background job did not return an answer.'} recovery="Review the repository name and confirm it has been indexed, then submit the question again." />
+        </section>
+      )}
+
+      {job?.status === 'completed' && submission && (
+        <article ref={resultRef} className="chat-result">
+          <section className="chat-answer" aria-labelledby="chat-answer-heading">
+            <header className="chat-answer__header">
+              <div>
+                <div className="chat-answer__identity">
+                  <JobStatus status="completed">completed</JobStatus>
+                  <code>{submission.repo}</code>
+                </div>
+                <h2 id="chat-answer-heading">Answer</h2>
+                <p className="chat-submitted-question">{submission.question}</p>
+              </div>
+              <Button type="button" variant="secondary" onClick={copyAnswer}>
+                {copyStatus === 'copied' ? <Check aria-hidden="true" /> : <Clipboard aria-hidden="true" />}
+                {copyStatus === 'copied' ? 'Copied' : 'Copy Answer'}
+              </Button>
+            </header>
+            {copyStatus === 'failed' && <p className="chat-copy-error" role="alert">Clipboard access was unavailable. Select the answer text to copy it manually.</p>}
+            <MarkdownDocument markdown={job.answer} title="Answer" className="chat-answer-markdown preserve" />
+            <footer className="chat-answer__actions">
+              <Button type="button" variant="secondary" onClick={askAnother}>Ask another question</Button>
+              <Button asChild variant="ghost"><Link to={`/wiki?repo=${encodeURIComponent(submission.repo)}`}>Generate Wiki <ArrowRight aria-hidden="true" /></Link></Button>
+            </footer>
+          </section>
+
+          <aside className="chat-sources" aria-labelledby="chat-sources-heading">
+            <div className="chat-sources__heading">
+              <FileCode2 aria-hidden="true" />
+              <div>
+                <h2 id="chat-sources-heading">Sources</h2>
+                <p>File paths returned by the retrieval service.</p>
+              </div>
+            </div>
+            {sources.length ? (
+              <ul>{sources.map((path) => <li className="chat-source-item" key={path}><FileCode2 aria-hidden="true" /><code>{path}</code></li>)}</ul>
+            ) : (
+              <p className="chat-sources__empty">No source paths were returned for this answer. No citations have been inferred.</p>
+            )}
+            {jobId && <details className="chat-job-details"><summary>Job reference</summary><code>{jobId}</code></details>}
+            <Button asChild variant="secondary" className="chat-sources__workspace"><Link to="/workspace">Repository Workspace</Link></Button>
+          </aside>
+        </article>
       )}
     </section>
   )

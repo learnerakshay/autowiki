@@ -103,10 +103,14 @@ test('starting wiki after indexing preserves both results and actions', async ({
   await expect(wikiStatus.getByRole('link', { name: 'View wiki' })).toHaveAttribute('href', '/wiki?jobId=wiki-complete')
 
   await expect(indexStatus.getByRole('status')).toHaveText('Completed')
-  await expect(indexStatus.getByRole('link', { name: 'Open Chat' })).toHaveAttribute('href', '/chat')
+  await expect(indexStatus.getByRole('link', { name: 'Open Chat' })).toHaveAttribute('href', `/chat?repo=${encodeURIComponent(REPO)}`)
   await page.evaluate(() => window.scrollTo(0, 0))
   await page.screenshot({ path: 'screenshots/prompt-06-wiki-completed.png', fullPage: true })
   await indexStatus.screenshot({ path: 'screenshots/prompt-06-indexing-state.png' })
+
+  await indexStatus.getByRole('link', { name: 'Open Chat' }).click()
+  await expect(page).toHaveURL(`/chat?repo=${encodeURIComponent(REPO)}`)
+  await expect(page.getByLabel('Repository', { exact: true })).toHaveValue(REPO)
 })
 
 test('workspace presents backend submission errors with recovery context', async ({ page }) => {

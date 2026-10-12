@@ -19,6 +19,7 @@ import {
 
 import { postJson } from '../api.js'
 import { JobStatus } from '../components/JobStatus.jsx'
+import { WikiGenerationProgress } from '../components/WikiGenerationProgress.jsx'
 import { Button } from '../components/ui/button.jsx'
 import { Input } from '../components/ui/input.jsx'
 import { Label } from '../components/ui/label.jsx'
@@ -138,21 +139,27 @@ function WorkspaceJobCard({ kind, jobId, repo, job, error, submitting }) {
         {jobId ? <code title={jobId}>{jobId}</code> : null}
       </div>
 
-      <div className="workspace-job__body">
-        <span className="workspace-job__icon" aria-hidden="true">
-          <Icon size={19} />
-        </span>
-        <div>
-          <h3>{copy.title}</h3>
-          <p>{job?.error || copy.description}</p>
-          {repo && jobId ? <p className="workspace-job__repo">{repo}</p> : null}
-        </div>
-      </div>
+      {isWiki && state === 'pending' ? (
+        <WikiGenerationProgress progress={job?.progress} repo={repo} compact />
+      ) : (
+        <>
+          <div className="workspace-job__body">
+            <span className="workspace-job__icon" aria-hidden="true">
+              <Icon size={19} />
+            </span>
+            <div>
+              <h3>{copy.title}</h3>
+              <p>{job?.error || copy.description}</p>
+              {repo && jobId ? <p className="workspace-job__repo">{repo}</p> : null}
+            </div>
+          </div>
 
-      {(state === 'submitting' || state === 'pending') && (
-        <div className="workspace-activity" aria-hidden="true">
-          <span />
-        </div>
+          {(state === 'submitting' || state === 'pending') && (
+            <div className="workspace-activity" aria-hidden="true">
+              <span />
+            </div>
+          )}
+        </>
       )}
 
       {state === 'completed' && isWiki ? (
@@ -197,8 +204,8 @@ function WorkspaceJobCard({ kind, jobId, repo, job, error, submitting }) {
             </Button>
           ) : null}
           {!isWiki && state === 'completed' && job?.saved !== false ? (
-            <Button asChild size="sm" variant="outline">
-              <Link to="/chat">
+            <Button asChild size="sm" variant="secondary">
+              <Link to={`/chat?repo=${encodeURIComponent(repo)}`}>
                 Open Chat
                 <MessageSquareText aria-hidden="true" size={15} />
               </Link>
@@ -283,10 +290,6 @@ export default function Home() {
   return (
     <div ref={pageRef} className="workspace-page">
       <header className="workspace-intro">
-        <p className="workspace-eyebrow">
-          <GitFork aria-hidden="true" size={15} />
-          Repository intelligence
-        </p>
         <h1>What will we document today?</h1>
         <p>
           Turn a public GitHub repository into a structured technical wiki, or index its source for repository-grounded Q&amp;A.
@@ -300,7 +303,6 @@ export default function Home() {
               <BookOpenText size={22} />
             </span>
             <div>
-              <p className="workspace-kicker">Primary workflow</p>
               <h2 id="wiki-workflow-title">Generate a technical wiki</h2>
             </div>
           </div>
@@ -371,7 +373,6 @@ export default function Home() {
                 <Files size={20} />
               </span>
               <div>
-                <p className="workspace-kicker">How generation works</p>
                 <h2 id="workflow-title">From source to chapters</h2>
               </div>
             </div>
@@ -398,7 +399,6 @@ export default function Home() {
                 <Database size={20} />
               </span>
               <div>
-                <p className="workspace-kicker">Supporting workflow</p>
                 <h2 id="index-workflow-title">Index for grounded Q&amp;A</h2>
               </div>
             </div>
@@ -408,7 +408,7 @@ export default function Home() {
             {submitErrors.index ? <InlineError>{submitErrors.index}</InlineError> : null}
             <Button
               type="button"
-              variant="outline"
+              variant="secondary"
               className="workspace-index__button"
               disabled={!repo.trim() || submitting.index || indexState.job?.status === 'pending'}
               onClick={() => submit('index')}

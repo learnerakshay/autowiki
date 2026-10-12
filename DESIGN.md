@@ -13,6 +13,9 @@ colors:
   deep-indigo: "#2947bd"
   indigo-wash: "#edf1ff"
   indigo-rule: "#c7d2fb"
+  operational-cyan: "#0e7490"
+  operational-cyan-wash: "#ecf9fc"
+  operational-cyan-rule: "#b9e4ee"
   verified-green: "#176b43"
   verified-wash: "#eaf7f0"
   danger-red: "#9f2835"
@@ -118,8 +121,10 @@ The interface is evidence-led rather than ornamental. Dense technical material s
 - Clean Light surfaces with cool tonal separation.
 - Strong editorial hierarchy with technical, factual detail.
 - Restrained indigo reserved for action, state, icons, and connectors.
+- Truthful worker status with cyan operational signals and no invented completion data.
 - Border-led structure with quiet, exceptional elevation.
 - Authentic repository paths, chapters, diagrams, and product evidence.
+- Grounded Chat keeps each submitted repository and question visibly bound to one answer and its returned source paths.
 
 ## Colors
 
@@ -144,6 +149,7 @@ The palette is a cool neutral document field with one disciplined indigo voice a
 
 ### Secondary
 
+- **Operational Cyan / Operational Cyan Wash / Operational Cyan Rule:** Identify live worker boundaries and current generation activity without competing with indigo actions or implying completion.
 - **Verified Green / Verified Wash:** Communicate authentic, completed, or verified output.
 - **Danger Red / Danger Wash:** Communicate failures and blocking errors only.
 
@@ -161,7 +167,7 @@ The palette is a cool neutral document field with one disciplined indigo voice a
 
 **Label/Mono Font:** SFMono-Regular (with Consolas and Liberation Mono fallbacks)
 
-**Character:** Manrope gives the landing page an editorial, compact display voice, while Segoe keeps product controls and long-form reading familiar and efficient. Monospace is used as evidence for paths, sequence numbers, code, and repository metadata.
+**Character:** Manrope gives landing displays, document identity, and operational state headings an editorial, compact voice, while Segoe keeps product controls and long-form reading familiar and efficient. Monospace is used as evidence for paths, sequence numbers, code, and repository metadata.
 
 ### Hierarchy
 
@@ -174,7 +180,7 @@ The palette is a cool neutral document field with one disciplined indigo voice a
 
 ### Named Rules
 
-**The Landing Display Rule.** Manrope belongs only to landing display headings; body copy, navigation, controls, and workspace UI remain Segoe.
+**The Identity Display Rule.** Manrope identifies the product, generated document, or current operational state; body copy, navigation, controls, and dense workspace UI remain Segoe.
 
 **The Metadata Is Evidence Rule.** Use monospace sparingly where literal paths, code, sequence, or repository structure make the interface more trustworthy.
 
@@ -183,6 +189,12 @@ The palette is a cool neutral document field with one disciplined indigo voice a
 The system uses centered content frames with an operational maximum width of 72rem and a wider landing frame of 80rem. Editorial landing sections settle at 76rem and use an 8rem desktop section rhythm. The hero and major section headings are deliberately asymmetric: message and proof, or statement and explanation, occupy unequal columns instead of a centered stack.
 
 The landing composition shifts at four observed breakpoints: 1120px tightens the split hero, 900px stacks the hero and hides the long landing navigation, 760px converts multi-column product structures to compact grids, and 520px creates a dedicated phone composition with full-width actions, horizontal chapter tabs, vertical proof flows, and one-column pipeline stages. Touch targets remain at least 2.75rem high, and the layout never assumes more than a 320px viewport.
+
+The operational Wiki reader uses a wider 84rem frame than the general application shell. At 900px, its sticky chapter rail becomes a labeled native chapter selector; at 760px, document identity and actions stack; at 520px, actions become full-width and the chapter position moves above the adjacent-chapter controls. Horizontal chapter tabs remain appropriate for the compact landing-page proof, where they preview the product rather than carry the reader's primary navigation.
+
+Wiki generation status is one shared operational component across Workspace and the `/wiki` pending route. Workspace uses its compact expression beneath the submitted repository context; the pending route gives the same component a calm 48rem reading measure inside the wider Wiki frame. At 520px, the heading stacks, long repository identifiers wrap, and the five-stage overview becomes two columns without changing the reported state.
+
+Grounded Chat stays inside the standard 72rem application frame. Its repository context and question share one substantial composer rather than separate cards. A completed request becomes a two-column evidence view: Markdown answer in the flexible reading column and a 16–19rem source-path rail beside it. The rail moves below the answer at 900px, the repository row stacks at 760px, and 520px turns suggestions, actions, and answer controls into full-width rows. Pending, failed, and completed states all repeat the submitted repository and question so composer edits cannot visually rewrite the active request.
 
 Spacing follows a four-pixel base with recurring 0.5rem, 0.75rem, 1rem, 1.5rem, 2rem, and 3rem steps. Dense product proof uses the smaller steps; editorial sections use the larger steps and preserve visible breathing room between narrative beats.
 
@@ -243,7 +255,25 @@ Navigation uses compact 2.75rem touch targets, semibold Segoe labels, transparen
 
 ### Documentation Reader
 
-The signature reader combines a muted browser bar, repository identity row, chapter rail, white document surface, path metadata, and a bordered diagram field. Chapter switching is keyboard-operable. On small screens, the rail becomes a horizontal tab strip above the document rather than shrinking into an unreadable sidebar.
+The reader has two expressions. The compact landing-page proof combines a muted browser bar, repository identity row, horizontal chapter preview, white document surface, path metadata, and a bordered diagram field. The operational reader uses a document header, sticky numbered rail, source-path chips, semantic Markdown, an independent diagram card, and adjacent-chapter pagination.
+
+Chapter switching is keyboard-operable. Generated prose keeps its headings subordinate to the chapter title and stays within a focused reading measure; wide tables, code blocks, and Mermaid diagrams scroll inside their own bounded regions instead of widening the page. Below 900px, the operational rail becomes a labeled native selector rather than shrinking into an unreadable sidebar.
+
+### Generation Activity
+
+The shared generation status reports the latest boundary entered by the real worker: queued, repository retrieval, outline planning, combined chapter-and-diagram generation, and persistence. Repository identity stays visible when known; the opaque job identifier remains secondary inside disclosure rather than competing with the current operation.
+
+The chapter count appears only while the worker supplies a valid current chapter and total. Missing or unrecognized progress remains an explicit running-but-unavailable state; it never backfills an inferred stage, percentage, elapsed estimate, or completion time.
+
+**The Honest Activity Rule.** The continuous line is an indeterminate activity signal, never a completion meter. The current-operation panel enters once and repeats its restrained 240ms response only when its resolved worker stage or validated chapter boundary changes; under reduced motion, remove the line entirely and show the same status content statically so no frozen segment can be mistaken for a percentage.
+
+### Grounded Repository Q&A
+
+Chat is a focused single-request tool, not a transcript. The composer combines editable repository context, a generous question field, lightweight prompt suggestions, and one indigo Ask action. While a request runs, show the submitted repository and question with a cyan indeterminate line; do not invent retrieval stages. On completion, render the returned answer through the same semantic Markdown rules as the Wiki reader and place only the service-returned file paths in the adjacent cyan evidence rail. If no paths arrive, state that none were returned rather than inferring citations.
+
+Draft edits may coexist with an active request, but a visible notice must explain that they do not alter it. “Ask another question” clears the prior result instead of extending a conversational thread. The result enters as one short 240ms response, source rows follow at 180ms with a 25ms stagger, and reduced-motion users receive the same content without those transitions.
+
+**The Bound Evidence Rule.** Each Chat submission keeps its submitted repository and question attached to the pending state, final Markdown answer, and only the source paths the service actually returns; draft edits cannot rewrite the active request.
 
 ### Brand Mark
 
@@ -255,9 +285,11 @@ The AutoWiki mark combines document geometry with repository branching inside an
 
 - **Do** put authentic repository paths, chapter names, diagrams, and generated output at the center of product proof.
 - **Do** use borders, tonal surfaces, and spacing as the primary hierarchy tools.
-- **Do** preserve Manrope for landing display headings and Segoe for all body and UI text.
+- **Do** preserve Manrope for landing displays, generated-document identity, and operational state headings, with Segoe for body copy and controls.
 - **Do** keep interactive targets at least 2.75rem high with visible keyboard focus.
 - **Do** provide purpose-built desktop and mobile compositions and honor reduced-motion preferences.
+- **Do** share the real worker status between Workspace and `/wiki`, preserving its five backend-reported boundaries and factual chapter counts.
+- **Do** preserve the one-to-one binding between a Chat submission, its Markdown answer, and the actual source paths returned for that request.
 
 ### Don't:
 
@@ -266,3 +298,5 @@ The AutoWiki mark combines document geometry with repository branching inside an
 - **Don't** use large shadows where a one-pixel border or cool surface change already defines structure.
 - **Don't** introduce oversized pills or corner radii beyond the established compact document geometry.
 - **Don't** fabricate metrics, testimonials, repositories, progress states, or product capabilities as visual filler.
+- **Don't** turn indeterminate Wiki activity into a percentage, elapsed-time estimate, completion forecast, or reduced-motion segment that looks like progress.
+- **Don't** present grounded Chat as a conversational transcript, infer missing citations, or let draft edits relabel an in-flight or completed request.
