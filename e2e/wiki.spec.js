@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 test("wiki replaces chapter content and keeps exactly one Mermaid SVG", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/workspace");
   await page.screenshot({ path: "screenshots/home.png", fullPage: true });
   await page.getByLabel("GitHub repository").fill("octocat/Spoon-Knife");
   await page.getByRole("button", { name: "Generate Wiki" }).click();

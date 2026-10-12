@@ -1,0 +1,220 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-12T21:35:05.9302728+05:30",
+  "title": "Design System: AutoWiki",
+  "extensions": {
+    "colorMeta": {
+      "cool-canvas": {
+        "role": "neutral",
+        "displayName": "Cool Canvas",
+        "canonical": "#f6f8fb",
+        "tonalRamp": ["#172033", "#33415a", "#596579", "#8490a3", "#b7c0ce", "#d7dee9", "#f1f4f8", "#f6f8fb"]
+      },
+      "reading-white": {
+        "role": "neutral",
+        "displayName": "Reading White",
+        "canonical": "#ffffff",
+        "tonalRamp": ["#172033", "#33415a", "#596579", "#8490a3", "#b7c0ce", "#d7dee9", "#f6f8fb", "#ffffff"]
+      },
+      "repository-ink": {
+        "role": "neutral",
+        "displayName": "Repository Ink",
+        "canonical": "#172033",
+        "tonalRamp": ["#111725", "#172033", "#26334b", "#33415a", "#596579", "#8490a3", "#d7dee9", "#f6f8fb"]
+      },
+      "cool-mist": {
+        "role": "neutral",
+        "displayName": "Cool Mist",
+        "canonical": "#f1f4f8",
+        "tonalRamp": ["#172033", "#33415a", "#596579", "#8490a3", "#b7c0ce", "#d7dee9", "#f1f4f8", "#ffffff"]
+      },
+      "slate-copy": {
+        "role": "neutral",
+        "displayName": "Slate Copy",
+        "canonical": "#596579",
+        "tonalRamp": ["#172033", "#26334b", "#33415a", "#596579", "#6e798b", "#98a4b6", "#d7dee9", "#f1f4f8"]
+      },
+      "quiet-rule": {
+        "role": "neutral",
+        "displayName": "Quiet Rule",
+        "canonical": "#d7dee9",
+        "tonalRamp": ["#172033", "#33415a", "#596579", "#8490a3", "#98a4b6", "#b7c0ce", "#d7dee9", "#f6f8fb"]
+      },
+      "strong-rule": {
+        "role": "neutral",
+        "displayName": "Strong Rule",
+        "canonical": "#8490a3",
+        "tonalRamp": ["#172033", "#26334b", "#33415a", "#596579", "#8490a3", "#b7c0ce", "#d7dee9", "#f6f8fb"]
+      },
+      "restrained-indigo": {
+        "role": "primary",
+        "displayName": "Restrained Indigo",
+        "canonical": "#3657d6",
+        "tonalRamp": ["#111a4d", "#1b2d78", "#2947bd", "#3657d6", "#637ce3", "#9fb0ff", "#d7dfff", "#edf1ff"]
+      },
+      "deep-indigo": {
+        "role": "primary",
+        "displayName": "Deep Indigo",
+        "canonical": "#2947bd",
+        "tonalRamp": ["#101844", "#18266c", "#2947bd", "#3657d6", "#637ce3", "#9fb0ff", "#d7dfff", "#edf1ff"]
+      },
+      "indigo-wash": {
+        "role": "primary",
+        "displayName": "Indigo Wash",
+        "canonical": "#edf1ff",
+        "tonalRamp": ["#111a4d", "#1b2d78", "#2947bd", "#3657d6", "#637ce3", "#9fb0ff", "#d7dfff", "#edf1ff"]
+      },
+      "indigo-rule": {
+        "role": "primary",
+        "displayName": "Indigo Rule",
+        "canonical": "#c7d2fb",
+        "tonalRamp": ["#111a4d", "#1b2d78", "#2947bd", "#3657d6", "#637ce3", "#9fb0ff", "#c7d2fb", "#edf1ff"]
+      },
+      "verified-green": {
+        "role": "secondary",
+        "displayName": "Verified Green",
+        "canonical": "#176b43",
+        "tonalRamp": ["#0b3320", "#115136", "#176b43", "#32865c", "#65aa82", "#9bc9ad", "#b8dfc9", "#eaf7f0"]
+      },
+      "verified-wash": {
+        "role": "secondary",
+        "displayName": "Verified Wash",
+        "canonical": "#eaf7f0",
+        "tonalRamp": ["#0b3320", "#115136", "#176b43", "#32865c", "#65aa82", "#9bc9ad", "#b8dfc9", "#eaf7f0"]
+      },
+      "danger-red": {
+        "role": "secondary",
+        "displayName": "Danger Red",
+        "canonical": "#9f2835",
+        "tonalRamp": ["#421018", "#6d1a25", "#9f2835", "#be4b58", "#d87984", "#e9a7ae", "#efc1c7", "#fff0f2"]
+      },
+      "danger-wash": {
+        "role": "secondary",
+        "displayName": "Danger Wash",
+        "canonical": "#fff0f2",
+        "tonalRamp": ["#421018", "#6d1a25", "#9f2835", "#be4b58", "#d87984", "#e9a7ae", "#efc1c7", "#fff0f2"]
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Landing Display", "purpose": "Hero statements on the landing surface only." },
+      "headline": { "displayName": "Editorial Headline", "purpose": "Landing section statements and final calls to action." },
+      "title": { "displayName": "Product Title", "purpose": "Cards, proof modules, generated chapters, and compact section titles." },
+      "body": { "displayName": "Reading Body", "purpose": "Product explanations and long-form technical reading." },
+      "label": { "displayName": "Technical Label", "purpose": "Eyebrows, captions, verified-state labels, and compact metadata." },
+      "code": { "displayName": "Repository Mono", "purpose": "Paths, chapter numbers, code, and literal technical values." }
+    },
+    "shadows": [
+      { "name": "hairline-card", "value": "0 1px 2px rgba(23, 32, 51, 0.04)", "purpose": "Quiet reinforcement for bordered cards." },
+      { "name": "floating-reader", "value": "0 24px 60px rgba(23, 32, 51, 0.12)", "purpose": "Lifts the verified documentation reader above the hero canvas." },
+      { "name": "transient-toast", "value": "0 16px 42px rgba(30, 42, 68, 0.14)", "purpose": "Separates temporary feedback from the application workspace." },
+      { "name": "focus-field", "value": "0 0 0 1px #ffffff, 0 0 0 3px #3657d6", "purpose": "Two-layer keyboard focus treatment for text fields." }
+    ],
+    "motion": [
+      { "name": "state-fast", "value": "140ms ease", "purpose": "Navigation, input, and textarea state changes." },
+      { "name": "state-standard", "value": "150ms ease", "purpose": "Buttons, landing links, and directional icons." },
+      { "name": "hero-copy-entrance", "value": "0.55s power3.out with 0.07s stagger", "purpose": "One-time landing hero copy entrance when reduced motion is not requested." },
+      { "name": "hero-reader-entrance", "value": "0.72s power4.out after 0.14s", "purpose": "One-time documentation reader entrance when reduced motion is not requested." }
+    ],
+    "breakpoints": [
+      { "name": "landing-tight", "value": "1120px" },
+      { "name": "landing-stack", "value": "900px" },
+      { "name": "compact-layout", "value": "760px" },
+      { "name": "phone", "value": "520px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The leading action in a region, optionally ending with a compact directional arrow.",
+      "html": "<button class=\"ds-btn-primary\">Generate a Wiki <svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M5 12h14M13 6l6 6-6 6\"/></svg></button>",
+      "css": ".ds-btn-primary { display:inline-flex; min-height:44px; align-items:center; justify-content:center; gap:8px; border:1px solid var(--primary, #3657d6); border-radius:8px; background:var(--primary, #3657d6); padding:0 16px; color:var(--primary-foreground, #fff); font:600 14px/1 \"Segoe UI Variable\", \"Segoe UI\", sans-serif; transition:color 150ms ease, background-color 150ms ease, border-color 150ms ease, transform 150ms ease; } .ds-btn-primary svg { width:16px; height:16px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; transition:transform 150ms ease; } .ds-btn-primary:hover { border-color:var(--primary-hover, #2947bd); background:var(--primary-hover, #2947bd); } .ds-btn-primary:hover svg { transform:translateX(2px); } .ds-btn-primary:active { transform:translateY(1px); } .ds-btn-primary:focus-visible { outline:2px solid var(--primary, #3657d6); outline-offset:3px; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "A bordered alternative for supporting actions beside a primary decision.",
+      "html": "<button class=\"ds-btn-secondary\">Explore How It Works</button>",
+      "css": ".ds-btn-secondary { display:inline-flex; min-height:44px; align-items:center; justify-content:center; border:1px solid var(--border-strong, #8490a3); border-radius:8px; background:var(--background, #fff); padding:0 16px; color:var(--foreground, #172033); font:600 14px/1 \"Segoe UI Variable\", \"Segoe UI\", sans-serif; transition:color 150ms ease, background-color 150ms ease, border-color 150ms ease, transform 150ms ease; } .ds-btn-secondary:hover { border-color:color-mix(in srgb, var(--primary, #3657d6) 45%, transparent); background:var(--accent-soft, #edf1ff); color:var(--primary-hover, #2947bd); } .ds-btn-secondary:active { transform:translateY(1px); } .ds-btn-secondary:focus-visible { outline:2px solid var(--primary, #3657d6); outline-offset:3px; }"
+    },
+    {
+      "name": "Repository Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "A strong-stroke text field for owner/repository values and other technical input.",
+      "html": "<label class=\"ds-field-label\" for=\"ds-repo\">Public repository</label><input class=\"ds-input\" id=\"ds-repo\" placeholder=\"owner/repository\" />",
+      "css": ".ds-field-label { display:block; margin:0 0 8px; color:var(--foreground, #172033); font:600 14px/1 \"Segoe UI Variable\", \"Segoe UI\", sans-serif; } .ds-input { display:flex; width:100%; height:44px; border:1px solid var(--border-strong, #8490a3); border-radius:8px; outline:none; background:var(--background, #fff); padding:0 14px; color:var(--foreground, #172033); font:400 15px/1.4 \"Segoe UI Variable\", \"Segoe UI\", sans-serif; transition:border-color 140ms ease, box-shadow 140ms ease, background-color 140ms ease; } .ds-input::placeholder { color:var(--muted-foreground, #596579); } .ds-input:hover { border-color:color-mix(in srgb, var(--foreground, #172033) 45%, transparent); } .ds-input:focus-visible { border-color:var(--primary, #3657d6); box-shadow:0 0 0 1px var(--background, #fff), 0 0 0 3px var(--primary, #3657d6); }"
+    },
+    {
+      "name": "Active Navigation Link",
+      "kind": "nav",
+      "description": "Compact application navigation with an indigo-wash active state.",
+      "html": "<nav class=\"ds-nav\" aria-label=\"Main navigation\"><a class=\"ds-nav-link\" href=\"#\">Workspace</a><a class=\"ds-nav-link ds-nav-link-active\" href=\"#\">Wiki</a><a class=\"ds-nav-link\" href=\"#\">Chat</a></nav>",
+      "css": ".ds-nav { display:flex; align-items:center; gap:4px; } .ds-nav-link { display:inline-flex; min-height:44px; align-items:center; border:1px solid transparent; border-radius:8px; padding:0 12px; color:var(--muted-foreground, #596579); font:600 14px/1 \"Segoe UI Variable\", \"Segoe UI\", sans-serif; text-decoration:none; transition:color 140ms ease, background-color 140ms ease, border-color 140ms ease, transform 140ms ease; } .ds-nav-link:hover { border-color:var(--border, #d7dee9); background:var(--surface-subtle, #f1f4f8); color:var(--foreground, #172033); } .ds-nav-link:active { transform:translateY(1px); } .ds-nav-link:focus-visible { outline:2px solid var(--primary, #3657d6); outline-offset:3px; } .ds-nav-link-active, .ds-nav-link-active:hover { border-color:var(--pending-border, #c7d2fb); background:var(--accent-soft, #edf1ff); color:var(--primary-hover, #2947bd); font-weight:700; }"
+    },
+    {
+      "name": "Verified Badge",
+      "kind": "chip",
+      "description": "A compact semantic badge for authentic or completed output.",
+      "html": "<span class=\"ds-badge-verified\">Verified output</span>",
+      "css": ".ds-badge-verified { display:inline-flex; min-height:24px; align-items:center; border:1px solid var(--success-border, #b8dfc9); border-radius:6px; background:var(--success-soft, #eaf7f0); padding:4px 8px; color:var(--success, #176b43); font:800 10px/1 \"Segoe UI Variable\", \"Segoe UI\", sans-serif; letter-spacing:0.04em; text-transform:uppercase; } .ds-badge-verified:focus-visible { outline:2px solid var(--primary, #3657d6); outline-offset:3px; }"
+    },
+    {
+      "name": "Document Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "The default white reading container with a crisp rule and nearly imperceptible lift.",
+      "html": "<article class=\"ds-card\"><h3>Repository source</h3><p>Provide a public GitHub repository in owner/repository format.</p></article>",
+      "css": ".ds-card { max-width:480px; border:1px solid var(--border, #d7dee9); border-radius:12px; background:var(--card, #fff); padding:24px; color:var(--foreground, #172033); box-shadow:0 1px 2px rgba(23,32,51,0.04); font-family:\"Segoe UI Variable\", \"Segoe UI\", sans-serif; transition:border-color 150ms ease, transform 150ms ease; } .ds-card h3 { margin:0; font-size:18px; font-weight:600; letter-spacing:-0.02em; } .ds-card p { margin:8px 0 0; max-width:42ch; color:var(--muted-foreground, #596579); font-size:14px; line-height:1.7; } .ds-card:hover { border-color:var(--border-strong, #8490a3); } .ds-card:focus-within { outline:2px solid var(--primary, #3657d6); outline-offset:3px; }"
+    },
+    {
+      "name": "Chapter Tab",
+      "kind": "custom",
+      "refersTo": "tab-active",
+      "description": "A keyboard-operable chapter selector pairing a monospace sequence with an editorial label.",
+      "html": "<div class=\"ds-chapters\" role=\"tablist\"><button class=\"ds-chapter ds-chapter-active\" role=\"tab\" aria-selected=\"true\"><span>01</span>Introduction</button><button class=\"ds-chapter\" role=\"tab\"><span>02</span>Web Structure</button></div>",
+      "css": ".ds-chapters { display:grid; gap:4px; padding:8px; background:var(--surface-subtle, #f1f4f8); } .ds-chapter { display:grid; min-height:44px; grid-template-columns:22px minmax(0,1fr); align-items:center; gap:4px; border:1px solid transparent; border-radius:8px; background:transparent; padding:0 14px; color:var(--muted-foreground, #596579); font:500 14px/1 \"Segoe UI Variable\", \"Segoe UI\", sans-serif; text-align:left; transition:color 150ms ease, background-color 150ms ease, border-color 150ms ease, transform 150ms ease; } .ds-chapter span { color:#6e798b; font:400 10px/1 \"SFMono-Regular\", Consolas, monospace; } .ds-chapter:hover { border-color:var(--border, #d7dee9); background:var(--background, #fff); color:var(--foreground, #172033); } .ds-chapter:active { transform:translateY(1px); } .ds-chapter:focus-visible { outline:2px solid var(--primary, #3657d6); outline-offset:2px; } .ds-chapter-active { border-color:color-mix(in srgb, var(--primary, #3657d6) 20%, transparent); background:var(--accent-soft, #edf1ff); color:var(--primary-hover, #2947bd); font-weight:600; }"
+    },
+    {
+      "name": "Documentation Reader",
+      "kind": "custom",
+      "description": "The signature proof surface: repository identity, chapter rail, generated chapter, and a diagram excerpt in one bordered window.",
+      "html": "<section class=\"ds-reader\"><header class=\"ds-reader-bar\"><span>autowiki / octocat / Spoon-Knife</span><b>Verified output</b></header><div class=\"ds-reader-body\"><aside><small>Chapters</small><button class=\"ds-reader-tab\">01&nbsp;&nbsp;Introduction</button><button class=\"ds-reader-tab\">02&nbsp;&nbsp;Web Structure</button></aside><article><em>Generated chapter</em><h3>Introduction</h3><p>Overview of the project and its purpose.</p><figure><figcaption>Mermaid diagram excerpt</figcaption><div><span>README.md</span><i></i><span>Forking Process</span><i></i><span>Personal Copy</span></div></figure></article></div></section>",
+      "css": ".ds-reader { overflow:hidden; border:1px solid #cbd4e2; border-radius:12px; background:var(--background, #fff); color:var(--foreground, #172033); box-shadow:0 24px 60px rgba(23,32,51,0.12); font-family:\"Segoe UI Variable\", \"Segoe UI\", sans-serif; } .ds-reader-bar { display:flex; min-height:44px; align-items:center; justify-content:space-between; gap:12px; border-bottom:1px solid var(--border, #d7dee9); background:var(--muted, #f1f4f8); padding:0 14px; color:var(--muted-foreground, #596579); font:400 11px/1 \"SFMono-Regular\", Consolas, monospace; } .ds-reader-bar b { border:1px solid var(--success-border, #b8dfc9); border-radius:6px; background:var(--success-soft, #eaf7f0); padding:4px 7px; color:var(--success, #176b43); font:800 10px/1 \"Segoe UI Variable\", \"Segoe UI\", sans-serif; letter-spacing:0.04em; text-transform:uppercase; } .ds-reader-body { display:grid; grid-template-columns:168px minmax(0,1fr); min-height:300px; } .ds-reader aside { border-right:1px solid var(--border, #d7dee9); background:var(--surface-subtle, #f1f4f8); padding:16px 10px; } .ds-reader aside small { display:block; margin:0 8px 10px; color:var(--muted-foreground, #596579); font-size:11px; font-weight:700; letter-spacing:0.04em; text-transform:uppercase; } .ds-reader-tab { display:block; width:100%; min-height:44px; border:1px solid transparent; border-radius:8px; background:transparent; padding:0 8px; color:var(--muted-foreground, #596579); text-align:left; } .ds-reader-tab:hover { border-color:var(--border, #d7dee9); background:var(--background, #fff); color:var(--foreground, #172033); } .ds-reader-tab:focus-visible { outline:2px solid var(--primary, #3657d6); outline-offset:2px; } .ds-reader article { padding:20px 22px; } .ds-reader article em { color:var(--primary, #3657d6); font-size:10px; font-style:normal; font-weight:800; letter-spacing:0.05em; text-transform:uppercase; } .ds-reader article h3 { margin:5px 0; font-size:20px; letter-spacing:-0.025em; } .ds-reader article p { margin:0; color:var(--muted-foreground, #596579); font-size:12px; line-height:1.6; } .ds-reader figure { margin:22px 0 0; overflow:hidden; border:1px solid var(--border, #d7dee9); border-radius:10px; background:var(--surface-subtle, #f1f4f8); } .ds-reader figcaption { border-bottom:1px solid var(--border, #d7dee9); padding:10px 12px; color:var(--muted-foreground, #596579); font-size:11px; font-weight:700; } .ds-reader figure div { display:grid; grid-template-columns:1fr 12px 1fr 12px 1fr; align-items:center; gap:8px; padding:16px; } .ds-reader figure span { display:grid; min-height:56px; place-items:center; border:1px solid var(--pending-border, #c7d2fb); border-radius:8px; background:var(--accent-soft, #edf1ff); padding:8px; font-size:11px; font-weight:700; text-align:center; } .ds-reader figure i { height:1px; background:var(--border-strong, #8490a3); } @media (max-width:520px) { .ds-reader-body { grid-template-columns:1fr; } .ds-reader aside { display:flex; overflow:auto; border-right:0; border-bottom:1px solid var(--border, #d7dee9); padding:12px; } .ds-reader aside small { display:none; } .ds-reader-tab { min-width:136px; } .ds-reader article { padding:16px; } .ds-reader figure div { gap:6px; padding:12px; } }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Documentation Studio",
+    "overview": "AutoWiki is a clean, light workspace where repository structure becomes readable documentation. The visual system feels editorial and technical at once: cool canvas surrounds white reading surfaces, crisp rules establish hierarchy, and restrained indigo marks action, state, and connective logic.\n\nThe interface is evidence-led rather than ornamental. Dense technical material stays approachable through clear grouping, generous section rhythm, compact monospace metadata, and product proof that looks and behaves like the real reader. The result should feel precise, credible, and calm—not like a generic chatbot or a decorative AI landing template.",
+    "keyCharacteristics": [
+      "Clean Light surfaces with cool tonal separation.",
+      "Strong editorial hierarchy with technical, factual detail.",
+      "Restrained indigo reserved for action, state, icons, and connectors.",
+      "Border-led structure with quiet, exceptional elevation.",
+      "Authentic repository paths, chapters, diagrams, and product evidence."
+    ],
+    "rules": [
+      { "name": "The Restrained Indigo Rule", "body": "Indigo is a navigational and semantic signal, not a decorative fill; reserve it for decisions, state, and connective logic.", "section": "colors" },
+      { "name": "The Cool Neutral Rule", "body": "Reading white belongs inside cool canvas and mist fields so sections remain visible without beige warmth or heavy gray blocks.", "section": "colors" },
+      { "name": "The Landing Display Rule", "body": "Manrope belongs only to landing display headings; body copy, navigation, controls, and workspace UI remain Segoe.", "section": "typography" },
+      { "name": "The Metadata Is Evidence Rule", "body": "Use monospace sparingly where literal paths, code, sequence, or repository structure make the interface more trustworthy.", "section": "typography" },
+      { "name": "The Border-Before-Shadow Rule", "body": "Establish hierarchy with surface tone and a one-pixel rule before adding elevation; shadows must explain physical separation, not decorate a container.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do put authentic repository paths, chapter names, diagrams, and generated output at the center of product proof.",
+      "Do use borders, tonal surfaces, and spacing as the primary hierarchy tools.",
+      "Do preserve Manrope for landing display headings and Segoe for all body and UI text.",
+      "Do keep interactive targets at least 2.75rem high with visible keyboard focus.",
+      "Do provide purpose-built desktop and mobile compositions and honor reduced-motion preferences."
+    ],
+    "donts": [
+      "Don't turn AutoWiki into a generic chatbot visual language; the structured wiki is the flagship artifact.",
+      "Don't flood screens with indigo, gradients, decorative glow, or unsupported AI spectacle.",
+      "Don't use large shadows where a one-pixel border or cool surface change already defines structure.",
+      "Don't introduce oversized pills or corner radii beyond the established compact document geometry.",
+      "Don't fabricate metrics, testimonials, repositories, progress states, or product capabilities as visual filler."
+    ]
+  }
+}
