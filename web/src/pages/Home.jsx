@@ -354,6 +354,9 @@ export default function Home() {
               </Button>
               <p>Creates chapters, technical explanations, and architecture diagrams.</p>
             </div>
+            <p className="workspace-sample-link">
+              Presenting AutoWiki? <Link to="/wiki/sample/spoon-knife">Open the pre-generated Spoon-Knife Wiki</Link> without starting a backend job.
+            </p>
           </form>
 
           <WorkspaceJobCard

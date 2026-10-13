@@ -1,0 +1,221 @@
+export const architectureNodes = [
+  {
+    id: 'react',
+    label: 'React client',
+    shortLabel: 'React',
+    group: 'Client',
+    description: 'Starts Wiki, Index, and Chat jobs, then polls the matching Express endpoint until the job leaves pending state.',
+    responsibility: 'Presentation, request submission, two-second polling, and secure rendering of returned Markdown and Mermaid output.',
+    files: ['web/src/App.jsx', 'web/src/useJobPoll.js', 'web/src/pages/Wiki.jsx', 'web/src/pages/Chat.jsx'],
+    position: { x: 7, y: 12 },
+  },
+  {
+    id: 'express',
+    label: 'Express API',
+    shortLabel: 'Express',
+    group: 'API boundary',
+    description: 'Validates requests, creates process-local job records, dispatches Inngest events, and exposes polling responses.',
+    responsibility: 'The only browser-facing boundary. Provider credentials remain in the server process and never enter React.',
+    files: ['src/index.js', 'src/routes/wiki.routes.js', 'src/routes/index.routes.js', 'src/routes/chat.routes.js'],
+    position: { x: 37, y: 12 },
+  },
+  {
+    id: 'jobs',
+    label: 'Shared job store',
+    shortLabel: 'Job store',
+    group: 'Coordination',
+    description: 'A process-local Map stores pending, completed, and failed records for all three workflows.',
+    responsibility: 'Provides one small polling contract. Records disappear on an Express restart and are not shared across server instances.',
+    files: ['src/service/jobStore.js'],
+    position: { x: 68, y: 12 },
+  },
+  {
+    id: 'inngest',
+    label: 'Inngest functions',
+    shortLabel: 'Inngest',
+    group: 'Background execution',
+    description: 'Consumes three explicit events and runs repository indexing, grounded questions, or Wiki generation outside the HTTP request.',
+    responsibility: 'Step-based background execution with terminal onFailure handlers that mark jobs failed only after retries are exhausted.',
+    files: ['src/inngest/client.js', 'src/inngest/index.js', 'src/inngest/functions/generateWiki.js', 'src/inngest/functions/indexRepo.js', 'src/inngest/functions/askQuestions.js'],
+    position: { x: 37, y: 42 },
+  },
+  {
+    id: 'github',
+    label: 'GitHub source',
+    shortLabel: 'GitHub',
+    group: 'Repository input',
+    description: 'Reads repository metadata, the recursive tree, and up to 200 eligible text files through Octokit.',
+    responsibility: 'Filters generated directories, binary formats, lockfiles, minified JavaScript, and files larger than 200 KB before download.',
+    files: ['src/service/github.js'],
+    position: { x: 7, y: 73 },
+  },
+  {
+    id: 'openai',
+    label: 'OpenAI models',
+    shortLabel: 'OpenAI',
+    group: 'Generation + embeddings',
+    description: 'Uses gpt-4o-mini for outline, chapter, and grounded-answer generation, plus text-embedding-3-small for vector search.',
+    responsibility: 'Wiki chapter prose and Mermaid source are returned together by one chapter model call—not separate generation stages.',
+    files: ['src/service/wiki.js', 'src/service/rag.js', 'src/service/vectorStore.js'],
+    position: { x: 37, y: 73 },
+  },
+  {
+    id: 'pinecone',
+    label: 'Pinecone index',
+    shortLabel: 'Pinecone',
+    group: 'Chat only',
+    description: 'Stores embedded source chunks by repository namespace and retrieves the top five matching chunks for a question.',
+    responsibility: 'Supports Index and Chat only. Wiki generation never depends on this vector path.',
+    files: ['src/service/vectorStore.js', 'src/service/chunker.js'],
+    position: { x: 68, y: 73 },
+  },
+  {
+    id: 'artifact',
+    label: 'Wiki artifact',
+    shortLabel: 'Wiki JSON',
+    group: 'Generated output',
+    description: 'Writes the latest generated repository Wiki to wiki-output/<owner>-<repo>.json after all chapters finish.',
+    responsibility: 'The JSON survives a process restart, but the current app has no endpoint that rehydrates a lost polling job from it.',
+    files: ['src/inngest/functions/generateWiki.js', 'wiki-output/octocat-Spoon-Knife.json'],
+    position: { x: 68, y: 42 },
+  },
+]
+
+export const architectureConnections = [
+  { from: 'react', to: 'express', label: 'HTTP requests', workflows: ['wiki', 'rag', 'shared'] },
+  { from: 'express', to: 'jobs', label: 'create + read', workflows: ['wiki', 'rag', 'shared'] },
+  { from: 'express', to: 'inngest', label: 'dispatch event', workflows: ['wiki', 'rag', 'shared'] },
+  { from: 'inngest', to: 'github', label: 'fetch files', workflows: ['wiki', 'rag'] },
+  { from: 'inngest', to: 'openai', label: 'generate / embed', workflows: ['wiki', 'rag'] },
+  { from: 'inngest', to: 'pinecone', label: 'upsert / query', workflows: ['rag'] },
+  { from: 'inngest', to: 'artifact', label: 'persist Wiki', workflows: ['wiki'] },
+  { from: 'inngest', to: 'jobs', label: 'result / failure', workflows: ['wiki', 'rag', 'shared'] },
+  { from: 'jobs', to: 'react', label: 'poll response', workflows: ['wiki', 'rag', 'shared'], curved: true },
+]
+
+export const wikiStages = [
+  {
+    id: 'fetch',
+    label: 'Read eligible source',
+    progress: 'fetching_repository',
+    input: 'A validated owner/repository identifier and server-side GitHub token.',
+    operation: 'Octokit reads the default branch tree, filters unsupported content, and downloads at most 200 eligible files.',
+    output: 'Repository paths and UTF-8 source content.',
+    files: ['src/service/github.js', 'src/inngest/functions/generateWiki.js'],
+  },
+  {
+    id: 'outline',
+    label: 'Plan the outline',
+    progress: 'planning_outline',
+    input: 'Verified repository file paths.',
+    operation: 'gpt-4o-mini plans one to eight chapters. Invalid JSON gets one stricter retry, then a deterministic Overview fallback.',
+    output: 'A bounded chapter plan with source paths assigned to each chapter.',
+    files: ['src/service/wiki.js'],
+  },
+  {
+    id: 'chapters',
+    label: 'Write chapters + diagrams',
+    progress: 'generating_chapter',
+    input: 'One chapter plan and up to 3,000 characters from each assigned source file.',
+    operation: 'One model call returns both explanatory Markdown and a fenced-free Mermaid definition. Each chapter runs as its own Inngest step.',
+    output: 'Chapter prose, source-path evidence, Mermaid source, and a validation flag.',
+    files: ['src/service/wiki.js', 'src/inngest/functions/generateWiki.js'],
+  },
+  {
+    id: 'save',
+    label: 'Save the Wiki',
+    progress: 'saving_wiki',
+    input: 'The generated repository name, timestamp, and completed chapters.',
+    operation: 'Writes formatted JSON to wiki-output and then marks the polling job completed.',
+    output: 'A local Wiki artifact plus the completed in-memory job result.',
+    files: ['src/inngest/functions/generateWiki.js', 'src/service/jobStore.js'],
+  },
+  {
+    id: 'render',
+    label: 'Render the reader',
+    progress: 'completed',
+    input: 'The completed job returned by GET /api/wiki/jobs/:jobId.',
+    operation: 'React renders semantic Markdown and lazy-loads Mermaid only when a valid diagram reaches the Wiki reader.',
+    output: 'A navigable chaptered document with exactly one current SVG.',
+    files: ['web/src/pages/Wiki.jsx', 'web/src/pages/MermaidDiagram.jsx'],
+  },
+]
+
+export const ragFlows = {
+  index: {
+    label: 'Index repository',
+    description: 'Explicitly prepares a repository for later questions. This path is independent from Wiki generation.',
+    stages: [
+      { label: 'Fetch files', detail: 'GitHub tree + filtered source content', file: 'src/service/github.js' },
+      { label: 'Split source', detail: '1,000-character chunks with 150 overlap', file: 'src/service/chunker.js' },
+      { label: 'Embed chunks', detail: 'text-embedding-3-small', file: 'src/service/vectorStore.js' },
+      { label: 'Upsert vectors', detail: 'Batches of 100 in a repository namespace', file: 'src/service/vectorStore.js' },
+    ],
+  },
+  question: {
+    label: 'Answer question',
+    description: 'Each submission is an independent background request; the implementation does not retain conversation memory.',
+    stages: [
+      { label: 'Embed question', detail: 'Convert the submitted question to a query vector', file: 'src/service/vectorStore.js' },
+      { label: 'Retrieve context', detail: 'Top five Pinecone matches with metadata', file: 'src/service/vectorStore.js' },
+      { label: 'Ground prompt', detail: 'Join retrieved file paths and chunk text', file: 'src/service/rag.js' },
+      { label: 'Return answer', detail: 'gpt-4o-mini answer + deduplicated source paths', file: 'src/service/rag.js' },
+    ],
+  },
+}
+
+export const jobStages = [
+  { label: 'Submit', detail: 'Express creates a UUID job with status pending.' },
+  { label: 'Dispatch', detail: 'The route sends a small event containing identifiers—not provider credentials.' },
+  { label: 'Execute', detail: 'An Inngest function performs step-based work and updates the same job record.' },
+  { label: 'Poll', detail: 'React requests the job endpoint every two seconds while status remains pending.' },
+  { label: 'Settle', detail: 'Success stores a completed result; terminal onFailure stores the exhausted error.' },
+]
+
+export const engineeringDecisions = [
+  {
+    id: 'separate-pipelines',
+    title: 'Two pipelines, one coordination model',
+    summary: 'Wiki generation reads source directly; Chat requires a separately initiated vector index.',
+    evidence: ['src/inngest/functions/generateWiki.js', 'src/inngest/functions/indexRepo.js', 'src/inngest/functions/askQuestions.js'],
+  },
+  {
+    id: 'failure',
+    title: 'Failures settle after retries',
+    summary: 'Each background function uses onFailure to mark the job failed only when Inngest has exhausted its retry lifecycle.',
+    evidence: ['src/inngest/functions/generateWiki.js', 'src/inngest/functions/indexRepo.js', 'src/inngest/functions/askQuestions.js', 'tests/failureHandlers.test.js'],
+  },
+  {
+    id: 'token',
+    title: 'Credentials stay server-side',
+    summary: 'The GitHub token is read from process.env inside the worker and is not included in browser requests or Inngest event data.',
+    evidence: ['src/inngest/functions/generateWiki.js', 'src/inngest/functions/indexRepo.js'],
+  },
+  {
+    id: 'mermaid',
+    title: 'Latest Mermaid render wins',
+    summary: 'The renderer clears stale markup, ignores late async results after cleanup, and replaces the container with one parsed SVG.',
+    evidence: ['web/src/pages/MermaidDiagram.jsx', 'e2e/wiki-reader.spec.js', 'e2e/wiki.spec.js'],
+  },
+  {
+    id: 'truthful-progress',
+    title: 'Progress reports boundaries, not guesses',
+    summary: 'Only five validated Wiki stages and real chapter counts are exposed. Percentages and completion estimates are discarded.',
+    evidence: ['src/service/jobStore.js', 'web/src/components/WikiGenerationProgress.jsx', 'tests/wikiJobProgress.test.js'],
+  },
+  {
+    id: 'tests',
+    title: 'Regression coverage targets behavior',
+    summary: 'Backend tests protect parsing, failure, and progress contracts; Playwright protects concurrency, request identity, and exactly-one-SVG rendering.',
+    evidence: ['tests/wiki.test.js', 'tests/wikiJobProgress.test.js', 'e2e/workspace.spec.js', 'e2e/chat-ui.spec.js', 'e2e/wiki-reader.spec.js'],
+  },
+]
+
+export const limitations = [
+  'Job state lives in one Express process. Restarts lose polling records and multiple instances would not share them.',
+  'Generated Wiki JSON is written locally, but no implemented API reloads that artifact into a lost job.',
+  'Repository fetching stops after 200 eligible files and skips files above 200 KB plus generated, binary, and lockfile content.',
+  'The compact Pinecone namespace encoding can collide for certain owner/repository names containing hyphens.',
+  'Polling uses a fixed two-second interval with no backoff, persistence, cancellation, or cross-device resume.',
+  'Generated explanations and diagrams remain model output and should be checked against the cited source files.',
+]

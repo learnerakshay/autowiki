@@ -17,4 +17,10 @@ FIRST VIEWPORT: A compact repository/document header sits above a two-column rea
 
 FORM: Brief-pinned established-world extension in Read mode; no concept seed was required because the information architecture, palette, and interaction priorities are explicit. The signature interaction is immediate chapter replacement with a short continuity transition while one guarded Mermaid surface remains authoritative.
 
-FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance
+## Prompt 11 consolidation
+
+Wiki is the Read-mode destination of the shared journey and owns one production reader. `/wiki?jobId=...` supplies live job output; `/wiki/sample/spoon-knife` imports a checked-in copy of the verified `wiki-output/octocat-Spoon-Knife.json` artifact and passes it to the same `WikiReader`. Sample mode is read-only, clearly labeled `Pre-generated sample`, includes the source artifact and repository provenance, offers `Generate your own`, makes zero backend/provider calls, and renders an honest unavailable state for unknown or invalid samples.
+
+Pending, failure, missing-job, completed, and sample states retain factual copy and never imply unavailable progress. At 900px the chapter rail becomes a labeled native selector; at 760px identity and actions stack; at 520px controls become full-width and pagination preserves chapter position; 320px remains overflow-safe. Chapter and Mermaid continuity motion is short and optional, with all content immediately visible under reduced motion.
+
+FINISH: Prompt 11 final reviewer disposition is SHIP. Shared-reader behavior, exactly-one-SVG protection, provenance, sample zero-call behavior, desktop/mobile reflow, and accessible navigation are documented and verified.

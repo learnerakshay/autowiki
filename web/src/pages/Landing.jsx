@@ -141,7 +141,7 @@ export default function Landing() {
       const enter = { autoAlpha: 1, y: 0, duration: conditions.compact ? 0.38 : 0.5, ease: 'power3.out', clearProps: 'all' }
 
       gsap.timeline()
-        .fromTo('.landing-eyebrow', { autoAlpha: 0, y: distance * 0.6 }, enter)
+        .fromTo('.landing-hero__sequence', { autoAlpha: 0, y: distance * 0.6 }, enter)
         .fromTo('.landing-hero h1', { autoAlpha: 0, y: distance }, enter, '-=0.38')
         .fromTo('.landing-hero__lede', { autoAlpha: 0, y: distance * 0.8 }, enter, '-=0.34')
         .fromTo('.landing-hero__actions, .landing-hero__note', { autoAlpha: 0, y: distance * 0.6 }, { ...enter, stagger: 0.06 }, '-=0.32')
@@ -179,6 +179,7 @@ export default function Landing() {
           <nav className="landing-nav" aria-label="Landing navigation">
             <a href="#how-it-works">How it works</a>
             <a href="#features">Features</a>
+            <Link to="/architecture">Architecture</Link>
             <Link to="/workspace">Workspace</Link>
             <Link to="/chat">Chat</Link>
           </nav>
@@ -192,7 +193,9 @@ export default function Landing() {
         <section className="landing-hero" aria-labelledby="landing-title">
           <div className="landing-hero__inner">
             <div className="landing-hero__copy">
-              <p className="landing-eyebrow">AI-powered repository documentation</p>
+              <div className="landing-hero__sequence" aria-label="Repository to documentation sequence">
+                <span>Repository</span><i aria-hidden="true" /><span>Chapters</span><i aria-hidden="true" /><span>Wiki</span>
+              </div>
               <h1 id="landing-title">Your repository.<br />Beautifully documented.</h1>
               <p className="landing-hero__lede">Transform GitHub repositories into structured technical wikis with AI-generated chapters, clear explanations, and Mermaid diagrams.</p>
               <div className="landing-hero__actions">
@@ -200,10 +203,10 @@ export default function Landing() {
                   <Link to="/workspace">Generate a Wiki <ArrowRight aria-hidden="true" /></Link>
                 </Button>
                 <Button asChild variant="secondary">
-                  <a href="#how-it-works">Explore How It Works</a>
+                  <Link to="/wiki/sample/spoon-knife">Explore Sample Wiki</Link>
                 </Button>
               </div>
-              <p className="landing-hero__note"><Workflow aria-hidden="true" /> From source code to structured documentation.</p>
+              <p className="landing-hero__note"><Workflow aria-hidden="true" /> Real generated output, or <a href="#how-it-works">Explore How It Works</a>.</p>
             </div>
             <ProductPreview />
           </div>
@@ -282,7 +285,10 @@ export default function Landing() {
           <ol className="pipeline" aria-label="Wiki generation pipeline">
             {pipeline.map((stage) => <li key={stage}>{stage}</li>)}
           </ol>
-          <p className="architecture__note">Repository-grounded chat uses a separate embeddings and vector-search pipeline.</p>
+          <div className="architecture__footer">
+            <p className="architecture__note">Repository-grounded chat uses a separate embeddings and vector-search pipeline.</p>
+            <Button asChild variant="secondary"><Link to="/architecture">Explore the architecture <ArrowRight aria-hidden="true" /></Link></Button>
+          </div>
         </section>
 
         <section className="landing-cta" aria-labelledby="cta-title">
@@ -304,6 +310,7 @@ export default function Landing() {
           </div>
           <nav aria-label="Footer navigation">
             <a href="#how-it-works">How it works</a>
+            <Link to="/architecture">Architecture</Link>
             <Link to="/workspace">Workspace</Link>
             <Link to="/chat">Chat</Link>
           </nav>

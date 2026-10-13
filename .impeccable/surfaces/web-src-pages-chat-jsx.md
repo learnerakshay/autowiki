@@ -17,4 +17,10 @@ FIRST VIEWPORT: A compact page identity leads directly into one substantial comp
 
 FORM: Brief-pinned established-world extension; no concept seed is required because the prompt fixes the visual world, hierarchy, interaction model, and content. The signature motion binds the submitted question to the arriving answer with a short state transition; there is no staged page-load spectacle or fake retrieval choreography.
 
-FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance
+## Prompt 11 consolidation
+
+Chat remains the focused supporting Operate mode rather than the product's main visual template. The bright white composer, cyan repository context, deep navy answer hierarchy, and narrow evidence rail make the submitted repository → question → grounded answer relationship distinct while still belonging to the same documentation studio as Landing, Workspace, Wiki, and Architecture.
+
+At 900px evidence moves below the answer; at 760px repository and guidance rows stack; at 520px suggestions, actions, identity, and answer controls become full-width; 320px remains overflow-safe. Only first-view hierarchy, result arrival, and returned source rows animate. Reduced motion clears animation state immediately, and pending/error/live routes continue to expose the submitted request without fabricated retrieval stages.
+
+FINISH: Prompt 11 final reviewer disposition is SHIP. Empty, pending, completed, error, desktop, mobile, keyboard, and reduced-motion behavior are documented and verified.

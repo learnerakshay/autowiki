@@ -1,29 +1,35 @@
 ---
 name: AutoWiki
-description: Clean Light documentation studio for repository-to-wiki experiences.
+description: Bright white-and-cyan documentation studio for repository-to-wiki journeys.
 colors:
-  cool-canvas: "#f6f8fb"
+  cool-canvas: "#f7fcfe"
   reading-white: "#ffffff"
-  repository-ink: "#172033"
-  cool-mist: "#f1f4f8"
-  slate-copy: "#596579"
-  quiet-rule: "#d7dee9"
-  strong-rule: "#8490a3"
+  repository-ink: "#142638"
+  cool-mist: "#f1f8fa"
+  slate-copy: "#506579"
+  quiet-rule: "#d7e7ec"
+  strong-rule: "#7f96a4"
+  subtle-surface: "#f3fafc"
+  skeleton-cyan: "#deedf1"
   restrained-indigo: "#3657d6"
   deep-indigo: "#2947bd"
   indigo-wash: "#edf1ff"
   indigo-rule: "#c7d2fb"
+  active-cyan-wash: "#e9f8fb"
   operational-cyan: "#0e7490"
-  operational-cyan-wash: "#ecf9fc"
-  operational-cyan-rule: "#b9e4ee"
+  operational-cyan-wash: "#ecfafd"
+  operational-cyan-highlight: "#22d3ee"
+  operational-cyan-rule: "#b9e8ef"
   verified-green: "#176b43"
   verified-wash: "#eaf7f0"
+  verified-rule: "#b8dfc9"
   danger-red: "#9f2835"
   danger-wash: "#fff0f2"
+  danger-rule: "#efc1c7"
 typography:
   display:
     fontFamily: '"Manrope AutoWiki", "Segoe UI Variable", "Segoe UI", ui-sans-serif, system-ui, sans-serif'
-    fontSize: "clamp(3.75rem, 5.2vw, 4.75rem)"
+    fontSize: "clamp(4rem, 5.25vw, 4.9rem)"
     fontWeight: 700
     lineHeight: 0.98
     letterSpacing: "-0.04em"
@@ -99,8 +105,8 @@ components:
     rounded: "{rounded.xl}"
     padding: "1.5rem"
   tab-active:
-    backgroundColor: "{colors.indigo-wash}"
-    textColor: "{colors.deep-indigo}"
+    backgroundColor: "{colors.active-cyan-wash}"
+    textColor: "{colors.repository-ink}"
     rounded: "{rounded.md}"
     padding: "0 0.875rem"
     height: "2.75rem"
@@ -112,52 +118,53 @@ components:
 
 **Creative North Star: "The Documentation Studio"**
 
-AutoWiki is a clean, light workspace where repository structure becomes readable documentation. The visual system feels editorial and technical at once: cool canvas surrounds white reading surfaces, crisp rules establish hierarchy, and restrained indigo marks action, state, and connective logic.
+AutoWiki is a bright, light workspace where a repository becomes planned chapters and then a navigable technical Wiki. The visual system feels editorial and technical at once: icy-cyan canvas surrounds white reading surfaces, deep navy type carries the hierarchy, restrained cyan marks operational context, and indigo remains the rarer signal for primary decisions and connective logic.
 
-The interface is evidence-led rather than ornamental. Dense technical material stays approachable through clear grouping, generous section rhythm, compact monospace metadata, and product proof that looks and behaves like the real reader. The result should feel precise, credible, and calm—not like a generic chatbot or a decorative AI landing template.
+The interface is evidence-led rather than ornamental. Dense technical material stays approachable through clear grouping, generous section rhythm, compact monospace metadata, and product proof that looks and behaves like the real reader. Landing, Workspace, Wiki, Chat, and Architecture each adopt the composition that best serves their mode while sharing the same tokens, document geometry, navigation, and truthful state language. The result should feel precise, credible, and calm—not like a generic chatbot or a decorative AI landing template.
 
 **Key Characteristics:**
 
-- Clean Light surfaces with cool tonal separation.
+- Bright white and icy-cyan surfaces with deep navy type.
 - Strong editorial hierarchy with technical, factual detail.
-- Restrained indigo reserved for action, state, icons, and connectors.
+- Restrained cyan for operational context; indigo reserved for primary actions and selected connective logic.
 - Truthful worker status with cyan operational signals and no invented completion data.
 - Border-led structure with quiet, exceptional elevation.
 - Authentic repository paths, chapters, diagrams, and product evidence.
 - Grounded Chat keeps each submitted repository and question visibly bound to one answer and its returned source paths.
+- A provenance-labeled Spoon-Knife sample reuses the production reader without calling the backend.
 
 ## Colors
 
-The palette is a cool neutral document field with one disciplined indigo voice and semantic green and red reserved for verified and failure states.
+The palette is a bright cyan-tinted document field with deep navy type, one disciplined operational cyan voice, and a rarer indigo reserved for primary decisions. Semantic green and red remain limited to verified and failure states.
 
 ### Primary
 
-- **Restrained Indigo:** Drives primary actions, active navigation, focus, key icons, and diagram connectors.
+- **Restrained Indigo:** Drives primary actions, global focus, selected navigation, and the few connection states that must read as decisions rather than ambient operation.
 - **Deep Indigo:** Gives interactive hover and selected states a firmer endpoint.
 - **Indigo Wash:** Creates selected, explanatory, and call-to-action surfaces without competing with content.
 - **Indigo Rule:** Defines indigo-tinted boundaries for active and pending states.
 
 ### Neutral
 
-- **Repository Ink:** Anchors headings, body emphasis, dark feature surfaces, and the brand mark.
+- **Repository Ink:** Anchors deep-navy headings, body emphasis, dark feature surfaces, and the brand mark.
 - **Cool Canvas:** Provides the page field and the visual breathing room around documents.
 - **Reading White:** Keeps documents, cards, navigation, and inputs crisp and legible.
-- **Cool Mist:** Separates rails, diagram fields, code-adjacent content, and secondary surfaces.
+- **Cool Mist / Subtle Surface / Skeleton Cyan:** Separate rails, diagram fields, code-adjacent content, secondary surfaces, and honest loading placeholders without turning the app gray.
 - **Slate Copy:** Carries explanatory copy, inactive navigation, captions, and metadata.
 - **Quiet Rule:** Provides the default one-pixel structural divider.
 - **Strong Rule:** Defines inputs and high-salience boundaries without introducing heavy contrast.
 
 ### Secondary
 
-- **Operational Cyan / Operational Cyan Wash / Operational Cyan Rule:** Identify live worker boundaries and current generation activity without competing with indigo actions or implying completion.
+- **Active Cyan Wash / Operational Cyan / Operational Cyan Wash / Operational Cyan Highlight / Operational Cyan Rule:** Identify selected navigation, repository context, live worker boundaries, evidence, active reader wayfinding, and current generation activity without competing with indigo actions or implying completion.
 - **Verified Green / Verified Wash:** Communicate authentic, completed, or verified output.
 - **Danger Red / Danger Wash:** Communicate failures and blocking errors only.
 
 ### Named Rules
 
-**The Restrained Indigo Rule.** Indigo is a navigational and semantic signal, not a decorative fill; reserve it for decisions, state, and connective logic.
+**The Restrained Indigo Rule.** Indigo is a decision signal, not the default decoration; reserve it for primary actions, focus, selected global navigation, and connective logic that cyan cannot carry clearly.
 
-**The Cool Neutral Rule.** Reading white belongs inside cool canvas and mist fields so sections remain visible without beige warmth or heavy gray blocks.
+**The White-and-Cyan Rule.** Reading white belongs inside the icy-cyan canvas and pale cyan fields so sections remain visible without beige warmth, heavy gray blocks, or cyan flooding the page.
 
 ## Typography
 
@@ -186,9 +193,9 @@ The palette is a cool neutral document field with one disciplined indigo voice a
 
 ## Layout
 
-The system uses centered content frames with an operational maximum width of 72rem and a wider landing frame of 80rem. Editorial landing sections settle at 76rem and use an 8rem desktop section rhythm. The hero and major section headings are deliberately asymmetric: message and proof, or statement and explanation, occupy unequal columns instead of a centered stack.
+The system uses centered content frames with an operational maximum width of 72rem, a 78rem Workspace frame, an 88rem Wiki frame, and an 86rem landing hero. Editorial landing sections settle at 76rem and use generous 6.75rem–8rem desktop section rhythm. Hero and major section headings are deliberately asymmetric: message and proof, or statement and explanation, occupy unequal columns instead of a centered stack.
 
-The landing composition shifts at four observed breakpoints: 1120px tightens the split hero, 900px stacks the hero and hides the long landing navigation, 760px converts multi-column product structures to compact grids, and 520px creates a dedicated phone composition with full-width actions, horizontal chapter tabs, vertical proof flows, and one-column pipeline stages. Touch targets remain at least 2.75rem high, and the layout never assumes more than a 320px viewport.
+The composition shifts at four shared breakpoints: 1120px tightens wide editorial splits, 900px stacks the landing hero and collapses wide evidence layouts, 760px converts multi-column product structures to compact grids, and 520px creates a dedicated phone composition with icon-led application navigation, full-width actions, horizontal proof tabs, and one-column sequences. The system is verified at 1440, 1280, 768, 390, and 320px where relevant; touch targets remain at least 2.75rem high, content reflows without document-level horizontal overflow, and no layout assumes more than a 320px viewport.
 
 The operational Wiki reader uses a wider 84rem frame than the general application shell. At 900px, its sticky chapter rail becomes a labeled native chapter selector; at 760px, document identity and actions stack; at 520px, actions become full-width and the chapter position moves above the adjacent-chapter controls. Horizontal chapter tabs remain appropriate for the compact landing-page proof, where they preview the product rather than carry the reader's primary navigation.
 
@@ -196,11 +203,15 @@ Wiki generation status is one shared operational component across Workspace and 
 
 Grounded Chat stays inside the standard 72rem application frame. Its repository context and question share one substantial composer rather than separate cards. A completed request becomes a two-column evidence view: Markdown answer in the flexible reading column and a 16–19rem source-path rail beside it. The rail moves below the answer at 900px, the repository row stacks at 760px, and 520px turns suggestions, actions, and answer controls into full-width rows. Pending, failed, and completed states all repeat the submitted repository and question so composer edits cannot visually rewrite the active request.
 
+Architecture uses an 80rem technical-reading frame and permits a real source-grid treatment only inside the selectable blueprint canvas, where the grid communicates an inspectable system diagram. At 760px the connector SVG disappears and nodes become a two-column grid; at 520px they become a single vertical sequence with detail immediately below. A detector advisory for grid styling is accepted only for this blueprint canvas and must not become a blanket exception for other surfaces.
+
+The five routes share one journey but not one template: Landing persuades with source-to-chapter-to-Wiki proof; Workspace operates through a dominant generation command and secondary indexing; Wiki reads as a document; Chat operates as one grounded request with bound evidence; Architecture reads as an inspectable system explanation. Loading, pending, failure, unavailable, completed, and sample states retain each route's structure instead of becoming generic centered cards.
+
 Spacing follows a four-pixel base with recurring 0.5rem, 0.75rem, 1rem, 1.5rem, 2rem, and 3rem steps. Dense product proof uses the smaller steps; editorial sections use the larger steps and preserve visible breathing room between narrative beats.
 
 ## Elevation & Depth
 
-AutoWiki is flat and border-led by default. Depth comes first from canvas-to-surface tonal changes and one-pixel rules; shadows are reserved for the hero documentation preview, ordinary cards, and transient toasts.
+AutoWiki is flat and border-led by default. Depth comes first from cyan-canvas-to-white-surface tonal changes and one-pixel rules; low-opacity cyan/navy shadows are reserved for hero proof, dominant operational surfaces, the Architecture canvas, and transient toasts.
 
 ### Shadow Vocabulary
 
@@ -251,13 +262,19 @@ Components are refined and restrained: quiet at rest, explicit on hover and focu
 
 ### Navigation
 
-Navigation uses compact 2.75rem touch targets, semibold Segoe labels, transparent borders at rest, cool-mist hover surfaces, and indigo-wash active states. Landing navigation becomes a concise primary action below 900px; application navigation becomes icon-led below 520px while labels remain available to assistive technology.
+Navigation uses compact 2.75rem touch targets, semibold Segoe labels, transparent borders at rest, pale cyan hover/active surfaces, and a firmer indigo label for the selected global destination. Landing navigation becomes a concise primary action below 900px; application navigation becomes icon-led below 520px while labels remain available to assistive technology.
 
 ### Documentation Reader
 
-The reader has two expressions. The compact landing-page proof combines a muted browser bar, repository identity row, horizontal chapter preview, white document surface, path metadata, and a bordered diagram field. The operational reader uses a document header, sticky numbered rail, source-path chips, semantic Markdown, an independent diagram card, and adjacent-chapter pagination.
+The reader has two expressions. The compact landing-page proof combines a cyan-tinted browser bar, repository identity row, chapter preview, white document surface, path metadata, and a bordered diagram field. The operational reader uses a document header, sticky numbered rail, source-path chips, semantic Markdown, an independent diagram card, and adjacent-chapter pagination.
 
 Chapter switching is keyboard-operable. Generated prose keeps its headings subordinate to the chapter title and stays within a focused reading measure; wide tables, code blocks, and Mermaid diagrams scroll inside their own bounded regions instead of widening the page. Below 900px, the operational rail becomes a labeled native selector rather than shrinking into an unreadable sidebar.
+
+### Pre-generated Sample
+
+`/wiki/sample/spoon-knife` is a read-only demonstration state, not a second reader implementation. It imports the checked-in Spoon-Knife data copied from `wiki-output/octocat-Spoon-Knife.json`, validates the expected shape, and passes it to the shared `WikiReader` with a “Pre-generated sample” status, provenance note, source repository link, and “Generate your own” action. This path starts no Wiki job, performs no backend fetch, and makes no model, embeddings, vector-store, or other provider call. An unknown or invalid sample slug renders an honest unavailable state.
+
+**The One Reader Rule.** Live jobs and verified samples use the same chapter navigation, Markdown, diagram, responsive, and accessibility behavior; sample-specific UI is limited to provenance and calls to generate a new Wiki.
 
 ### Generation Activity
 
@@ -275,9 +292,27 @@ Draft edits may coexist with an active request, but a visible notice must explai
 
 **The Bound Evidence Rule.** Each Chat submission keeps its submitted repository and question attached to the pending state, final Markdown answer, and only the source paths the service actually returns; draft edits cannot rewrite the active request.
 
+### Architecture Explorer
+
+The `/architecture` route is a Read-mode technical walkthrough inside the existing documentation-studio world. Its first major surface is a selectable system canvas: component nodes sit on a faint source-grid field, relevant connections gain indigo emphasis, and an adjacent evidence panel explains the selected responsibility with copyable repository-relative paths. The diagram is explicitly conceptual and never implies live telemetry.
+
+Wiki generation remains visually dominant through a connected vertical pipeline and a focused input/operation/output panel. RAG indexing and question answering use one segmented secondary surface so their relationship is clear without suggesting that either is required for Wiki generation. The shared job lifecycle moves to a dark repository-ink band to mark the coordination boundary without turning the route into a dark theme.
+
+At 760px and below, the overview becomes a two-column node grid with no SVG connector dependency; at 520px it becomes a single vertical sequence. Detail content stays directly below the selectable nodes, source paths wrap, all controls retain 44px targets, and the full technical explanation remains available without hover, animation, or horizontal panning.
+
+Architecture facts live in `web/src/data/architecture.js` rather than being scattered through the page. Update that module only after verifying responsibilities, inputs, outputs, event names, progress stages, source paths, and limitations against the implementation. Motion is one restrained GSAP page entrance plus section reveals; reduced motion keeps all content visible and removes transition timing.
+
+### Accessibility and Motion
+
+Every mode keeps semantic landmarks, ordered headings, keyboard-operable chapter/node/tab controls, visible focus, 44px minimum targets, and text or list alternatives for diagrams and conceptual flows. Status and error copy uses appropriate live-region semantics without relying on color alone; literal paths wrap or scroll inside their own bounded region.
+
+GSAP is reserved for short continuity cues: first-view hierarchy, one-time section reveals, chapter/result replacement, and selected worker-stage response. Motion never supplies missing information, blocks interaction, or fakes progress. Under `prefers-reduced-motion: reduce`, page and state content is immediately visible, scroll behavior becomes static, transition timing is removed, and indeterminate activity lines are hidden when a frozen segment could imply a percentage.
+
+**The Purposeful Motion Rule.** Animate the relationship a user needs to notice—never the whole interface merely because GSAP is available.
+
 ### Brand Mark
 
-The AutoWiki mark combines document geometry with repository branching inside an indigo-wash square. Keep the wordmark compact and dark; do not detach the mark from the visible AutoWiki name in primary navigation contexts.
+The AutoWiki mark combines document geometry with repository branching inside a cyan-wash square, with one bright cyan node as the operational spark. Keep the wordmark compact and deep navy; do not detach the mark from the visible AutoWiki name in primary navigation contexts.
 
 ## Do's and Don'ts
 
@@ -290,6 +325,8 @@ The AutoWiki mark combines document geometry with repository branching inside an
 - **Do** provide purpose-built desktop and mobile compositions and honor reduced-motion preferences.
 - **Do** share the real worker status between Workspace and `/wiki`, preserving its five backend-reported boundaries and factual chapter counts.
 - **Do** preserve the one-to-one binding between a Chat submission, its Markdown answer, and the actual source paths returned for that request.
+- **Do** render the verified Spoon-Knife sample through the shared production Wiki reader and keep its provenance and zero-call behavior explicit.
+- **Do** treat Landing, Workspace, Wiki, Chat, and Architecture as distinct modes of one connected repository-to-chapters-to-Wiki journey.
 
 ### Don't:
 
@@ -300,3 +337,6 @@ The AutoWiki mark combines document geometry with repository branching inside an
 - **Don't** fabricate metrics, testimonials, repositories, progress states, or product capabilities as visual filler.
 - **Don't** turn indeterminate Wiki activity into a percentage, elapsed-time estimate, completion forecast, or reduced-motion segment that looks like progress.
 - **Don't** present grounded Chat as a conversational transcript, infer missing citations, or let draft edits relabel an in-flight or completed request.
+- **Don't** let sample mode submit a job, call a backend/provider, hide its provenance, or drift into a separate reader implementation.
+- **Don't** generalize the Architecture blueprint's accepted grid-pattern detector advisory to unrelated surfaces.
+- **Don't** add ambient GSAP choreography; every motion must clarify entrance, state change, navigation continuity, or evidence arrival and must disappear safely under reduced motion.

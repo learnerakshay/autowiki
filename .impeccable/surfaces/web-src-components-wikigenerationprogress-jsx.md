@@ -17,4 +17,10 @@ FIRST VIEWPORT: Workspace keeps the submission context visible and replaces the 
 
 FORM: Brief-pinned established-world extension in Operate mode; the user's narrow, locked clean-light direction explicitly exempts this surface from concept seeding. The signature interaction is a restrained border-and-surface response only when the reported worker stage changes; the continuous line indicates activity, never completion, and is removed entirely under reduced motion so a static segment cannot imply percentage.
 
-FINISH: unreviewed and undocumented is unfinished; this build ends with detector output, desktop and mobile capture, finish review, verdict, DESIGN.md, and shipping raster provenance.
+## Prompt 11 consolidation
+
+Workspace is the Operate-mode command center in the shared repository-to-chapters-to-Wiki journey. The generation command remains dominant, the five honest worker boundaries remain unchanged, indexing stays secondary, and a quiet link opens the pre-generated Spoon-Knife Wiki without submitting a job. Bright white command surfaces sit on the icy-cyan canvas with deep navy hierarchy and restrained cyan operational signals.
+
+At 900px the command grid stacks; at 760px side content becomes one column; at 520px controls, job actions, identifiers, and the five-stage overview reflow into full-width or two-column arrangements; 320px remains supported. Workspace entrance motion is a one-time hierarchy cue, stage response follows only real state changes, and reduced motion shows all content statically while removing activity that could look like percentage progress.
+
+FINISH: Prompt 11 final reviewer disposition is SHIP. Live, unavailable, failed, completed, loading, sample-entry, desktop, mobile, and reduced-motion behavior remain truthful and documented.

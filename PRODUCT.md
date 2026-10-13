@@ -20,7 +20,7 @@ AutoWiki's primary mechanism is a multi-stage repository-to-wiki generation pipe
 
 ## Operating Context
 
-Users provide a public repository in `owner/repository` form, start wiki generation, wait for a pending/completed/failed job, and read the resulting chapters at `/wiki?jobId=...`. They can separately index a repository and ask grounded questions in Chat.
+Users provide a public repository in `owner/repository` form, start wiki generation, wait for a pending/completed/failed job, and read the resulting chapters at `/wiki?jobId=...`. They can separately index a repository and ask grounded questions in Chat. Evaluators can also open the pre-generated Spoon-Knife Wiki at `/wiki/sample/spoon-knife` to inspect the real reader without starting a backend job.
 
 ## Capabilities and Constraints
 
@@ -28,7 +28,8 @@ Users provide a public repository in `owner/repository` form, start wiki generat
 - Wiki jobs expose only pending, completed, and failed states.
 - Wiki deep links depend on the `jobId` query parameter.
 - Mermaid rendering has an exactly-one-SVG race-condition guarantee that must remain protected.
-- No authentication, billing, sample mode, or granular backend progress tracking currently exists.
+- Sample mode is deliberately narrow: `/wiki/sample/spoon-knife` imports a checked-in copy of the verified `wiki-output/octocat-Spoon-Knife.json` artifact, renders it through the shared production Wiki reader, identifies it as pre-generated, and makes zero backend or provider calls.
+- No authentication, billing, additional sample catalog, or granular backend progress tracking currently exists.
 
 ## Brand Commitments
 
@@ -37,7 +38,8 @@ The visible product name is AutoWiki; “AutoWiki for Git” is appropriate for 
 ## Evidence on Hand
 
 - Verified generated wiki output: `wiki-output/octocat-Spoon-Knife.json` and `wiki-output/octocat-Hello-World.json`.
-- Verified product captures: `e2e/screenshots/wiki-chapter.png`, `e2e/screenshots/chat-completed.png`, and workspace screenshots.
+- The shipping Spoon-Knife sample is provenance-linked to `wiki-output/octocat-Spoon-Knife.json`; the checked-in sample data records that no new generation occurred for sample mode.
+- Verified product captures include the Prompt 11 Landing, Workspace, Wiki, Chat, Architecture, pending, and sample-reader desktop/mobile screenshots under `e2e/screenshots/`.
 - No customer logos, testimonials, adoption metrics, benchmarks, or commercial claims are available and none should be fabricated.
 
 ## Product Principles
@@ -46,6 +48,7 @@ The visible product name is AutoWiki; “AutoWiki for Git” is appropriate for 
 - Show concrete generated documentation instead of generic AI claims.
 - Keep indexing and grounded chat useful but visually secondary.
 - Preserve real routes, APIs, job behavior, and accessibility.
+- Keep loading, failure, pending, and unavailable states honest; never replace absent backend facts with decorative progress or inferred evidence.
 - Prefer precise, maintainable implementation over ornamental complexity.
 
 ## Accessibility & Inclusion

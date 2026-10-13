@@ -31,4 +31,10 @@ FIRST VIEWPORT: A restrained sticky header sits above an asymmetric split hero. 
 
 FORM: Code-led, surface extension inside the established Clean Light world. Signature interaction: keyboard-operable chapter switching changes the authentic chapter proof while a single short GSAP entrance introduces copy and reader together. Seed key: brief-pinned-prompt-03.
 
-FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance
+## Prompt 11 consolidation
+
+The landing page is the Persuade-mode opening of the connected journey `repository → planned chapters → navigable technical wiki`. Bright white and cyan-tinted surfaces, deep navy display type, and the literal Repository / Chapters / Wiki sequence make that mechanism legible before feature detail. The verified Spoon-Knife reader remains first-viewport proof, while `Explore Sample Wiki` opens `/wiki/sample/spoon-knife` so evaluators can inspect the shared production reader without starting backend or provider work.
+
+Desktop keeps the asymmetric copy/proof composition; 900px stacks it, 760px converts feature/pipeline structures, 520px creates full-width actions and an adaptive horizontal chapter preview, and 320px remains overflow-safe. GSAP is limited to the first-view hierarchy, one-time section reveals, and chapter continuity; reduced-motion users receive the complete static composition immediately.
+
+FINISH: Prompt 11 final reviewer disposition is SHIP. The landing proof, sample entry point, responsive reflow, reduced-motion state, and honest route behavior are documented and verified.

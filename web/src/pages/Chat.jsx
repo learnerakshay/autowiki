@@ -281,7 +281,7 @@ export default function Chat() {
               </Button>
             </header>
             {copyStatus === 'failed' && <p className="chat-copy-error" role="alert">Clipboard access was unavailable. Select the answer text to copy it manually.</p>}
-            <MarkdownDocument markdown={job.answer} title="Answer" className="chat-answer-markdown preserve" />
+            <MarkdownDocument markdown={job.answer} title="Answer" className="chat-answer-markdown" />
             <footer className="chat-answer__actions">
               <Button type="button" variant="secondary" onClick={askAnother}>Ask another question</Button>
               <Button asChild variant="ghost"><Link to={`/wiki?repo=${encodeURIComponent(submission.repo)}`}>Generate Wiki <ArrowRight aria-hidden="true" /></Link></Button>

@@ -127,7 +127,7 @@ function WikiFailure({ title, error, jobId }) {
   )
 }
 
-function WikiReader({ job, jobId }) {
+export function WikiReader({ job, jobId, sample = false, provenance }) {
   const readerRef = useRef(null)
   const articleRef = useRef(null)
   const chapterButtons = useRef([])
@@ -192,33 +192,45 @@ function WikiReader({ job, jobId }) {
 
   return (
     <section ref={readerRef} className="wiki-reader" aria-label={`Generated wiki for ${job.repo}`}>
-      <header className="wiki-document-header">
+      <header className={`wiki-document-header${sample ? ' wiki-document-header--sample' : ''}`}>
         <div className="wiki-document-header__topline">
           <Link className="wiki-back-link" to="/workspace"><ArrowLeft aria-hidden="true" size={16} />Workspace</Link>
-          <JobStatus status="completed">Generated</JobStatus>
+          <JobStatus status="completed">{sample ? 'Pre-generated sample' : 'Generated'}</JobStatus>
         </div>
         <div className="wiki-document-header__body">
           <div>
             <h1>{job.repo}</h1>
-            <p>Structured repository documentation generated from source context.</p>
+            <p>{sample
+              ? 'A previously generated Wiki from a public repository. Opening it does not start a new AI generation job.'
+              : 'Structured repository documentation generated from source context.'}</p>
           </div>
           <div className="wiki-document-actions">
-            <Button asChild variant="secondary" size="sm">
-              <Link to={chatHref}><MessageSquareText aria-hidden="true" size={16} />Open Chat</Link>
-            </Button>
+            {!sample ? (
+              <Button asChild variant="secondary" size="sm">
+                <Link to={chatHref}><MessageSquareText aria-hidden="true" size={16} />Open Chat</Link>
+              </Button>
+            ) : null}
             <Button asChild size="sm">
-              <Link to="/workspace">Generate another<ArrowRight aria-hidden="true" size={16} /></Link>
+              <Link to="/workspace">{sample ? 'Generate your own' : 'Generate another'}<ArrowRight aria-hidden="true" size={16} /></Link>
             </Button>
           </div>
         </div>
+        {sample ? (
+          <div className="wiki-sample-provenance" aria-label="Sample provenance">
+            <span>Demo-safe</span>
+            <p>{provenance}</p>
+          </div>
+        ) : null}
         <div className="wiki-document-meta">
           <span><Clock3 aria-hidden="true" size={15} />{generatedAt}</span>
           <span><BookOpenText aria-hidden="true" size={15} />{chapters.length} {chapters.length === 1 ? 'chapter' : 'chapters'}</span>
           <span><GitFork aria-hidden="true" size={15} />Repository-generated</span>
-          <details className="wiki-job-details wiki-job-details--inline">
-            <summary>Job details</summary>
-            <code>{jobId}</code>
-          </details>
+          {!sample && jobId ? (
+            <details className="wiki-job-details wiki-job-details--inline">
+              <summary>Job details</summary>
+              <code>{jobId}</code>
+            </details>
+          ) : null}
         </div>
       </header>
 
