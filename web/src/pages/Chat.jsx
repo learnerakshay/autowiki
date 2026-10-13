@@ -11,6 +11,7 @@ import {
   GitFork,
   LoaderCircle,
   MessageSquareText,
+  RefreshCw,
   Send,
 } from 'lucide-react'
 import { postJson } from '../api.js'
@@ -45,7 +46,7 @@ export default function Chat() {
   const questionRef = useRef(null)
   const requestRef = useRef(0)
   const copyTimerRef = useRef()
-  const { job, error: pollError } = useJobPoll('chat', jobId)
+  const { job, error: pollError, retry: retryPoll } = useJobPoll('chat', jobId)
 
   useJobNotifications(job, jobId, { completed: 'Answer is ready', failed: 'Repository question failed' })
 
@@ -63,14 +64,21 @@ export default function Chat() {
   useGSAP(() => {
     const media = gsap.matchMedia()
     media.add(motionQuery, () => {
-      gsap.fromTo(
+      const timeline = gsap.timeline()
+      timeline.fromTo(
         ['.chat-intro', '.chat-composer', '.chat-index-note'],
         { autoAlpha: 0.8, y: 6 },
         { autoAlpha: 1, y: 0, duration: motion.selection, stagger: 0.025, ease: motion.ease, clearProps: 'opacity,visibility,transform' },
       )
+      timeline.fromTo(
+        '.chat-intro__flow li',
+        { autoAlpha: 0.7, x: -5 },
+        { autoAlpha: 1, x: 0, duration: motion.feedback, stagger: 0.035, ease: motion.ease, clearProps: 'opacity,visibility,transform' },
+        0.04,
+      )
     })
     media.add(reducedMotionQuery, () => {
-      gsap.set(['.chat-intro', '.chat-composer', '.chat-index-note'], { clearProps: 'all' })
+      gsap.set(['.chat-intro', '.chat-composer', '.chat-index-note', '.chat-intro__flow li'], { clearProps: 'all' })
     })
     return () => media.revert()
   }, { scope: pageRef })
@@ -159,10 +167,15 @@ export default function Chat() {
     <section ref={pageRef} className="chat-page">
       <header className="chat-intro">
         <div className="chat-intro__icon" aria-hidden="true"><MessageSquareText /></div>
-        <div>
+        <div className="chat-intro__copy">
           <h1>Ask better questions about your code.</h1>
           <p>Explore an indexed GitHub repository with AI-generated answers grounded in retrieved source context.</p>
         </div>
+        <ol className="chat-intro__flow" aria-label="Grounded answer workflow">
+          <li><span>01</span><div><strong>Index</strong><small>Store source chunks</small></div></li>
+          <li><span>02</span><div><strong>Retrieve</strong><small>Find relevant files</small></div></li>
+          <li><span>03</span><div><strong>Answer</strong><small>Return source paths</small></div></li>
+        </ol>
       </header>
 
       <form className="chat-composer" onSubmit={submit} aria-busy={submitting || pending}>
@@ -257,7 +270,8 @@ export default function Chat() {
         <section ref={resultRef} className="chat-request-state" aria-labelledby="chat-error-context">
           <div className="chat-request-state__topline"><span>Request context</span><code>{submission.repo}</code></div>
           <h2 id="chat-error-context">{submission.question}</h2>
-          <ErrorNotice title="Question could not be completed" error={currentError} recovery="Confirm the repository has been indexed, then submit the question again." />
+          <ErrorNotice title="Question could not be completed" error={currentError} recovery={pollError ? 'The job may still be running. Retry the status check without submitting a duplicate question.' : 'Confirm the repository has been indexed, then submit the question again.'} />
+          {pollError ? <Button type="button" variant="secondary" onClick={retryPoll}><RefreshCw aria-hidden="true" />Retry status check</Button> : null}
         </section>
       )}
 

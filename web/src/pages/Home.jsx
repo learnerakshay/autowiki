@@ -15,6 +15,7 @@ import {
   ListTree,
   LoaderCircle,
   MessageSquareText,
+  RefreshCw,
 } from 'lucide-react'
 
 import { postJson } from '../api.js'
@@ -82,7 +83,7 @@ function InlineError({ children }) {
   )
 }
 
-function WorkspaceJobCard({ kind, jobId, repo, job, error, submitting }) {
+function WorkspaceJobCard({ kind, jobId, repo, job, error, submitting, onRetry }) {
   const panelRef = useRef(null)
   const isWiki = kind === 'wiki'
   const state = submitting
@@ -151,7 +152,7 @@ function WorkspaceJobCard({ kind, jobId, repo, job, error, submitting }) {
             </span>
             <div>
               <h3>{copy.title}</h3>
-              <p>{job?.error || copy.description}</p>
+              <p>{error || job?.error || copy.description}</p>
               {repo && jobId ? <p className="workspace-job__repo">{repo}</p> : null}
             </div>
           </div>
@@ -197,7 +198,13 @@ function WorkspaceJobCard({ kind, jobId, repo, job, error, submitting }) {
 
       {(jobId || (state === 'completed' && !isWiki)) && (
         <div className="workspace-job__footer">
-          {isWiki && jobId ? (
+          {state === 'unavailable' ? (
+            <Button type="button" size="sm" variant="secondary" onClick={onRetry}>
+              <RefreshCw aria-hidden="true" size={15} />
+              Retry status check
+            </Button>
+          ) : null}
+          {isWiki && jobId && state !== 'unavailable' ? (
             <Button asChild size="sm">
               <Link to={`/wiki?jobId=${encodeURIComponent(jobId)}`}>
                 View wiki
@@ -373,6 +380,7 @@ export default function Home() {
             job={wikiState.job}
             error={wikiState.error}
             submitting={submitting.wiki}
+            onRetry={wikiState.retry}
           />
         </section>
 
@@ -425,6 +433,7 @@ export default function Home() {
               job={indexState.job}
               error={indexState.error}
               submitting={submitting.index}
+              onRetry={indexState.retry}
             />
         </section>
       </div>

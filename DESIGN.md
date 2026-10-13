@@ -160,6 +160,22 @@ Motion follows a three-tier rhythm: 580–680ms for authored heading/product ent
 
 **The Calm Reader Rule.** Marketing can choreograph arrival, but the documentation reader animates only chapter continuity, successful diagram arrival, and direct interaction feedback.
 
+### Prompt 15 release-candidate system
+
+Prompt 15 adds one deliberate emotional peak without replacing the established mint document world. After the light repository-to-document vertical story, the Landing enters a deep forest horizontal chapter sequence built from the committed Spoon-Knife fixture. Vertical wheel movement advances authentic Introduction, Web Structure, and Styling scenes laterally. The section uses bounded CSS sticky positioning and one scoped ScrollTrigger translation rather than GSAP pinning, so it exits into normal document flow without generated spacer elements.
+
+Desktop receives the lateral track only when motion is allowed and the viewport is at least 901px wide. Numbered chapter controls move the same scroll timeline and remain keyboard accessible. Tablet, phone, failed-script, and reduced-motion paths stack all three scenes in reading order with no hidden content, sticky trap, or horizontal document overflow. Source paths, excerpts, structure, and CSS shown in the sequence come from the verified sample; the interaction never implies a live generation job.
+
+The vertical Repository → Outline → Wiki story now uses one progress observer for active-state calculation. This makes forward scrolling, reverse scrolling, viewport refresh, and restored nonzero scroll positions deterministic while retaining the existing CSS-sticky product visual.
+
+Chat’s header exposes the truthful Index → Retrieve → Answer relationship as a compact supporting flow. Architecture’s selected-node panel labels incoming and outgoing component paths and their direction. These are explanatory diagrams, never runtime telemetry. Workspace and Chat are route-lazy, keeping their UI and motion out of the initial application entry.
+
+Polling recovery preserves the job identity and current state. Two bounded automatic retries precede a visible manual status-check action. Retrying polls the existing job endpoint and never resubmits Wiki, Index, or Chat provider work.
+
+**The Single Peak Rule.** The dark horizontal chapter sequence is the Landing’s strongest authored moment. Surrounding sections remain light, calm, and document-led so the peak is created by contrast rather than constant spectacle.
+
+**The Same Content Rule.** Horizontal motion may change spatial progression, but never content availability; every chapter remains present in semantic order when motion, JavaScript enhancement, or desktop composition is unavailable.
+
 The palette is a warm-white and mint document field with near-black type and one disciplined deep-teal operational voice. Semantic green and red remain limited to verified and failure states.
 
 ### Primary

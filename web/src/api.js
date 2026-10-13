@@ -7,7 +7,9 @@ export async function apiRequest(path, options) {
 
   if (!response.ok) {
     const message = typeof body === 'object' ? body.error : body
-    throw new Error(message || `Request failed with status ${response.status}`)
+    const error = new Error(message || `Request failed with status ${response.status}`)
+    error.status = response.status
+    throw error
   }
 
   return body

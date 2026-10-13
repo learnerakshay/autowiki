@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-13T16:40:17.0420159+05:30",
+  "generatedAt": "2026-10-14T03:35:00+05:30",
   "title": "Design System: AutoWiki",
   "extensions": {
     "colorMeta": {
@@ -176,7 +176,9 @@
       { "name": "chat-request-response", "value": "240ms power3.out", "purpose": "Binds a submitted repository and question to the arriving pending, failed, or completed request surface; disabled under reduced motion." },
       { "name": "chat-source-evidence", "value": "180ms power3.out with 25ms stagger after 40ms", "purpose": "Introduces only the source-path rows returned with a completed Chat answer; disabled under reduced motion." },
       { "name": "chat-indeterminate-activity", "value": "1.45s ease-in-out infinite", "purpose": "Signals an unresolved Chat job without implying retrieval stage or percentage; motion stops under reduced-motion preference." },
-      { "name": "architecture-entrance", "value": "450–620ms power3.out", "purpose": "One-time hero, blueprint, and section continuity cues; connector drawing is explanatory only and all timing disappears under reduced motion." }
+      { "name": "architecture-entrance", "value": "450–620ms power3.out", "purpose": "One-time hero, blueprint, and section continuity cues; connector drawing is explanatory only and all timing disappears under reduced motion." },
+      { "name": "vertical-story-observer", "value": "bounded ScrollTrigger progress", "purpose": "Maps repository, outline, and Wiki stages in both scroll directions without pinning or fictional worker progress." },
+      { "name": "horizontal-chapter-track", "value": "scrub 0.45 with CSS sticky", "purpose": "Moves the verified sample chapters laterally on desktop; mobile and reduced-motion paths retain a static semantic stack." }
     ],
     "breakpoints": [
       { "name": "landing-tight", "value": "1120px" },
@@ -295,7 +297,9 @@
       { "name": "The Honest Activity Rule", "body": "The continuous line is an indeterminate activity signal, never a completion meter. The current-operation panel enters once and repeats its restrained 240ms response only when its resolved worker stage or validated chapter boundary changes; under reduced motion, remove the line entirely and show the same status content statically so no frozen segment can be mistaken for a percentage.", "section": "components" },
       { "name": "The Bound Evidence Rule", "body": "Each Chat submission keeps its submitted repository and question attached to the pending state, final Markdown answer, and only the source paths the service actually returns; draft edits cannot rewrite the active request.", "section": "components" },
       { "name": "The One Reader Rule", "body": "Live jobs and verified samples use the same chapter navigation, Markdown, diagram, responsive, and accessibility behavior; sample-specific UI is limited to provenance and calls to generate a new Wiki.", "section": "components" },
-      { "name": "The Purposeful Motion Rule", "body": "Animate the relationship a user needs to notice—never the whole interface merely because GSAP is available.", "section": "components" }
+      { "name": "The Purposeful Motion Rule", "body": "Animate the relationship a user needs to notice—never the whole interface merely because GSAP is available.", "section": "components" },
+      { "name": "The Single Peak Rule", "body": "The dark horizontal chapter sequence is the Landing’s strongest authored moment. Surrounding sections remain light, calm, and document-led so the peak is created by contrast rather than constant spectacle.", "section": "layout" },
+      { "name": "The Same Content Rule", "body": "Horizontal motion may change spatial progression, but never content availability; every chapter remains present in semantic order when motion, JavaScript enhancement, or desktop composition is unavailable.", "section": "components" }
     ],
     "dos": [
       "Do put authentic repository paths, chapter names, diagrams, and generated output at the center of product proof.",
@@ -306,7 +310,8 @@
       "Do share the real worker status between Workspace and `/wiki`, preserving its five backend-reported boundaries and factual chapter counts.",
       "Do preserve the one-to-one binding between a Chat submission, its Markdown answer, and the actual source paths returned for that request.",
       "Do render the verified Spoon-Knife sample through the shared production Wiki reader and keep its provenance and zero-call behavior explicit.",
-      "Do treat Landing, Workspace, Wiki, Chat, and Architecture as distinct modes of one connected repository-to-chapters-to-Wiki journey."
+      "Do treat Landing, Workspace, Wiki, Chat, and Architecture as distinct modes of one connected repository-to-chapters-to-Wiki journey.",
+      "Do use the dark horizontal chapter sequence as the single authored peak and preserve all three scenes as a semantic stack without desktop motion."
     ],
     "donts": [
       "Don't turn AutoWiki into a generic chatbot visual language; the structured wiki is the flagship artifact.",

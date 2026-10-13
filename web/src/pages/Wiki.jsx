@@ -101,7 +101,7 @@ function WikiPending({ jobId, repo, progress }) {
   )
 }
 
-function WikiFailure({ title, error, jobId }) {
+function WikiFailure({ title, error, jobId, onRetry }) {
   return (
     <section className="wiki-state-page" aria-labelledby="wiki-failure-title">
       <Link className="wiki-back-link" to="/workspace"><ArrowLeft aria-hidden="true" size={16} />Back to Workspace</Link>
@@ -115,8 +115,9 @@ function WikiFailure({ title, error, jobId }) {
       <ErrorNotice
         title={title}
         error={error}
-        recovery="Return to Workspace, confirm the repository is available, and start a new Wiki job. Retrying may still depend on external services."
+        recovery={onRetry ? 'The generation job may still be running. Retry this status check without starting a duplicate job.' : 'Return to Workspace, confirm the repository is available, and start a new Wiki job. Retrying may still depend on external services.'}
       />
+      {onRetry ? <Button type="button" variant="secondary" onClick={onRetry}><RefreshCw aria-hidden="true" size={17} />Retry status check</Button> : null}
       {jobId ? (
         <details className="wiki-job-details">
           <summary>Job details</summary>
@@ -357,7 +358,7 @@ export default function Wiki() {
   const [submitError, setSubmitError] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const jobId = searchParams.get('jobId') ?? ''
-  const { job, error: pollError } = useJobPoll('wiki', jobId)
+  const { job, error: pollError, retry: retryPoll } = useJobPoll('wiki', jobId)
 
   useJobNotifications(job, jobId, {
     completed: 'Repository wiki is ready',
@@ -383,7 +384,7 @@ export default function Wiki() {
   }
 
   if (pollError) {
-    return <WikiFailure title="Wiki job unavailable" error={pollError} jobId={jobId} />
+    return <WikiFailure title="Wiki job unavailable" error={pollError} jobId={jobId} onRetry={retryPoll} />
   }
 
   if (!job || job.status === 'pending') {

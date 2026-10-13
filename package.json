@@ -5,6 +5,8 @@
   "main": "src/index.js",
   "scripts": {
     "dev": "node --watch src/index.js",
+    "dev:inngest": "npx --yes inngest-cli@1.46.0 dev -u http://localhost:5555/api/inngest",
+    "dev:web": "npm --prefix web run dev",
     "test": "node --test"
   },
   "keywords": [],

@@ -235,9 +235,17 @@ function ArchitectureOverview() {
           <div className="architecture-detail__connections">
             <strong>Highlighted connections</strong>
             <ul>
-              {relatedConnections.map((connection) => (
-                <li key={`${connection.from}-${connection.to}`}>{connection.label}</li>
-              ))}
+              {relatedConnections.map((connection) => {
+                const from = architectureNodes.find((node) => node.id === connection.from)
+                const to = architectureNodes.find((node) => node.id === connection.to)
+                return (
+                  <li key={`${connection.from}-${connection.to}`}>
+                    <span>{connection.from === selectedId ? 'outgoing' : 'incoming'}</span>
+                    <strong>{from.shortLabel} <ArrowRight aria-hidden="true" size={12} /> {to.shortLabel}</strong>
+                    <small>{connection.label}</small>
+                  </li>
+                )
+              })}
             </ul>
           </div>
         ) : null}

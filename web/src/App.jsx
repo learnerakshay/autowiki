@@ -3,10 +3,10 @@ import { NavLink, Route, Routes, useLocation } from 'react-router-dom'
 import { BookOpenText, LayoutPanelTop, MessageSquareText, Network } from 'lucide-react'
 import { AutoWikiBrand } from './components/AutoWikiBrand.jsx'
 import { Toaster } from './components/ui/sonner.jsx'
-import Chat from './pages/Chat.jsx'
-import Home from './pages/Home.jsx'
 
 const Landing = lazy(() => import('./pages/Landing.jsx'))
+const Home = lazy(() => import('./pages/Home.jsx'))
+const Chat = lazy(() => import('./pages/Chat.jsx'))
 const Wiki = lazy(() => import('./pages/Wiki.jsx'))
 const SampleWiki = lazy(() => import('./pages/SampleWiki.jsx'))
 const Architecture = lazy(() => import('./pages/Architecture.jsx'))

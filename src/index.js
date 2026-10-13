@@ -13,6 +13,10 @@ app.get("/" , (req , res)=>{
     res.send("hello world")
 })
 
+app.get("/api/health", (req, res) => {
+    res.json({ status: "ok", service: "autowiki-api" });
+});
+
 app.use("/api/index", indexRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/wiki", wikiRoutes);
