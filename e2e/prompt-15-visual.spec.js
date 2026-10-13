@@ -9,7 +9,12 @@ test('capture Prompt 15 release-candidate routes', async ({ page }) => {
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
   await page.screenshot({ path: 'screenshots/prompt-15-landing-hero.png' })
   await page.screenshot({ path: 'screenshots/prompt-15-landing-full.png', fullPage: true })
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.reload()
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+  await page.screenshot({ path: 'screenshots/prompt-15-landing-mobile.png', fullPage: true })
 
+  await page.setViewportSize({ width: 1440, height: 900 })
   await page.goto('/workspace')
   await expect(page.getByRole('heading', { name: 'What will we document today?' })).toBeVisible()
   await page.waitForTimeout(250)

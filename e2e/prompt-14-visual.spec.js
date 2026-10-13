@@ -13,7 +13,7 @@ test('Landing scroll story is accessible, interactive, and responsive', async ({
   await page.setViewportSize({ width: 1440, height: 900 })
   await page.goto('/')
   await expect(page.getByRole('heading', { level: 1, name: 'Your repository, beautifully documented.' })).toBeVisible()
-  await expect(page.getByRole('link', { name: 'Generate a Wiki' })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Generate', exact: true })).toBeVisible()
 
   const tabs = page.getByRole('tab')
   await tabs.nth(0).focus()

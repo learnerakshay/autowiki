@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import {
   AlertCircle,
   ArrowRight,
@@ -228,7 +228,10 @@ function WorkspaceJobCard({ kind, jobId, repo, job, error, submitting, onRetry }
 
 export default function Home() {
   const pageRef = useRef(null)
-  const [repo, setRepo] = useState('')
+  const [searchParams] = useSearchParams()
+  // The landing-page hero hands off a validated owner/repo as ?repo=. It only prefills the field;
+  // starting a job still takes an explicit click on Generate Wiki.
+  const [repo, setRepo] = useState(() => (searchParams.get('repo') ?? '').trim().slice(0, 140))
   const [touched, setTouched] = useState(false)
   const [indexJobId, setIndexJobId] = useState('')
   const [wikiJobId, setWikiJobId] = useState('')

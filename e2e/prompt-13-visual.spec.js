@@ -36,8 +36,9 @@ test('Prompt 13 landing reset is responsive, interactive, and uses only local sa
   await page.getByRole('link', { name: 'Architecture', exact: true }).first().click()
   await expect(page).toHaveURL(/\/architecture$/)
   await page.goto('/')
-  await page.getByRole('link', { name: 'Generate a Wiki' }).click()
-  await expect(page).toHaveURL(/\/workspace$/)
+  await page.getByRole('textbox', { name: /GitHub repository/ }).fill('octocat/Spoon-Knife')
+  await page.getByRole('button', { name: 'Generate', exact: true }).click()
+  await expect(page).toHaveURL(/\/workspace\?repo=octocat%2FSpoon-Knife$/)
 
   await page.setViewportSize({ width: 1280, height: 800 })
   await page.goto('/')

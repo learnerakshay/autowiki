@@ -7,7 +7,10 @@ test("landing interactions remain accurate and complete with reduced motion", as
   await page.goto("/");
 
   await expect(page.getByRole("heading", { level: 1, name: "Your repository, beautifully documented." })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Generate a Wiki" })).toHaveAttribute("href", "/workspace");
+  const repoField = page.getByRole("textbox", { name: /GitHub repository/ });
+  await expect(repoField).toBeVisible();
+  await expect(page.getByRole("button", { name: "Generate", exact: true })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Explore Sample Wiki" })).toHaveAttribute("href", "/wiki/sample/spoon-knife");
   await expect(page.getByText("octocat / Spoon-Knife", { exact: true })).toBeVisible();
   await expect(page.getByText("3 chapters", { exact: true })).toBeVisible();
   await expect(page.getByText("Source path", { exact: true })).toBeVisible();
@@ -27,8 +30,19 @@ test("landing interactions remain accurate and complete with reduced motion", as
   await expect(page.locator(".product-window__document")).toHaveCount(1);
   await expect(page.locator(".product-diagram").first()).toBeVisible();
 
-  await page.getByRole("link", { name: "Generate a Wiki" }).click();
-  await expect(page).toHaveURL(/\/workspace$/);
+  // Inline validation: flagged while typing, before any submit.
+  await repoField.fill("octo cat");
+  await expect(repoField).toHaveAttribute("aria-invalid", "true");
+  await expect(page.getByText("Repository names cannot contain spaces.")).toBeVisible();
+  await page.getByRole("button", { name: "Generate", exact: true }).click();
+  await expect(page).not.toHaveURL(/workspace/);
+
+  // Valid input hands off to the workspace with the repository prefilled (and no job started).
+  await repoField.fill("https://github.com/octocat/Spoon-Knife.git");
+  await expect(repoField).toHaveAttribute("aria-invalid", "false");
+  await page.getByRole("button", { name: "Generate", exact: true }).click();
+  await expect(page).toHaveURL(/\/workspace\?repo=octocat%2FSpoon-Knife$/);
+  await expect(page.getByLabel("GitHub repository")).toHaveValue("octocat/Spoon-Knife");
   await page.goBack();
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   await expect(page.locator(".landing-shell")).toHaveCount(1);
