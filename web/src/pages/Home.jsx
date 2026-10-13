@@ -24,6 +24,7 @@ import { Button } from '../components/ui/button.jsx'
 import { Input } from '../components/ui/input.jsx'
 import { Label } from '../components/ui/label.jsx'
 import { useJobNotifications } from '../hooks/useJobNotifications.js'
+import { motion, motionQuery, prefersReducedMotion } from '../lib/motion.js'
 import { useJobPoll } from '../useJobPoll.js'
 
 const workflowSteps = [
@@ -112,7 +113,7 @@ function WorkspaceJobCard({ kind, jobId, repo, job, error, submitting }) {
   useGSAP(() => {
     if (!panelRef.current) return
 
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    if (prefersReducedMotion()) {
       gsap.set(panelRef.current, { clearProps: 'all' })
       return
     }
@@ -120,7 +121,7 @@ function WorkspaceJobCard({ kind, jobId, repo, job, error, submitting }) {
     gsap.fromTo(
       panelRef.current,
       { opacity: 0.64, y: 4 },
-      { opacity: 1, y: 0, duration: 0.22, ease: 'power2.out', clearProps: 'transform' },
+      { opacity: 1, y: 0, duration: motion.selection, ease: 'power2.out', clearProps: 'transform' },
     )
   }, { scope: panelRef, dependencies: [jobId, state] })
 
@@ -243,11 +244,11 @@ export default function Home() {
   useGSAP(() => {
     const media = gsap.matchMedia()
 
-    media.add('(prefers-reduced-motion: no-preference)', () => {
+    media.add(motionQuery, () => {
       const timeline = gsap.timeline({ defaults: { ease: 'power2.out' } })
       timeline
-        .from('.workspace-intro > *', { opacity: 0, y: 12, duration: 0.32, stagger: 0.045 })
-        .from('.workspace-command-grid > *', { opacity: 0, y: 12, duration: 0.3, stagger: 0.06 }, '-=0.16')
+        .from('.workspace-intro > *', { opacity: 0, y: 12, duration: motion.content, stagger: 0.045 })
+        .from('.workspace-command-grid > *', { opacity: 0, y: 12, duration: motion.content, stagger: 0.06 }, '-=0.16')
         .from('.workspace-assurance > *', { opacity: 0, y: 6, duration: 0.24, stagger: 0.04 }, '-=0.14')
         .to('.workspace-workflow', { '--workflow-progress': '100%', duration: 0.58, ease: 'power1.inOut' }, '-=0.2')
     })

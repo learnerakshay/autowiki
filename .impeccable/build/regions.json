@@ -1,0 +1,54 @@
+{
+  "regions": [
+    {
+      "id": "mint-atmosphere",
+      "kind": "chrome",
+      "grid": "A0:J8",
+      "container": true,
+      "note": "CSS-built luminous mint and aqua environmental ground"
+    },
+    {
+      "id": "floating-navigation",
+      "kind": "chrome",
+      "grid": "C0:H0",
+      "note": "Compact centered translucent navigation with dark workspace action"
+    },
+    {
+      "id": "hero-headline",
+      "kind": "text",
+      "grid": "C1:H1",
+      "note": "Single-line near-black editorial display headline"
+    },
+    {
+      "id": "hero-description",
+      "kind": "text",
+      "grid": "C2:H2",
+      "note": "Centered concise product-specific supporting copy"
+    },
+    {
+      "id": "hero-actions",
+      "kind": "control",
+      "grid": "D2:F2",
+      "note": "Dark primary Generate a Wiki action and white secondary sample action"
+    },
+    {
+      "id": "product-tabs",
+      "kind": "control",
+      "grid": "D3:G3",
+      "note": "Three accessible product capability tabs with understated active marker"
+    },
+    {
+      "id": "documentation-showcase",
+      "kind": "chrome",
+      "grid": "A4:J8",
+      "container": true,
+      "note": "Large semantic three-region AutoWiki documentation application"
+    },
+    {
+      "id": "next-section-heading",
+      "kind": "text",
+      "grid": "D9:G9",
+      "note": "Beginning of repository-to-documentation process section"
+    }
+  ]
+}

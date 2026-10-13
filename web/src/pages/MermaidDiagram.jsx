@@ -1,8 +1,10 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
-import { AlertTriangle, MoveHorizontal, Network } from 'lucide-react'
+import { AlertTriangle, Maximize2, MoveHorizontal, Network, X } from 'lucide-react'
 import { Skeleton } from '../components/ui/skeleton.jsx'
+import { Button } from '../components/ui/button.jsx'
+import { motion, prefersReducedMotion } from '../lib/motion.js'
 
 let mermaidPromise
 
@@ -74,12 +76,12 @@ function MermaidRender({ source, label }) {
 
   useGSAP(() => {
     if (!rendered || !containerRef.current) return
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const reduced = prefersReducedMotion()
 
     gsap.fromTo(
       containerRef.current,
       { autoAlpha: reduced ? 1 : 0.72, y: reduced ? 0 : 6 },
-      { autoAlpha: 1, y: 0, duration: reduced ? 0.1 : 0.24, ease: reduced ? 'none' : 'power3.out' },
+      { autoAlpha: 1, y: 0, duration: reduced ? 0.1 : motion.selection, ease: reduced ? 'none' : motion.ease },
     )
   }, { scope: containerRef, dependencies: [rendered] })
 
@@ -120,19 +122,95 @@ function MermaidRender({ source, label }) {
 }
 
 export default function MermaidDiagram({ source, valid, titleId, label = 'Repository architecture diagram' }) {
+  const cardRef = useRef(null)
+  const toggleRef = useRef(null)
+  const [expanded, setExpanded] = useState(false)
+
+  useEffect(() => {
+    if (!expanded) return undefined
+
+    const toggle = toggleRef.current
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+
+    function handleKeyDown(event) {
+      if (event.key === 'Escape') {
+        event.preventDefault()
+        setExpanded(false)
+        return
+      }
+
+      if (event.key !== 'Tab' || !cardRef.current) return
+      const focusable = [...cardRef.current.querySelectorAll('button:not([disabled]), [href], [tabindex]:not([tabindex="-1"])')]
+      if (!focusable.length) return
+      const first = focusable[0]
+      const last = focusable.at(-1)
+
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault()
+        last.focus()
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault()
+        first.focus()
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => {
+      document.body.style.overflow = previousOverflow
+      document.removeEventListener('keydown', handleKeyDown)
+      requestAnimationFrame(() => toggle?.focus())
+    }
+  }, [expanded])
+
+  useGSAP(() => {
+    if (!expanded || !cardRef.current || prefersReducedMotion()) return
+    gsap.fromTo(
+      cardRef.current,
+      { autoAlpha: 0.84, scale: 0.985, y: 8 },
+      { autoAlpha: 1, scale: 1, y: 0, duration: motion.content, ease: motion.ease, clearProps: 'opacity,visibility,transform' },
+    )
+  }, { scope: cardRef, dependencies: [expanded] })
+
   if (!source) return null
 
   return (
-    <div className="diagram-card">
+    <>
+      {expanded ? <div className="diagram-backdrop" aria-hidden="true" /> : null}
+      <div
+        ref={cardRef}
+        id={`${titleId}-viewer`}
+        className={`diagram-card${expanded ? ' is-expanded' : ''}`}
+        role={expanded ? 'dialog' : undefined}
+        aria-modal={expanded ? 'true' : undefined}
+        aria-labelledby={titleId}
+        aria-describedby={`${titleId}-description`}
+      >
       <div className="diagram-header">
         <div className="diagram-header__identity">
           <span aria-hidden="true"><Network size={18} /></span>
           <div>
             <h3 id={titleId}>Architecture diagram</h3>
-            <p>Relationships described by this chapter’s generated Mermaid definition.</p>
+            <p id={`${titleId}-description`}>Relationships described by this chapter’s generated Mermaid definition.</p>
           </div>
         </div>
-        <span className="diagram-header__hint"><MoveHorizontal aria-hidden="true" size={15} />Scroll to explore</span>
+        <div className="diagram-header__actions">
+          <span className="diagram-header__hint"><MoveHorizontal aria-hidden="true" size={15} />Scroll to explore</span>
+          {valid ? (
+            <Button
+              ref={toggleRef}
+              type="button"
+              variant="secondary"
+              size="sm"
+              aria-expanded={expanded}
+              aria-controls={`${titleId}-viewer`}
+              onClick={() => setExpanded((value) => !value)}
+            >
+              {expanded ? <X aria-hidden="true" size={16} /> : <Maximize2 aria-hidden="true" size={16} />}
+              {expanded ? 'Close diagram' : 'Expand diagram'}
+            </Button>
+          ) : null}
+        </div>
       </div>
 
       {!valid ? (
@@ -150,6 +228,7 @@ export default function MermaidDiagram({ source, valid, titleId, label = 'Reposi
       ) : (
         <MermaidRender key={source} source={source} label={label} />
       )}
-    </div>
+      </div>
+    </>
   )
 }

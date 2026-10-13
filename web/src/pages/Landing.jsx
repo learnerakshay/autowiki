@@ -1,321 +1,172 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { Link } from 'react-router-dom'
-import { ArrowRight, BookOpenText, Braces, FileCode2, GitFork, Layers3, MessageSquareText, Network, Workflow } from 'lucide-react'
+import { ArrowRight, BookOpenText, FileCode2, GitFork, Menu, MessageSquareText, Network, X } from 'lucide-react'
 import { AutoWikiBrand, AutoWikiMark } from '../components/AutoWikiBrand.jsx'
 import { Button } from '../components/ui/button.jsx'
-import { Tabs, TabsList, TabsTrigger } from '../components/ui/tabs.jsx'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs.jsx'
+import sampleWiki from '../data/samples/spoon-knife.json'
+import { motion, motionQuery, prefersReducedMotion } from '../lib/motion.js'
 
 gsap.registerPlugin(useGSAP, ScrollTrigger)
 
-const previewChapters = [
-  {
-    title: 'Introduction',
-    description: 'Overview of the project and its purpose.',
-    sourcePaths: ['README.md'],
-    body: 'This chapter provides an overview of the project and its purpose. The primary goal of this repository is to serve as an example for users looking to understand the process of forking a repository on GitHub. Forking allows users to create a personal copy of an existing project, enabling them to experiment with changes without affecting the original codebase.',
-    diagramLabel: 'README.md describes repository forking, which leads to a personal copy or a pull request.',
-    diagramLevels: [['README.md'], ['Forking a Repository'], ['Creating a Personal Copy', 'Submitting Pull Requests']],
-  },
-  {
-    title: 'Web Structure',
-    description: 'The main HTML structure of the web application.',
-    sourcePaths: ['index.html'],
-    body: 'The index.html file serves as the main entry point for the web application. It defines the overall structure and content that users will see when they visit the site. Below is a breakdown of its components.',
-    diagramLabel: 'index.html contains the head and body sections.',
-    diagramLevels: [['index.html'], ['head', 'body']],
-  },
-  {
-    title: 'Styling',
-    description: 'CSS styles used to enhance the appearance of the web application.',
-    sourcePaths: ['styles.css'],
-    body: 'The styles.css file is responsible for defining the visual appearance of the web application. It contains CSS rules that apply to various HTML elements, ensuring a consistent and appealing layout across the application.',
-    diagramLabel: 'styles.css defines the universal reset, Octocat image, and paragraph rules.',
-    diagramLevels: [['styles.css'], ['*', '#octocat', 'p']],
-  },
+const diagramLevels = [
+  [['README.md'], ['Forking a Repository', 'Pull Requests'], ['Personal Copy', 'Contribute to Original Project']],
+  [['index.html'], ['head', 'body'], ['meta', 'title', 'link', 'img', 'p']],
+  [['styles.css'], ['* selector', '#octocat', 'p'], ['display: block', 'width: 384px', 'margin: 50px auto']],
 ]
 
-function ProductPreview() {
-  const [activeChapter, setActiveChapter] = useState('0')
+const previewChapters = sampleWiki.chapters.map((chapter, index) => ({
+  ...chapter,
+  excerpt: chapter.markdown.replace(/^# .+\n+/, '').split('\n\n')[0].replace(/[`*_]/g, ''),
+  diagramLevels: diagramLevels[index],
+}))
+
+const processSteps = [
+  { number: '01', title: 'Connect the repository', text: 'Point AutoWiki at a public GitHub repository using its owner and repository name.' },
+  { number: '02', title: 'Shape the chapters', text: 'Repository files become a focused outline before any chapter prose is generated.' },
+  { number: '03', title: 'Read the generated wiki', text: 'Explanations, source paths, and Mermaid diagrams arrive as one navigable document.' },
+]
+
+const pipeline = ['GitHub repository', 'Repository files', 'Outline generation', 'Chapter generation', 'Mermaid diagrams', 'Structured wiki']
+
+function Diagram({ chapter, compact = false }) {
+  return (
+    <div className={`product-diagram${compact ? ' product-diagram--compact' : ''}`} role="img" aria-label={`Generated Mermaid structure for ${chapter.title}`}>
+      {chapter.diagramLevels.map((level, levelIndex) => (
+        <div className="product-diagram__level" key={level.join('-')}>
+          <div>{level.map((node) => <span key={node}>{node}</span>)}</div>
+          {levelIndex < chapter.diagramLevels.length - 1 && <i aria-hidden="true" />}
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function ProductShowcase() {
+  const [activeMode, setActiveMode] = useState('chapters')
+  const [activeChapter, setActiveChapter] = useState(0)
   const documentRef = useRef(null)
-  const previousChapterRef = useRef(activeChapter)
-  const chapter = previewChapters[Number(activeChapter)]
+  const chapter = previewChapters[activeChapter]
 
   useGSAP(() => {
-    if (previousChapterRef.current === activeChapter) return
-    previousChapterRef.current = activeChapter
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-
-    gsap.fromTo(
-      documentRef.current.children,
-      { autoAlpha: 0.25, y: 8 },
-      { autoAlpha: 1, y: 0, duration: 0.24, stagger: 0.025, ease: 'power3.out', clearProps: 'all' },
-    )
-  }, { scope: documentRef, dependencies: [activeChapter], revertOnUpdate: true })
+    if (prefersReducedMotion() || !documentRef.current) return
+    gsap.fromTo(documentRef.current.children, { autoAlpha: 0.3, y: 8 }, { autoAlpha: 1, y: 0, duration: motion.selection, stagger: 0.025, ease: motion.ease, clearProps: 'all' })
+  }, { scope: documentRef, dependencies: [activeChapter, activeMode], revertOnUpdate: true })
 
   return (
-    <Tabs value={activeChapter} onValueChange={setActiveChapter} className="landing-preview" aria-label="Generated wiki preview">
-      <div className="landing-preview__bar">
-        <span className="landing-preview__identity"><AutoWikiMark /><span>Generated wiki</span></span>
-        <span className="landing-preview__address">autowiki / octocat / Spoon-Knife</span>
-        <span className="landing-preview__proof">Generated from Spoon-Knife</span>
-      </div>
-      <div className="landing-preview__repo">
-        <div>
-          <GitFork aria-hidden="true" />
-          <span>octocat / <strong>Spoon-Knife</strong></span>
+    <Tabs value={activeMode} onValueChange={setActiveMode} className="product-proof">
+      <TabsList className="product-proof__tabs" aria-label="Explore the generated output">
+        <TabsTrigger value="chapters"><BookOpenText aria-hidden="true" />Wiki chapters</TabsTrigger>
+        <TabsTrigger value="architecture"><Network aria-hidden="true" />Architecture diagrams</TabsTrigger>
+        <TabsTrigger value="sources"><FileCode2 aria-hidden="true" />Source context</TabsTrigger>
+      </TabsList>
+
+      <div className="product-window">
+        <div className="product-window__bar">
+          <span><AutoWikiMark /> Generated wiki</span>
+          <span className="product-window__repo"><GitFork aria-hidden="true" /> octocat / <strong>Spoon-Knife</strong></span>
+          <span className="product-window__bar-actions"><span>Pre-generated example</span><Link to="/wiki/sample/spoon-knife">Explore Wiki <ArrowRight aria-hidden="true" /></Link></span>
         </div>
-        <span>3 chapters · read-only</span>
-      </div>
-      <div className="landing-preview__body">
-        <aside className="landing-preview__rail" aria-label="Preview chapters">
-          <p>Chapters</p>
-          <TabsList className="landing-preview__chapters">
-            {previewChapters.map((item, index) => (
-              <TabsTrigger id={`landing-chapter-${index}`} key={item.title} value={String(index)} className="landing-preview__chapter">
-                <span>{String(index + 1).padStart(2, '0')}</span>
-                {item.title}
-              </TabsTrigger>
-            ))}
-          </TabsList>
-        </aside>
-        <div ref={documentRef} className="landing-preview__document" role="tabpanel" aria-labelledby={`landing-chapter-${activeChapter}`}>
-          <div className="landing-preview__document-head">
-            <div>
-              <p>Generated chapter</p>
-              <h2>{chapter.title}</h2>
-              <span>{chapter.description}</span>
-            </div>
-          </div>
-          <div className="landing-preview__sources">
-            <span>Source paths</span>
-            <div>{chapter.sourcePaths.map((path) => <code key={path}>{path}</code>)}</div>
-          </div>
-          <div className="landing-preview__copy">
-            <h3>Chapter excerpt</h3>
-            <p>{chapter.body}</p>
-          </div>
-          <figure className="landing-preview__diagram">
-            <figcaption>
-              <span>Mermaid diagram excerpt</span>
-              <Braces aria-hidden="true" />
-            </figcaption>
-            <div className="landing-preview__flow" role="img" aria-label={chapter.diagramLabel}>
-              {chapter.diagramLevels.map((level, index) => (
-                <div className="landing-preview__flow-level" key={level.join('-')}>
-                  {level.map((node) => <span key={node}>{node}</span>)}
-                  {index < chapter.diagramLevels.length - 1 && <i aria-hidden="true" />}
-                </div>
+        <div className="product-window__layout">
+          <aside className="product-window__rail" aria-label="Sample wiki chapters">
+            <p>Chapters</p>
+            <div className="product-window__chapter-list">
+              {previewChapters.map((item, index) => (
+                <button key={item.title} type="button" className={activeChapter === index ? 'is-active' : ''} aria-pressed={activeChapter === index} onClick={() => setActiveChapter(index)}>
+                  <span>{String(index + 1).padStart(2, '0')}</span><strong>{item.title}</strong>
+                </button>
               ))}
             </div>
-          </figure>
+            <div className="product-window__meta"><span>3 chapters</span><span>Read-only</span></div>
+          </aside>
+
+          <div ref={documentRef} className="product-window__document">
+            <TabsContent value="chapters" hidden={activeMode !== 'chapters'}>
+              <h2>{chapter.title}</h2><p className="product-window__description">{chapter.description}</p>
+              <div className="product-window__source-line"><span>Source path</span>{chapter.filePaths.map((path) => <code key={path}>{path}</code>)}</div>
+              <h3>Chapter excerpt</h3><p className="product-window__excerpt">{chapter.excerpt}</p>
+            </TabsContent>
+            <TabsContent value="architecture" hidden={activeMode !== 'architecture'}>
+              <h2>{chapter.title}</h2><p className="product-window__description">The chapter diagram is generated from the same source context as the explanation.</p><Diagram chapter={chapter} />
+            </TabsContent>
+            <TabsContent value="sources" hidden={activeMode !== 'sources'}>
+              <h2>Source context</h2><p className="product-window__description">Every sample chapter names the repository files used to create it.</p>
+              <div className="source-ledger">{previewChapters.map((item, index) => (
+                <button type="button" key={item.title} onClick={() => setActiveChapter(index)}><FileCode2 aria-hidden="true" /><span><strong>{item.filePaths.join(', ')}</strong><small>{item.title}</small></span><ArrowRight aria-hidden="true" /></button>
+              ))}</div>
+            </TabsContent>
+          </div>
+
+          <aside className="product-window__context" aria-label="Generated chapter context">
+            <div className="product-window__context-head"><Network aria-hidden="true" /><span>Diagram context</span></div>
+            <Diagram chapter={chapter} compact />
+            <div className="product-window__context-source"><span>Grounded in</span>{chapter.filePaths.map((path) => <code key={path}>{path}</code>)}</div>
+            <pre className="product-window__context-code"><code>{chapter.mermaid.split('\n').slice(0, 3).join('\n')}</code></pre>
+          </aside>
         </div>
       </div>
     </Tabs>
   )
 }
 
-const processSteps = [
-  { icon: GitFork, title: 'Connect your repository', text: 'Provide a public GitHub repository in owner/repository format.' },
-  { icon: Layers3, title: 'Plan the structure', text: 'AutoWiki analyzes repository files and organizes them into a focused chapter outline.' },
-  { icon: BookOpenText, title: 'Generate the wiki', text: 'Each chapter receives a technical explanation and a Mermaid diagram grounded in the source.' },
-]
+function LandingNavigation() {
+  const [open, setOpen] = useState(false)
+  useEffect(() => {
+    if (!open) return undefined
+    const closeOnEscape = (event) => { if (event.key === 'Escape') setOpen(false) }
+    window.addEventListener('keydown', closeOnEscape)
+    return () => window.removeEventListener('keydown', closeOnEscape)
+  }, [open])
+  const close = () => setOpen(false)
 
-const pipeline = ['GitHub Repository', 'Repository Files', 'Outline Generation', 'Chapter Generation', 'Mermaid Diagrams', 'Structured Wiki']
+  return (
+    <header className="landing-header"><div className="landing-header__inner">
+      <AutoWikiBrand />
+      <nav className="landing-nav landing-nav--desktop" aria-label="Landing navigation"><a href="#how-it-works">How it works</a><a href="#features">Features</a><Link to="/architecture">Architecture</Link><Link to="/workspace">Workspace</Link><Link to="/chat">Chat</Link></nav>
+      <Button asChild className="landing-header__cta"><Link to="/workspace">Open Workspace <ArrowRight aria-hidden="true" /></Link></Button>
+      <button className="landing-menu-button" type="button" aria-expanded={open} aria-controls="landing-mobile-navigation" aria-label={open ? 'Close navigation' : 'Open navigation'} onClick={() => setOpen((value) => !value)}>{open ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}</button>
+      {open && <nav id="landing-mobile-navigation" className="landing-nav landing-nav--mobile" aria-label="Mobile navigation"><a href="#how-it-works" onClick={close}>How it works</a><a href="#features" onClick={close}>Features</a><Link to="/architecture" onClick={close}>Architecture</Link><Link to="/workspace" onClick={close}>Workspace</Link><Link to="/chat" onClick={close}>Chat</Link></nav>}
+    </div></header>
+  )
+}
 
 export default function Landing() {
   const pageRef = useRef(null)
-
   useGSAP(() => {
     const media = gsap.matchMedia()
-
-    media.add({
-      motion: '(prefers-reduced-motion: no-preference)',
-      compact: '(max-width: 760px)',
-    }, ({ conditions }) => {
+    media.add({ motion: motionQuery, compact: '(max-width: 760px)' }, ({ conditions }) => {
       if (!conditions.motion) return
-
       const distance = conditions.compact ? 10 : 18
-      const enter = { autoAlpha: 1, y: 0, duration: conditions.compact ? 0.38 : 0.5, ease: 'power3.out', clearProps: 'all' }
-
-      gsap.timeline()
-        .fromTo('.landing-hero__sequence', { autoAlpha: 0, y: distance * 0.6 }, enter)
-        .fromTo('.landing-hero h1', { autoAlpha: 0, y: distance }, enter, '-=0.38')
-        .fromTo('.landing-hero__lede', { autoAlpha: 0, y: distance * 0.8 }, enter, '-=0.34')
-        .fromTo('.landing-hero__actions, .landing-hero__note', { autoAlpha: 0, y: distance * 0.6 }, { ...enter, stagger: 0.06 }, '-=0.32')
-        .fromTo('.landing-preview',
-          { autoAlpha: 0, y: distance, clipPath: 'inset(0 0 8% 0 round 12px)' },
-          { autoAlpha: 1, y: 0, clipPath: 'inset(0 0 0% 0 round 12px)', duration: conditions.compact ? 0.45 : 0.66, ease: 'power4.out', clearProps: 'all' },
-          '-=0.3',
-        )
-
-      gsap.timeline({ scrollTrigger: { trigger: '.landing-process', start: 'top 72%', once: true } })
-        .from('.landing-process .landing-section__heading', { autoAlpha: 0, y: distance, duration: 0.46, ease: 'power3.out', clearProps: 'all' })
-        .fromTo('.process-flow', { '--connector-progress': 0 }, { '--connector-progress': 1, duration: 0.62, ease: 'power2.out', clearProps: '--connector-progress' }, '-=0.12')
-        .from('.process-flow > li', { autoAlpha: 0, y: distance, duration: 0.42, stagger: 0.11, ease: 'power3.out', clearProps: 'all' }, '-=0.46')
-
-      gsap.timeline({ scrollTrigger: { trigger: '.landing-features', start: 'top 70%', once: true } })
-        .from('.landing-features .landing-section__heading', { autoAlpha: 0, y: distance, duration: 0.46, ease: 'power3.out', clearProps: 'all' })
-        .from('.feature-block--chapters', { autoAlpha: 0, y: distance, duration: 0.52, ease: 'power3.out', clearProps: 'all' }, '-=0.18')
-        .from('.feature-block--diagram, .feature-block--chat', { autoAlpha: 0, y: distance * 0.75, duration: 0.46, stagger: 0.1, ease: 'power3.out', clearProps: 'all' }, '-=0.34')
-
-      gsap.timeline({ scrollTrigger: { trigger: '.architecture', start: 'top 74%', once: true } })
-        .from('.architecture__heading', { autoAlpha: 0, y: distance, duration: 0.46, ease: 'power3.out', clearProps: 'all' })
-        .from('.pipeline > li', { autoAlpha: 0.35, y: distance * 0.6, duration: 0.38, stagger: 0.07, ease: 'power3.out', clearProps: 'all' }, '-=0.2')
-        .from('.architecture__note', { autoAlpha: 0, duration: 0.3, ease: 'power2.out', clearProps: 'all' }, '-=0.12')
+      gsap.timeline().from('.landing-hero h1', { autoAlpha: 0, y: distance, duration: motion.entrance, ease: motion.ease, clearProps: 'all' }).from('.landing-hero__lede, .landing-hero__actions', { autoAlpha: 0, y: distance * 0.65, duration: motion.content, stagger: 0.06, ease: motion.ease, clearProps: 'all' }, '-=0.34').from('.product-proof', { autoAlpha: 0, y: distance, duration: 0.58, ease: 'power4.out', clearProps: 'all' }, '-=0.3')
+      gsap.utils.toArray('.landing-section, .landing-cta').forEach((section) => gsap.from(section.children, { autoAlpha: 0, y: distance, duration: 0.52, stagger: 0.08, ease: 'power3.out', clearProps: 'all', scrollTrigger: { trigger: section, start: 'top 78%', once: true } }))
     })
-
     return () => media.revert()
   }, { scope: pageRef })
 
   return (
-    <div ref={pageRef} className="landing-shell">
-      <a className="skip-link" href="#main-content">Skip to content</a>
-      <header className="landing-header">
-        <div className="landing-header__inner">
-          <AutoWikiBrand />
-          <nav className="landing-nav" aria-label="Landing navigation">
-            <a href="#how-it-works">How it works</a>
-            <a href="#features">Features</a>
-            <Link to="/architecture">Architecture</Link>
-            <Link to="/workspace">Workspace</Link>
-            <Link to="/chat">Chat</Link>
-          </nav>
-          <Button asChild className="landing-header__cta">
-            <Link to="/workspace">Open Workspace <ArrowRight aria-hidden="true" /></Link>
-          </Button>
-        </div>
-      </header>
-
+    <div ref={pageRef} className="landing-shell"><a className="skip-link" href="#main-content">Skip to content</a><LandingNavigation />
       <main id="main-content" className="landing-main">
         <section className="landing-hero" aria-labelledby="landing-title">
-          <div className="landing-hero__inner">
-            <div className="landing-hero__copy">
-              <div className="landing-hero__sequence" aria-label="Repository to documentation sequence">
-                <span>Repository</span><i aria-hidden="true" /><span>Chapters</span><i aria-hidden="true" /><span>Wiki</span>
-              </div>
-              <h1 id="landing-title">Your repository.<br />Beautifully documented.</h1>
-              <p className="landing-hero__lede">Transform GitHub repositories into structured technical wikis with AI-generated chapters, clear explanations, and Mermaid diagrams.</p>
-              <div className="landing-hero__actions">
-                <Button asChild>
-                  <Link to="/workspace">Generate a Wiki <ArrowRight aria-hidden="true" /></Link>
-                </Button>
-                <Button asChild variant="secondary">
-                  <Link to="/wiki/sample/spoon-knife">Explore Sample Wiki</Link>
-                </Button>
-              </div>
-              <p className="landing-hero__note"><Workflow aria-hidden="true" /> Real generated output, or <a href="#how-it-works">Explore How It Works</a>.</p>
-            </div>
-            <ProductPreview />
-          </div>
+          <div className="landing-hero__copy"><h1 id="landing-title">Your repository,<br />beautifully documented.</h1><p className="landing-hero__lede">Transform a public GitHub repository into a structured technical wiki with generated chapters, source context, and Mermaid diagrams.</p><div className="landing-hero__actions"><Button asChild><Link to="/workspace">Generate a Wiki <ArrowRight aria-hidden="true" /></Link></Button><Button asChild variant="secondary"><Link to="/wiki/sample/spoon-knife">Explore Sample Wiki</Link></Button></div></div>
+          <ProductShowcase />
         </section>
 
-        <section id="how-it-works" className="landing-section landing-process" aria-labelledby="process-title">
-          <div className="landing-section__heading">
-            <h2 id="process-title">From repository to documentation.</h2>
-            <p>Source files become a planned chapter outline, grounded explanations, and per-chapter diagrams. Chat indexing remains a separate workflow.</p>
-          </div>
-          <ol className="process-flow">
-            {processSteps.map(({ icon: Icon, title, text }, index) => (
-              <li key={title}>
-                <div className="process-flow__number">{String(index + 1).padStart(2, '0')}</div>
-                <Icon aria-hidden="true" />
-                <h3>{title}</h3>
-                <p>{text}</p>
-              </li>
-            ))}
-          </ol>
-        </section>
+        <section id="how-it-works" className="landing-section landing-process" aria-labelledby="process-title"><div className="landing-section__heading"><h2 id="process-title">From repository to documentation.</h2><p>One deliberate path turns repository structure into a wiki people can actually navigate.</p></div><ol className="process-flow">{processSteps.map((step) => <li key={step.title}><span className="process-flow__number">{step.number}</span><div><h3>{step.title}</h3><p>{step.text}</p></div></li>)}</ol></section>
 
-        <section id="features" className="landing-section landing-features" aria-labelledby="features-title">
-          <div className="landing-section__heading landing-section__heading--wide">
-            <h2 id="features-title">Everything your repository needs to explain itself.</h2>
-            <p>Wiki generation leads. Diagrams make relationships visible. Grounded questions remain available as a separate supporting workflow.</p>
-          </div>
-          <div className="feature-grid">
-            <article className="feature-block feature-block--chapters">
-              <div className="feature-block__copy">
-                <BookOpenText aria-hidden="true" />
-                <h3>Structured Wiki Generation</h3>
-                <p>AutoWiki proactively organizes repository knowledge into a navigable technical document with focused chapters.</p>
-              </div>
-              <div className="chapter-proof" aria-label="Example chapter navigation from generated Spoon-Knife output">
-                <div><span>01</span><strong>Introduction</strong><FileCode2 aria-hidden="true" /></div>
-                <div><span>02</span><strong>Web Structure</strong><FileCode2 aria-hidden="true" /></div>
-                <div><span>03</span><strong>Styling</strong><FileCode2 aria-hidden="true" /></div>
-              </div>
-            </article>
+        <section id="features" className="landing-section landing-features" aria-labelledby="features-title"><div className="landing-section__heading landing-section__heading--wide"><h2 id="features-title">A technical document with the evidence still attached.</h2><p>Chapters lead the reading experience. Diagrams and source paths make the generated explanation easier to inspect.</p></div><div className="feature-composition">
+          <article className="feature-proof feature-proof--chapters"><div className="feature-proof__copy"><BookOpenText aria-hidden="true" /><h3>Structured wiki chapters</h3><p>A navigable document replaces a pile of disconnected repository notes.</p></div><div className="feature-chapters" aria-label="Sample generated Spoon-Knife chapters">{previewChapters.map((chapter, index) => <div key={chapter.title}><span>{String(index + 1).padStart(2, '0')}</span><strong>{chapter.title}</strong><code>{chapter.filePaths[0]}</code></div>)}</div></article>
+          <article className="feature-proof feature-proof--diagram"><div className="feature-proof__copy"><Network aria-hidden="true" /><h3>Relationships made visible</h3><p>Each chapter can pair explanation with a Mermaid diagram generated from the same context.</p></div><Diagram chapter={previewChapters[0]} compact /></article>
+          <article className="feature-proof feature-proof--chat"><div className="feature-proof__copy"><MessageSquareText aria-hidden="true" /><h3>Grounded follow-up questions</h3><p>After separate indexing, chat can answer focused questions and point back to source paths.</p></div><div className="feature-chat"><span>What does this repository demonstrate?</span><code>README.md</code></div></article>
+        </div></section>
 
-            <article className="feature-block feature-block--diagram">
-              <div className="feature-block__copy">
-                <Network aria-hidden="true" />
-                <h3>Per-Chapter Mermaid Diagrams</h3>
-                <p>Each generated chapter can pair its explanation with a Mermaid diagram grounded in the same source files.</p>
-              </div>
-              <div className="diagram-proof" role="img" aria-label="README.md leads to the forking process, then to a personal copy">
-                <span>README.md</span><i aria-hidden="true" /><span>Forking Process</span><i aria-hidden="true" /><span>Personal Copy</span>
-              </div>
-            </article>
+        <section className="landing-section architecture" aria-labelledby="architecture-title"><div className="architecture__heading"><div><h2 id="architecture-title">A generation pipeline you can follow.</h2><p>The product story mirrors the current implementation instead of simulating a fictional live process.</p></div><Button asChild variant="secondary"><Link to="/architecture">Explore the architecture <ArrowRight aria-hidden="true" /></Link></Button></div><ol className="pipeline" aria-label="Wiki generation pipeline">{pipeline.map((stage, index) => <li key={stage}><span>{String(index + 1).padStart(2, '0')}</span><strong>{stage}</strong></li>)}</ol><p className="architecture__note">Repository-grounded chat uses a separate embeddings and vector-search pipeline.</p></section>
 
-            <article className="feature-block feature-block--chat">
-              <div className="feature-block__copy">
-                <MessageSquareText aria-hidden="true" />
-                <h3>Grounded Follow-Up Questions</h3>
-                <p>After separate indexing, ask focused questions and inspect source paths without replacing the generated wiki.</p>
-              </div>
-              <div className="chat-proof">
-                <span>What does this repository contain?</span>
-                <code>README.md</code>
-              </div>
-            </article>
-          </div>
-        </section>
-
-        <section className="landing-section architecture" aria-labelledby="architecture-title">
-          <div className="architecture__heading">
-            <Network aria-hidden="true" />
-            <div>
-              <p className="architecture__label">Conceptual processing order</p>
-              <h2 id="architecture-title">Designed around a real generation pipeline.</h2>
-              <p>The landing story reflects the current implementation rather than a fictional live progress tracker.</p>
-            </div>
-          </div>
-          <ol className="pipeline" aria-label="Wiki generation pipeline">
-            {pipeline.map((stage) => <li key={stage}>{stage}</li>)}
-          </ol>
-          <div className="architecture__footer">
-            <p className="architecture__note">Repository-grounded chat uses a separate embeddings and vector-search pipeline.</p>
-            <Button asChild variant="secondary"><Link to="/architecture">Explore the architecture <ArrowRight aria-hidden="true" /></Link></Button>
-          </div>
-        </section>
-
-        <section className="landing-cta" aria-labelledby="cta-title">
-          <div>
-            <h2 id="cta-title">Turn your next repository into documentation.</h2>
-            <p>Generate structured chapters and Mermaid diagrams from a public GitHub repository.</p>
-          </div>
-          <Button asChild>
-            <Link to="/workspace">Open Workspace <ArrowRight aria-hidden="true" /></Link>
-          </Button>
-        </section>
+        <section className="landing-cta" aria-labelledby="cta-title"><div><h2 id="cta-title">Let the repository explain itself.</h2><p>Generate structured chapters and Mermaid diagrams from a public GitHub repository.</p></div><Button asChild><Link to="/workspace">Open Workspace <ArrowRight aria-hidden="true" /></Link></Button></section>
       </main>
-
-      <footer className="landing-footer">
-        <div className="landing-footer__inner">
-          <div>
-            <AutoWikiBrand />
-            <p>Structured technical wikis generated from public GitHub repositories.</p>
-          </div>
-          <nav aria-label="Footer navigation">
-            <a href="#how-it-works">How it works</a>
-            <Link to="/architecture">Architecture</Link>
-            <Link to="/workspace">Workspace</Link>
-            <Link to="/chat">Chat</Link>
-          </nav>
-        </div>
-      </footer>
+      <footer className="landing-footer"><div className="landing-footer__inner"><div><AutoWikiBrand /><p>Structured technical wikis generated from public GitHub repositories.</p></div><nav aria-label="Footer navigation"><a href="#how-it-works">How it works</a><Link to="/architecture">Architecture</Link><Link to="/workspace">Workspace</Link><Link to="/chat">Chat</Link></nav></div></footer>
     </div>
   )
 }

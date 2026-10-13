@@ -1,5 +1,7 @@
 import { defineConfig } from "@playwright/test";
 
+const executablePath = process.env.PLAYWRIGHT_EXECUTABLE_PATH;
+
 export default defineConfig({
   testDir: ".",
   testMatch: /.*\.spec\.js/,
@@ -10,5 +12,6 @@ export default defineConfig({
   use: {
     baseURL: "http://localhost:5173",
     browserName: "chromium",
+    ...(executablePath ? { launchOptions: { executablePath } } : {}),
   },
 });

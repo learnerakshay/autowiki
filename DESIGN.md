@@ -1,25 +1,25 @@
 ---
 name: AutoWiki
-description: Bright white-and-cyan documentation studio for repository-to-wiki journeys.
+description: Mint editorial documentation world for repository-to-wiki journeys.
 colors:
-  cool-canvas: "#f7fcfe"
+  mint-canvas: "#f7fbf9"
   reading-white: "#ffffff"
-  repository-ink: "#142638"
-  cool-mist: "#f1f8fa"
-  slate-copy: "#506579"
-  quiet-rule: "#d7e7ec"
-  strong-rule: "#7f96a4"
-  subtle-surface: "#f3fafc"
-  skeleton-cyan: "#deedf1"
-  restrained-indigo: "#3657d6"
-  deep-indigo: "#2947bd"
-  indigo-wash: "#edf1ff"
-  indigo-rule: "#c7d2fb"
-  active-cyan-wash: "#e9f8fb"
-  operational-cyan: "#0e7490"
-  operational-cyan-wash: "#ecfafd"
-  operational-cyan-highlight: "#22d3ee"
-  operational-cyan-rule: "#b9e8ef"
+  repository-ink: "#101a19"
+  sea-glass-mist: "#f0f7f4"
+  slate-copy: "#526361"
+  quiet-rule: "#dfece9"
+  strong-rule: "#8aa49f"
+  mint-surface: "#f3faf6"
+  skeleton-mint: "#dceae6"
+  action-ink: "#111918"
+  action-ink-hover: "#26312f"
+  pending-mint-wash: "#e2f8f2"
+  pending-mint-rule: "#b8e4da"
+  active-mint-wash: "#ddfce9"
+  operational-teal: "#087f75"
+  operational-mint-wash: "#e7faf2"
+  sea-glass-highlight: "#45d9b2"
+  operational-mint-rule: "#bce7dc"
   verified-green: "#176b43"
   verified-wash: "#eaf7f0"
   verified-rule: "#b8dfc9"
@@ -29,16 +29,16 @@ colors:
 typography:
   display:
     fontFamily: '"Manrope AutoWiki", "Segoe UI Variable", "Segoe UI", ui-sans-serif, system-ui, sans-serif'
-    fontSize: "clamp(4rem, 5.25vw, 4.9rem)"
-    fontWeight: 700
+    fontSize: "clamp(3.25rem, 6.1vw, 5.8rem)"
+    fontWeight: 720
     lineHeight: 0.98
-    letterSpacing: "-0.04em"
+    letterSpacing: "-0.066em"
   headline:
     fontFamily: '"Manrope AutoWiki", "Segoe UI Variable", "Segoe UI", ui-sans-serif, system-ui, sans-serif'
-    fontSize: "clamp(2.35rem, 4vw, 3.75rem)"
-    fontWeight: 700
-    lineHeight: 1.02
-    letterSpacing: "-0.04em"
+    fontSize: "clamp(2.7rem, 5vw, 4.8rem)"
+    fontWeight: 680
+    lineHeight: 0.98
+    letterSpacing: "-0.06em"
   title:
     fontFamily: '"Segoe UI Variable", "Segoe UI", ui-sans-serif, system-ui, sans-serif'
     fontSize: "1.25rem"
@@ -46,7 +46,7 @@ typography:
     lineHeight: 1.2
     letterSpacing: "-0.025em"
   body:
-    fontFamily: '"Segoe UI Variable", "Segoe UI", ui-sans-serif, system-ui, sans-serif'
+    fontFamily: '"Manrope AutoWiki", "Segoe UI Variable", "Segoe UI", ui-sans-serif, system-ui, sans-serif'
     fontSize: "1rem"
     fontWeight: 400
     lineHeight: 1.75
@@ -67,6 +67,7 @@ rounded:
   md: "0.5rem"
   lg: "0.625rem"
   xl: "0.75rem"
+  2xl: "1.15rem"
   full: "999px"
 spacing:
   xs: "0.25rem"
@@ -76,16 +77,16 @@ spacing:
   lg: "1.5rem"
   xl: "2rem"
   2xl: "3rem"
-  section: "8rem"
+  section: "clamp(7rem, 12vw, 11rem)"
 components:
   button-primary:
-    backgroundColor: "{colors.restrained-indigo}"
+    backgroundColor: "{colors.action-ink}"
     textColor: "{colors.reading-white}"
     rounded: "{rounded.md}"
     padding: "0 1rem"
     height: "2.75rem"
   button-primary-hover:
-    backgroundColor: "{colors.deep-indigo}"
+    backgroundColor: "{colors.action-ink-hover}"
     textColor: "{colors.reading-white}"
   button-secondary:
     backgroundColor: "{colors.reading-white}"
@@ -105,7 +106,7 @@ components:
     rounded: "{rounded.xl}"
     padding: "1.5rem"
   tab-active:
-    backgroundColor: "{colors.active-cyan-wash}"
+    backgroundColor: "{colors.active-mint-wash}"
     textColor: "{colors.repository-ink}"
     rounded: "{rounded.md}"
     padding: "0 0.875rem"
@@ -116,17 +117,17 @@ components:
 
 ## Overview
 
-**Creative North Star: "The Documentation Studio"**
+**Creative North Star: "The Living Documentation Field"**
 
-AutoWiki is a bright, light workspace where a repository becomes planned chapters and then a navigable technical Wiki. The visual system feels editorial and technical at once: icy-cyan canvas surrounds white reading surfaces, deep navy type carries the hierarchy, restrained cyan marks operational context, and indigo remains the rarer signal for primary decisions and connective logic.
+AutoWiki is a mint editorial world where a repository becomes planned chapters and then a navigable technical Wiki. Warm white reading surfaces sit inside a luminous sea-glass atmosphere, near-black type carries the hierarchy, and deep teal marks operational context. The landing page now leads with one centered promise and a large, authentic document window rather than a conventional copy-and-card split.
 
-The interface is evidence-led rather than ornamental. Dense technical material stays approachable through clear grouping, generous section rhythm, compact monospace metadata, and product proof that looks and behaves like the real reader. Landing, Workspace, Wiki, Chat, and Architecture each adopt the composition that best serves their mode while sharing the same tokens, document geometry, navigation, and truthful state language. The result should feel precise, credible, and calm—not like a generic chatbot or a decorative AI landing template.
+The interface is evidence-led rather than ornamental. Dense technical material stays approachable through clear grouping, generous section rhythm, compact monospace metadata, and product proof built directly from the checked-in Spoon-Knife fixture. Landing, Workspace, Wiki, Chat, and Architecture keep distinct compositions while sharing the new mint, near-black, and Manrope foundation. The result should feel precise, credible, and calm—not like a generic chatbot or a decorative AI landing template.
 
 **Key Characteristics:**
 
-- Bright white and icy-cyan surfaces with deep navy type.
+- Warm white and mint surfaces with near-black type.
 - Strong editorial hierarchy with technical, factual detail.
-- Restrained cyan for operational context; indigo reserved for primary actions and selected connective logic.
+- Deep teal for operational context; near-black for primary actions and selected navigation.
 - Truthful worker status with cyan operational signals and no invented completion data.
 - Border-led structure with quiet, exceptional elevation.
 - Authentic repository paths, chapters, diagrams, and product evidence.
@@ -135,7 +136,17 @@ The interface is evidence-led rather than ornamental. Dense technical material s
 
 ## Colors
 
-The palette is a bright cyan-tinted document field with deep navy type, one disciplined operational cyan voice, and a rarer indigo reserved for primary decisions. Semantic green and red remain limited to verified and failure states.
+### Prompt 13 landing composition
+
+The Landing route uses a compact floating navigation, a centered two-line display, paired dark and white actions, and a wide three-region product window. The window exposes three real modes—Wiki chapters, Architecture diagrams, and Source context—and all labels, paths, excerpts, and relationships come from the checked-in Spoon-Knife sample. Desktop preserves chapter rail, document, and diagram context; phone layouts replace the squeeze with horizontal chapter navigation, one focused document column, and hidden secondary context.
+
+Lower sections follow an editorial sequence instead of repeating a card grid: an open vertical process line, one dominant chapter proof with two supporting capabilities, a pale-mint six-stage architecture ribbon, and an unboxed sea-glass closing horizon. Large atmosphere is static and tonal. Motion is limited to short entrance and state-continuity transitions and is removed under reduced motion.
+
+**The Product-Is-The-Hero Rule.** The generated document must remain the largest and most concrete object in the first viewport; atmosphere, copy, and motion support it rather than compete with it.
+
+**The Mobile Recomposition Rule.** At phone widths, remove secondary context and restack the reading flow; never preserve a desktop multi-rail layout by shrinking it until the text becomes ornamental.
+
+The palette is a warm-white and mint document field with near-black type and one disciplined deep-teal operational voice. Semantic green and red remain limited to verified and failure states.
 
 ### Primary
 

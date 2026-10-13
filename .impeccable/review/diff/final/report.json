@@ -1,0 +1,358 @@
+{
+  "tool": "comp-diff",
+  "version": 1,
+  "createdAt": "2026-10-13T16:44:12.332Z",
+  "label": "final",
+  "comp": ".impeccable/mocks/prompt-13/landing-hero-approved.png",
+  "build": ".impeccable/review/hero-1586x992.png",
+  "spec": ".impeccable/build/spec.json",
+  "compSize": "1586x992",
+  "buildSize": "1586x992",
+  "align": "top",
+  "overall": 0.6684,
+  "verdict": "drift",
+  "scores": {
+    "overall": 0.6684,
+    "structure": 0.5933,
+    "color": 0.8496,
+    "colorIntersection": 0.7677,
+    "paletteMatch": 0.8937,
+    "detail": 0.4157,
+    "detailRaw": 0.5303,
+    "detailAdded": 0.2292,
+    "bands": 0.9625
+  },
+  "palette": {
+    "comp": [
+      {
+        "hex": "#f5f8f8",
+        "coverage": 0.5728
+      },
+      {
+        "hex": "#cbf7ec",
+        "coverage": 0.3955
+      },
+      {
+        "hex": "#090f13",
+        "coverage": 0.0171
+      },
+      {
+        "hex": "#64747e",
+        "coverage": 0.0057
+      },
+      {
+        "hex": "#c2c8cd",
+        "coverage": 0.0054
+      },
+      {
+        "hex": "#949ea7",
+        "coverage": 0.0034
+      }
+    ],
+    "build": [
+      {
+        "hex": "#f1f7f6",
+        "coverage": 0.5498
+      },
+      {
+        "hex": "#c5f7e5",
+        "coverage": 0.4089
+      },
+      {
+        "hex": "#0d1918",
+        "coverage": 0.0389
+      },
+      {
+        "hex": "#586862",
+        "coverage": 0.0017
+      },
+      {
+        "hex": "#b8d8d8",
+        "coverage": 0.0008
+      }
+    ]
+  },
+  "regions": [
+    {
+      "id": "mint-atmosphere",
+      "x": 0,
+      "y": 0,
+      "w": 1,
+      "h": 0.9,
+      "kind": "chrome",
+      "score": {
+        "overall": 0.6334,
+        "structure": 0.6152,
+        "color": 0.8429,
+        "colorIntersection": 0.7599,
+        "paletteMatch": 0.8876,
+        "detail": 0.3562,
+        "detailRaw": 0.4864,
+        "detailAdded": 0.2604,
+        "bands": 0.7886
+      },
+      "verdict": "drift",
+      "inkBox": {
+        "comp": {
+          "x": 165,
+          "y": 31,
+          "w": 1233,
+          "h": 795
+        },
+        "build": {
+          "x": 168,
+          "y": 27,
+          "w": 1246,
+          "h": 860
+        }
+      }
+    },
+    {
+      "id": "floating-navigation",
+      "x": 0.2,
+      "y": 0,
+      "w": 0.6,
+      "h": 0.1,
+      "kind": "chrome",
+      "score": {
+        "overall": 0.5287,
+        "structure": 0.7565,
+        "color": 0.5874,
+        "colorIntersection": 0.3655,
+        "paletteMatch": 0.7068,
+        "detail": 0.2114,
+        "detailRaw": 0.3468,
+        "detailAdded": 0.2708,
+        "bands": 0.4286
+      },
+      "verdict": "drift",
+      "inkBox": {
+        "comp": {
+          "x": 129,
+          "y": 31,
+          "w": 701,
+          "h": 32
+        },
+        "build": {
+          "x": 20,
+          "y": 27,
+          "w": 932,
+          "h": 44
+        }
+      }
+    },
+    {
+      "id": "hero-headline",
+      "x": 0.2264,
+      "y": 0.13,
+      "w": 0.5485,
+      "h": 0.0696,
+      "kind": "text",
+      "score": {
+        "overall": 0.4164,
+        "structure": 0.3754,
+        "color": 0.6372,
+        "colorIntersection": 0.3624,
+        "paletteMatch": 0.7852,
+        "detail": 0.2415,
+        "detailRaw": 0.377,
+        "detailAdded": 0.2708,
+        "bands": 0.3314
+      },
+      "verdict": "contradicted",
+      "inkBox": {
+        "comp": {
+          "x": 7,
+          "y": 6,
+          "w": 852,
+          "h": 63
+        },
+        "build": {
+          "x": 130,
+          "y": 3,
+          "w": 604,
+          "h": 66
+        }
+      }
+    },
+    {
+      "id": "hero-description",
+      "x": 0.2,
+      "y": 0.2,
+      "w": 0.6,
+      "h": 0.1,
+      "kind": "text",
+      "score": {
+        "overall": 0.3721,
+        "structure": 0.3418,
+        "color": 0.6189,
+        "colorIntersection": 0.5245,
+        "paletteMatch": 0.6698,
+        "detail": 0.1834,
+        "detailRaw": 0.5219,
+        "detailAdded": 0.6771,
+        "bands": 0.19
+      },
+      "verdict": "contradicted",
+      "inkBox": {
+        "comp": {
+          "x": 109,
+          "y": 0,
+          "w": 733,
+          "h": 75
+        },
+        "build": {
+          "x": 0,
+          "y": 0,
+          "w": 952,
+          "h": 100
+        }
+      }
+    },
+    {
+      "id": "hero-actions",
+      "x": 0.3,
+      "y": 0.2,
+      "w": 0.3,
+      "h": 0.1,
+      "kind": "control",
+      "score": {
+        "overall": 0.3954,
+        "structure": 0.2286,
+        "color": 0.7653,
+        "colorIntersection": 0.4783,
+        "paletteMatch": 0.9198,
+        "detail": 0.1234,
+        "detailRaw": 0.4099,
+        "detailAdded": 0.5729,
+        "bands": 0.4091
+      },
+      "verdict": "contradicted",
+      "inkBox": {
+        "comp": {
+          "x": 1,
+          "y": 0,
+          "w": 475,
+          "h": 75
+        },
+        "build": {
+          "x": 0,
+          "y": 0,
+          "w": 476,
+          "h": 100
+        }
+      }
+    },
+    {
+      "id": "product-tabs",
+      "x": 0.3,
+      "y": 0.3,
+      "w": 0.4,
+      "h": 0.1,
+      "kind": "control",
+      "score": {
+        "overall": 0.5217,
+        "structure": 0.6761,
+        "color": 0.6214,
+        "colorIntersection": 0.4863,
+        "paletteMatch": 0.6941,
+        "detail": 0,
+        "detailRaw": 0.0741,
+        "detailAdded": 0.5,
+        "bands": 0
+      },
+      "verdict": "missing",
+      "inkBox": {
+        "comp": {
+          "x": 0,
+          "y": 16,
+          "w": 600,
+          "h": 83
+        },
+        "build": {
+          "x": 3,
+          "y": 0,
+          "w": 627,
+          "h": 87
+        }
+      }
+    },
+    {
+      "id": "documentation-showcase",
+      "x": 0,
+      "y": 0.4,
+      "w": 1,
+      "h": 0.5,
+      "kind": "chrome",
+      "score": {
+        "overall": 0.531,
+        "structure": 0.6424,
+        "color": 0.8358,
+        "colorIntersection": 0.7317,
+        "paletteMatch": 0.8918,
+        "detail": 0.1578,
+        "detailRaw": 0.2776,
+        "detailAdded": 0.2396,
+        "bands": 0.385
+      },
+      "verdict": "drift",
+      "inkBox": {
+        "comp": {
+          "x": 165,
+          "y": 0,
+          "w": 1232,
+          "h": 429
+        },
+        "build": {
+          "x": 168,
+          "y": 19,
+          "w": 1246,
+          "h": 471
+        }
+      }
+    },
+    {
+      "id": "next-section-heading",
+      "x": 0.3153,
+      "y": 0.9546,
+      "w": 0.3707,
+      "h": 0.0454,
+      "kind": "text",
+      "score": {
+        "overall": 0.4715,
+        "structure": 0.5915,
+        "color": 0.5617,
+        "colorIntersection": 0.522,
+        "paletteMatch": 0.5831,
+        "detail": 0.0453,
+        "detailRaw": 0.0453,
+        "detailAdded": 0,
+        "bands": 0.2857
+      },
+      "verdict": "missing",
+      "inkBox": {
+        "comp": {
+          "x": 10,
+          "y": 8,
+          "w": 567,
+          "h": 35
+        },
+        "build": null
+      }
+    }
+  ],
+  "files": {
+    "sideBySide": "C:/Users/aksha/Desktop/autowiki/.impeccable/review/diff/final/side-by-side.png",
+    "heatmap": "C:/Users/aksha/Desktop/autowiki/.impeccable/review/diff/final/heatmap.png",
+    "regionFiles": [
+      "C:/Users/aksha/Desktop/autowiki/.impeccable/review/diff/final/regions/mint-atmosphere.png",
+      "C:/Users/aksha/Desktop/autowiki/.impeccable/review/diff/final/regions/floating-navigation.png",
+      "C:/Users/aksha/Desktop/autowiki/.impeccable/review/diff/final/regions/hero-headline.png",
+      "C:/Users/aksha/Desktop/autowiki/.impeccable/review/diff/final/regions/hero-description.png",
+      "C:/Users/aksha/Desktop/autowiki/.impeccable/review/diff/final/regions/hero-actions.png",
+      "C:/Users/aksha/Desktop/autowiki/.impeccable/review/diff/final/regions/product-tabs.png",
+      "C:/Users/aksha/Desktop/autowiki/.impeccable/review/diff/final/regions/documentation-showcase.png",
+      "C:/Users/aksha/Desktop/autowiki/.impeccable/review/diff/final/regions/next-section-heading.png"
+    ]
+  }
+}

@@ -35,10 +35,20 @@ async function capture(page, name, width) {
   })
   expect(overflow, `${name} should not overflow at ${width}px`).toEqual({ viewport: width, documentWidth: width, elements: [] })
   await page.evaluate(() => window.scrollTo(0, 0))
-  await page.screenshot({
-    path: `screenshots/prompt-11-${phase}-${name}-${width === 390 ? 'mobile' : 'desktop'}.png`,
-    fullPage: true,
-  })
+  let lastError
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    try {
+      await page.screenshot({
+        path: `screenshots/prompt-11-${phase}-${name}-${width === 390 ? 'mobile' : 'desktop'}.png`,
+        fullPage: true,
+      })
+      return
+    } catch (error) {
+      lastError = error
+      await page.waitForTimeout(150)
+    }
+  }
+  throw lastError
 }
 
 test('capture Prompt 11 visual baseline and final states', async ({ page }) => {
@@ -103,10 +113,21 @@ test('capture Prompt 11 visual baseline and final states', async ({ page }) => {
       await expect(page.getByText('Pre-generated sample', { exact: true })).toBeVisible()
       await expect(page.locator('.diagram svg')).toHaveCount(1)
       await page.evaluate(() => window.scrollTo(0, 0))
-      await page.screenshot({
-        path: `screenshots/prompt-11-sample-${width === 390 ? 'mobile' : 'wiki'}.png`,
-        fullPage: true,
-      })
+      let lastError
+      for (let attempt = 0; attempt < 3; attempt += 1) {
+        try {
+          await page.screenshot({
+            path: `screenshots/prompt-11-sample-${width === 390 ? 'mobile' : 'wiki'}.png`,
+            fullPage: true,
+          })
+          lastError = undefined
+          break
+        } catch (error) {
+          lastError = error
+          await page.waitForTimeout(150)
+        }
+      }
+      if (lastError) throw lastError
     }
   }
 })

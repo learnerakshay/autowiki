@@ -70,6 +70,36 @@ test('workspace exposes the sample without submitting a job', async ({ page }) =
   expect(apiRequests).toEqual([])
 })
 
+test('diagram expansion reuses the active SVG and restores keyboard focus', async ({ page }) => {
+  const apiRequests = []
+  page.on('request', (request) => {
+    if (new URL(request.url()).pathname.startsWith('/api/')) apiRequests.push(request.url())
+  })
+
+  await page.setViewportSize({ width: 1280, height: 900 })
+  await page.goto(SAMPLE_URL)
+  await expect(page.locator('.diagram svg')).toHaveCount(1)
+
+  const expand = page.getByRole('button', { name: 'Expand diagram' })
+  await expand.focus()
+  await expand.press('Enter')
+
+  const viewer = page.getByRole('dialog', { name: 'Architecture diagram' })
+  await expect(viewer).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Close diagram' })).toBeFocused()
+  await expect(page.locator('.diagram svg')).toHaveCount(1)
+  await expect.poll(() => page.evaluate(() => document.body.style.overflow)).toBe('hidden')
+  await expect.poll(() => viewer.evaluate((element) => Math.round(element.getBoundingClientRect().top))).toBe(24)
+  await page.screenshot({ path: 'screenshots/prompt-12-diagram-expanded.png' })
+
+  await page.keyboard.press('Escape')
+  await expect(viewer).toHaveCount(0)
+  await expect(page.getByRole('button', { name: 'Expand diagram' })).toBeFocused()
+  await expect(page.locator('.diagram svg')).toHaveCount(1)
+  await expect.poll(() => page.evaluate(() => document.body.style.overflow)).toBe('')
+  expect(apiRequests).toEqual([])
+})
+
 test('sample reader is responsive and complete with reduced motion', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' })
 
@@ -85,6 +115,17 @@ test('sample reader is responsive and complete with reduced motion', async ({ pa
     await expect(page.getByRole('heading', { level: 1, name: REPO })).toBeVisible()
     await expect(page.locator('.diagram svg')).toHaveCount(1)
     await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+
+    if (viewport.width === 390) {
+      await page.getByRole('button', { name: 'Expand diagram' }).click()
+      const viewer = page.getByRole('dialog', { name: 'Architecture diagram' })
+      await expect(viewer).toBeVisible()
+      await expect.poll(async () => {
+        const box = await viewer.boundingBox()
+        return Boolean(box && box.x >= 0 && box.width <= viewport.width)
+      }).toBe(true)
+      await page.keyboard.press('Escape')
+    }
 
     if (viewport.width <= 900) {
       const selector = page.getByLabel('Chapter', { exact: true })

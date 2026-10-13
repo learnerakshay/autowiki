@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 import { Link, useSearchParams } from 'react-router-dom'
@@ -26,6 +26,7 @@ import { Button } from '../components/ui/button.jsx'
 import { Input } from '../components/ui/input.jsx'
 import { Label } from '../components/ui/label.jsx'
 import { useJobNotifications } from '../hooks/useJobNotifications.js'
+import { motion, prefersReducedMotion } from '../lib/motion.js'
 import { useJobPoll } from '../useJobPoll.js'
 import { MarkdownDocument } from './MarkdownDocument.jsx'
 import MermaidDiagram from './MermaidDiagram.jsx'
@@ -131,31 +132,35 @@ export function WikiReader({ job, jobId, sample = false, provenance }) {
   const readerRef = useRef(null)
   const articleRef = useRef(null)
   const chapterButtons = useRef([])
+  const copyTimerRef = useRef()
   const [selected, setSelected] = useState(0)
   const [copyStatus, setCopyStatus] = useState('idle')
   const chapters = job.chapters
   const chapter = chapters[selected]
 
   useGSAP(() => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    if (prefersReducedMotion()) return
     gsap.from('.wiki-document-header, .wiki-chapter-nav, .wiki-article', {
       autoAlpha: 0.72,
       y: 8,
-      duration: 0.26,
+      duration: motion.selection,
       stagger: 0.045,
-      ease: 'power3.out',
+      ease: motion.ease,
+      clearProps: 'opacity,visibility,transform',
     })
   }, { scope: readerRef })
 
   useGSAP(() => {
     if (!articleRef.current) return
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const reduced = prefersReducedMotion()
     gsap.fromTo(
       articleRef.current,
       { autoAlpha: reduced ? 1 : 0.62, y: reduced ? 0 : 6 },
-      { autoAlpha: 1, y: 0, duration: reduced ? 0.1 : 0.22, ease: reduced ? 'none' : 'power3.out' },
+      { autoAlpha: 1, y: 0, duration: reduced ? 0.1 : motion.selection, ease: reduced ? 'none' : motion.ease, clearProps: 'opacity,visibility,transform' },
     )
   }, { scope: articleRef, dependencies: [selected] })
+
+  useEffect(() => () => window.clearTimeout(copyTimerRef.current), [])
 
   function selectChapter(index) {
     if (index < 0 || index >= chapters.length) return
@@ -179,12 +184,14 @@ export function WikiReader({ job, jobId, sample = false, provenance }) {
   }
 
   async function copyMarkdown() {
+    window.clearTimeout(copyTimerRef.current)
     try {
       await navigator.clipboard.writeText(chapter.markdown)
       setCopyStatus('copied')
     } catch {
       setCopyStatus('failed')
     }
+    copyTimerRef.current = window.setTimeout(() => setCopyStatus('idle'), 2400)
   }
 
   const generatedAt = formatGeneratedAt(job.generatedAt)

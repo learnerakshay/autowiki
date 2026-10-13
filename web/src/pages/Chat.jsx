@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 import { Link, useSearchParams } from 'react-router-dom'
@@ -20,6 +20,7 @@ import { Button } from '../components/ui/button.jsx'
 import { Input } from '../components/ui/input.jsx'
 import { Label } from '../components/ui/label.jsx'
 import { useJobNotifications } from '../hooks/useJobNotifications.js'
+import { motion, motionQuery, reducedMotionQuery } from '../lib/motion.js'
 import { useJobPoll } from '../useJobPoll.js'
 import { MarkdownDocument } from './MarkdownDocument.jsx'
 
@@ -43,6 +44,7 @@ export default function Chat() {
   const resultRef = useRef(null)
   const questionRef = useRef(null)
   const requestRef = useRef(0)
+  const copyTimerRef = useRef()
   const { job, error: pollError } = useJobPoll('chat', jobId)
 
   useJobNotifications(job, jobId, { completed: 'Answer is ready', failed: 'Repository question failed' })
@@ -60,14 +62,14 @@ export default function Chat() {
 
   useGSAP(() => {
     const media = gsap.matchMedia()
-    media.add('(prefers-reduced-motion: no-preference)', () => {
+    media.add(motionQuery, () => {
       gsap.fromTo(
         ['.chat-intro', '.chat-composer', '.chat-index-note'],
         { autoAlpha: 0.8, y: 6 },
-        { autoAlpha: 1, y: 0, duration: 0.22, stagger: 0.025, ease: 'power3.out', clearProps: 'opacity,visibility,transform' },
+        { autoAlpha: 1, y: 0, duration: motion.selection, stagger: 0.025, ease: motion.ease, clearProps: 'opacity,visibility,transform' },
       )
     })
-    media.add('(prefers-reduced-motion: reduce)', () => {
+    media.add(reducedMotionQuery, () => {
       gsap.set(['.chat-intro', '.chat-composer', '.chat-index-note'], { clearProps: 'all' })
     })
     return () => media.revert()
@@ -76,11 +78,11 @@ export default function Chat() {
   useGSAP(() => {
     if (!resultRef.current) return undefined
     const media = gsap.matchMedia()
-    media.add('(prefers-reduced-motion: no-preference)', () => {
+    media.add(motionQuery, () => {
       gsap.fromTo(
         resultRef.current,
         { autoAlpha: 0.76, y: 8, clipPath: 'inset(0 0 10px 0 round 12px)' },
-        { autoAlpha: 1, y: 0, clipPath: 'inset(0 0 0 0 round 12px)', duration: 0.24, ease: 'power3.out', clearProps: 'opacity,visibility,transform,clipPath' },
+        { autoAlpha: 1, y: 0, clipPath: 'inset(0 0 0 0 round 12px)', duration: motion.selection, ease: motion.ease, clearProps: 'opacity,visibility,transform,clipPath' },
       )
       if (job?.status === 'completed') {
         const sourceItems = gsap.utils.toArray('.chat-source-item', pageRef.current)
@@ -88,18 +90,20 @@ export default function Chat() {
           gsap.fromTo(
             sourceItems,
             { autoAlpha: 0.65, x: 5 },
-            { autoAlpha: 1, x: 0, duration: 0.18, stagger: 0.025, delay: 0.04, ease: 'power3.out', clearProps: 'opacity,visibility,transform' },
+            { autoAlpha: 1, x: 0, duration: motion.feedback, stagger: 0.025, delay: 0.04, ease: motion.ease, clearProps: 'opacity,visibility,transform' },
           )
         }
       }
     })
-    media.add('(prefers-reduced-motion: reduce)', () => {
+    media.add(reducedMotionQuery, () => {
       gsap.set(resultRef.current, { clearProps: 'all' })
       const sourceItems = gsap.utils.toArray('.chat-source-item', pageRef.current)
       if (sourceItems.length) gsap.set(sourceItems, { clearProps: 'all' })
     })
     return () => media.revert()
   }, { scope: pageRef, dependencies: [stateKey, jobId] })
+
+  useEffect(() => () => window.clearTimeout(copyTimerRef.current), [])
 
   async function submit(event) {
     event.preventDefault()
@@ -131,12 +135,14 @@ export default function Chat() {
   }
 
   async function copyAnswer() {
+    window.clearTimeout(copyTimerRef.current)
     try {
       await navigator.clipboard.writeText(String(job?.answer || ''))
       setCopyStatus('copied')
     } catch {
       setCopyStatus('failed')
     }
+    copyTimerRef.current = window.setTimeout(() => setCopyStatus('idle'), 2400)
   }
 
   function askAnother() {

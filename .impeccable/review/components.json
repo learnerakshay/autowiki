@@ -1,0 +1,119 @@
+{
+  "schemaVersion": 3,
+  "stage": "components",
+  "id": "components",
+  "title": "Plan and asset review · web\\src\\pages\\Landing.jsx",
+  "comp": {
+    "path": ".impeccable/mocks/prompt-13/landing-hero-approved.png",
+    "width": 1586,
+    "height": 992
+  },
+  "specSha256": "d946d9c42374f7eee7bd4cf6e934cd3e1690c4e0842d236956c1cb821f6d512c",
+  "components": [
+    {
+      "id": "floating-navigation",
+      "name": "Floating navigation",
+      "kind": "chrome",
+      "role": "plan",
+      "box": {
+        "x": 0.2,
+        "y": 0,
+        "w": 0.6,
+        "h": 0.1
+      },
+      "note": "Compact centered translucent navigation with dark workspace action",
+      "medium": "code",
+      "preview": {
+        "kind": "comp-crop"
+      },
+      "codeDrawn": false,
+      "dependencies": []
+    }
+  ],
+  "codeRegions": [
+    {
+      "id": "mint-atmosphere",
+      "name": "Mint atmosphere",
+      "kind": "chrome",
+      "box": {
+        "x": 0,
+        "y": 0,
+        "w": 1,
+        "h": 0.9
+      },
+      "note": "CSS-built luminous mint and aqua environmental ground"
+    },
+    {
+      "id": "hero-headline",
+      "name": "Hero headline",
+      "kind": "text",
+      "box": {
+        "x": 0.2264,
+        "y": 0.13,
+        "w": 0.5485,
+        "h": 0.0696
+      },
+      "note": "Single-line near-black editorial display headline"
+    },
+    {
+      "id": "hero-description",
+      "name": "Hero description",
+      "kind": "text",
+      "box": {
+        "x": 0.2,
+        "y": 0.2,
+        "w": 0.6,
+        "h": 0.1
+      },
+      "note": "Centered concise product-specific supporting copy"
+    },
+    {
+      "id": "hero-actions",
+      "name": "Hero actions",
+      "kind": "control",
+      "box": {
+        "x": 0.3,
+        "y": 0.2,
+        "w": 0.3,
+        "h": 0.1
+      },
+      "note": "Dark primary Generate a Wiki action and white secondary sample action"
+    },
+    {
+      "id": "product-tabs",
+      "name": "Product tabs",
+      "kind": "control",
+      "box": {
+        "x": 0.3,
+        "y": 0.3,
+        "w": 0.4,
+        "h": 0.1
+      },
+      "note": "Three accessible product capability tabs with understated active marker"
+    },
+    {
+      "id": "documentation-showcase",
+      "name": "Documentation showcase",
+      "kind": "chrome",
+      "box": {
+        "x": 0,
+        "y": 0.4,
+        "w": 1,
+        "h": 0.5
+      },
+      "note": "Large semantic three-region AutoWiki documentation application"
+    },
+    {
+      "id": "next-section-heading",
+      "name": "Next section heading",
+      "kind": "text",
+      "box": {
+        "x": 0.3153,
+        "y": 0.9546,
+        "w": 0.3707,
+        "h": 0.0454
+      },
+      "note": "Beginning of repository-to-documentation process section"
+    }
+  ]
+}

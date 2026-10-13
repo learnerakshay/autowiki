@@ -10,6 +10,20 @@ function json(route, body, status = 200) {
   })
 }
 
+async function capture(page, options) {
+  let lastError
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    try {
+      await page.screenshot(options)
+      return
+    } catch (error) {
+      lastError = error
+      await page.waitForTimeout(150)
+    }
+  }
+  throw lastError
+}
+
 test('Chat loads with accessible empty state, query prefill, and non-submitting suggestions', async ({ page }) => {
   let requests = 0
   await page.route('**/api/**', (route) => {
@@ -25,7 +39,7 @@ test('Chat loads with accessible empty state, query prefill, and non-submitting 
   await expect(page.getByLabel('Question', { exact: true })).toHaveValue('')
   await expect(page.getByRole('button', { name: 'Ask', exact: true })).toBeDisabled()
   await expect(page.getByText('Entering a repository does not index it.')).toBeVisible()
-  await page.screenshot({ path: 'screenshots/prompt-09-chat-empty.png', fullPage: true })
+  await capture(page, { path: 'screenshots/prompt-09-chat-empty.png', fullPage: true })
 
   const suggestion = page.getByRole('button', { name: 'How is the application structured?' })
   await suggestion.focus()
@@ -35,8 +49,8 @@ test('Chat loads with accessible empty state, query prefill, and non-submitting 
   expect(requests).toBe(0)
 
   await page.evaluate(() => window.scrollTo(0, 0))
-  await page.screenshot({ path: 'screenshots/prompt-09-chat-desktop.png', fullPage: true })
-  await page.screenshot({ path: '../.impeccable/review/desktop.png', fullPage: true })
+  await capture(page, { path: 'screenshots/prompt-09-chat-desktop.png', fullPage: true })
+  await capture(page, { path: '../.impeccable/review/desktop.png', fullPage: true })
 })
 
 test('Chat renders a secure Markdown answer, real sources, copy action, and honest empty sources', async ({ page, context }) => {
@@ -76,7 +90,7 @@ test('Chat renders a secure Markdown answer, real sources, copy action, and hone
 
   await expect(page.getByText('pending...', { exact: true })).toBeVisible()
   await expect(page.locator('.chat-request-state .chat-submitted-question')).toHaveText('How does a Chat request move through the system?')
-  await page.screenshot({ path: 'screenshots/prompt-09-chat-pending.png', fullPage: true })
+  await capture(page, { path: 'screenshots/prompt-09-chat-pending.png', fullPage: true })
 
   complete = true
   await expect(page.getByRole('heading', { name: 'Answer', exact: true })).toBeVisible()
@@ -98,7 +112,7 @@ test('Chat renders a secure Markdown answer, real sources, copy action, and hone
 
   await expect(page.locator('[data-sonner-toast]')).toHaveCount(0, { timeout: 7000 })
   await page.evaluate(() => window.scrollTo(0, 0))
-  await page.screenshot({ path: 'screenshots/prompt-09-chat-answer.png', fullPage: true })
+  await capture(page, { path: 'screenshots/prompt-09-chat-answer.png', fullPage: true })
   await page.locator('.chat-sources').screenshot({ path: 'screenshots/prompt-09-chat-sources.png' })
 
   await page.getByLabel('Question', { exact: true }).fill('Show an empty source response')
@@ -125,7 +139,7 @@ test('Chat presents failed and unknown jobs with their submitted context', async
   await expect(page.getByRole('heading', { name: 'Where is the request validated?', exact: true })).toBeVisible()
   await expect(page.locator('[data-sonner-toast]')).toHaveCount(0, { timeout: 7000 })
   await page.evaluate(() => window.scrollTo(0, 0))
-  await page.screenshot({ path: 'screenshots/prompt-09-chat-error.png', fullPage: true })
+  await capture(page, { path: 'screenshots/prompt-09-chat-error.png', fullPage: true })
 
   nextJob = 'missing-job'
   await page.getByLabel('Question', { exact: true }).fill('Where is the worker registered?')
@@ -202,8 +216,8 @@ test('Chat remains usable without horizontal overflow at required widths and red
     if (width === 390) {
       await expect(page.locator('[data-sonner-toast]')).toHaveCount(0, { timeout: 7000 })
       await page.evaluate(() => window.scrollTo(0, 0))
-      await page.screenshot({ path: 'screenshots/prompt-09-chat-mobile.png', fullPage: true })
-      await page.screenshot({ path: '../.impeccable/review/mobile.png', fullPage: true })
+      await capture(page, { path: 'screenshots/prompt-09-chat-mobile.png', fullPage: true })
+      await capture(page, { path: '../.impeccable/review/mobile.png', fullPage: true })
     }
   }
 

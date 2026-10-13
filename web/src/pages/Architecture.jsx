@@ -30,6 +30,7 @@ import {
   Workflow,
 } from 'lucide-react'
 import { Button } from '../components/ui/button.jsx'
+import { motion, motionQuery, reducedMotionQuery } from '../lib/motion.js'
 import {
   architectureConnections,
   architectureNodes,
@@ -115,11 +116,44 @@ function connectorPath(connection) {
 function ArchitectureOverview() {
   const [selectedId, setSelectedId] = useState('inngest')
   const nodeRefs = useRef([])
+  const overviewRef = useRef(null)
+  const detailRef = useRef(null)
   const selected = architectureNodes.find((node) => node.id === selectedId)
   const relatedConnections = useMemo(
     () => architectureConnections.filter((connection) => connection.from === selectedId || connection.to === selectedId),
     [selectedId],
   )
+
+  useGSAP(() => {
+    const media = gsap.matchMedia()
+    media.add(motionQuery, () => {
+      const activePaths = gsap.utils.toArray('.architecture-connectors path.is-active', overviewRef.current)
+      const selectedNode = overviewRef.current?.querySelector('.architecture-node.is-selected')
+      const timeline = gsap.timeline({ defaults: { ease: motion.ease } })
+
+      if (activePaths.length) {
+        timeline.fromTo(activePaths, { strokeDasharray: 1, strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: motion.content, stagger: 0.035, clearProps: 'stroke-dasharray,stroke-dashoffset' })
+      }
+      if (selectedNode) {
+        timeline.fromTo(selectedNode, { scale: 0.985 }, { scale: 1, duration: motion.selection, clearProps: 'transform' }, 0)
+      }
+      timeline.fromTo(
+        detailRef.current?.children || [],
+        { autoAlpha: 0.72, y: 6 },
+        { autoAlpha: 1, y: 0, duration: motion.selection, stagger: 0.025, clearProps: 'opacity,visibility,transform' },
+        0,
+      )
+    })
+    media.add(reducedMotionQuery, () => {
+      const targets = [
+        ...gsap.utils.toArray('.architecture-connectors path', overviewRef.current),
+        ...gsap.utils.toArray('.architecture-node', overviewRef.current),
+        ...(detailRef.current ? [...detailRef.current.children] : []),
+      ]
+      gsap.set(targets, { clearProps: 'all' })
+    })
+    return () => media.revert()
+  }, { scope: overviewRef, dependencies: [selectedId], revertOnUpdate: true })
 
   function handleNodeKey(event, index) {
     const last = architectureNodes.length - 1
@@ -135,7 +169,7 @@ function ArchitectureOverview() {
   }
 
   return (
-    <div className="architecture-overview">
+    <div ref={overviewRef} className="architecture-overview">
       <div className="architecture-canvas" aria-label="Interactive AutoWiki system overview">
         <div className="architecture-canvas__bar">
           <span><Network aria-hidden="true" size={15} />Architecture walkthrough</span>
@@ -155,6 +189,7 @@ function ArchitectureOverview() {
                   key={`${connection.from}-${connection.to}`}
                   className={active ? 'is-active' : ''}
                   d={connectorPath(connection)}
+                  pathLength="1"
                   markerEnd="url(#architecture-arrow)"
                   vectorEffect="non-scaling-stroke"
                 />
@@ -188,7 +223,7 @@ function ArchitectureOverview() {
         </p>
       </div>
 
-      <aside className="architecture-detail" aria-live="polite" aria-labelledby="selected-node-title">
+      <aside ref={detailRef} className="architecture-detail" aria-live="polite" aria-labelledby="selected-node-title">
         <span className="architecture-detail__group">{selected.group}</span>
         <h2 id="selected-node-title">{selected.label}</h2>
         <p>{selected.description}</p>
@@ -363,9 +398,9 @@ export default function Architecture() {
 
   useGSAP(() => {
     const media = gsap.matchMedia()
-    media.add('(prefers-reduced-motion: no-preference)', () => {
+    media.add(motionQuery, () => {
       gsap.timeline({ defaults: { ease: 'power3.out' } })
-        .fromTo('.architecture-hero__copy > *', { autoAlpha: 0.78, y: 14 }, { autoAlpha: 1, y: 0, duration: 0.48, stagger: 0.055, clearProps: 'all' })
+        .fromTo('.architecture-hero__copy > *', { autoAlpha: 0.78, y: 14 }, { autoAlpha: 1, y: 0, duration: motion.entrance, stagger: 0.055, clearProps: 'all' })
         .fromTo('.architecture-overview', { autoAlpha: 0.84, y: 18, clipPath: 'inset(0 0 7% 0 round 12px)' }, { autoAlpha: 1, y: 0, clipPath: 'inset(0 0 0 0 round 12px)', duration: 0.62, clearProps: 'all' }, '-=0.28')
         .fromTo('.architecture-connectors path', { strokeDasharray: 1, strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.58, stagger: 0.025, ease: 'power2.out', clearProps: 'stroke-dasharray,stroke-dashoffset' }, '-=0.48')
 
@@ -377,7 +412,7 @@ export default function Architecture() {
         )
       })
     })
-    media.add('(prefers-reduced-motion: reduce)', () => {
+    media.add(reducedMotionQuery, () => {
       gsap.set('.architecture-page *', { clearProps: 'opacity,visibility,transform,clip-path,stroke-dasharray,stroke-dashoffset' })
     })
     return () => media.revert()
