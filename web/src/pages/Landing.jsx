@@ -21,6 +21,12 @@ const diagramLevels = [
 const previewChapters = sampleWiki.chapters.map((chapter, index) => ({
   ...chapter,
   excerpt: chapter.markdown.replace(/^# .+\n+/, '').split('\n\n')[0].replace(/[`*_]/g, ''),
+  excerptParagraphs: chapter.markdown
+    .replace(/^# .+\n+/, '')
+    .split('\n\n')
+    .filter((paragraph) => paragraph && !paragraph.startsWith('#') && !paragraph.startsWith('```'))
+    .slice(0, 2)
+    .map((paragraph) => paragraph.replace(/[`*_]/g, '')),
   diagramLevels: diagramLevels[index],
 }))
 
@@ -31,6 +37,25 @@ const processSteps = [
 ]
 
 const pipeline = ['GitHub repository', 'Repository files', 'Outline generation', 'Chapter generation', 'Mermaid diagrams', 'Structured wiki']
+
+function AnimatedHeading({ as: Heading = 'h2', id, lines, hero = false }) {
+  return (
+    <Heading
+      id={id}
+      className={`motion-heading${hero ? ' motion-heading--hero' : ''}`}
+      aria-label={lines.join(' ')}
+      data-motion-heading={hero ? 'hero' : 'section'}
+    >
+      {lines.map((line) => (
+        <span className="motion-heading__line" aria-hidden="true" key={line}>
+          {line.split(' ').map((word, index) => (
+            <span className="motion-heading__word" key={`${word}-${index}`}>{word}</span>
+          ))}
+        </span>
+      ))}
+    </Heading>
+  )
+}
 
 function Diagram({ chapter, compact = false }) {
   return (
@@ -87,7 +112,9 @@ function ProductShowcase() {
             <TabsContent value="chapters" hidden={activeMode !== 'chapters'}>
               <h2>{chapter.title}</h2><p className="product-window__description">{chapter.description}</p>
               <div className="product-window__source-line"><span>Source path</span>{chapter.filePaths.map((path) => <code key={path}>{path}</code>)}</div>
-              <h3>Chapter excerpt</h3><p className="product-window__excerpt">{chapter.excerpt}</p>
+              <h3>Chapter excerpt</h3>
+              <div className="product-window__excerpt">{chapter.excerptParagraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}</div>
+              <div className="product-window__reading-meta"><span>{String(activeChapter + 1).padStart(2, '0')} / {previewChapters.length}</span><span>Generated explanation</span></div>
             </TabsContent>
             <TabsContent value="architecture" hidden={activeMode !== 'architecture'}>
               <h2>{chapter.title}</h2><p className="product-window__description">The chapter diagram is generated from the same source context as the explanation.</p><Diagram chapter={chapter} />
@@ -109,6 +136,45 @@ function ProductShowcase() {
         </div>
       </div>
     </Tabs>
+  )
+}
+
+function ProcessVisual({ activeStage }) {
+  const chapter = previewChapters[0]
+
+  return (
+    <div className="process-visual" aria-hidden="true">
+      <div className="process-visual__bar">
+        <span><AutoWikiMark /> AutoWiki pipeline</span>
+        <code>octocat/Spoon-Knife</code>
+      </div>
+      <div className="process-visual__canvas">
+        <div className={`process-visual__layer process-visual__repository${activeStage === 0 ? ' is-active' : ''}`}>
+          <p>Public repository</p>
+          <strong>octocat/Spoon-Knife</strong>
+          <div className="process-file-tree">
+            {chapter.filePaths.concat(['index.html', 'styles.css']).map((path, index) => (
+              <span key={`${path}-${index}`}><FileCode2 />{path}</span>
+            ))}
+          </div>
+        </div>
+        <div className={`process-visual__layer process-visual__outline${activeStage === 1 ? ' is-active' : ''}`}>
+          <p>Planned outline</p>
+          <div className="process-outline-list">
+            {previewChapters.map((item, index) => (
+              <div key={item.title}><span>{String(index + 1).padStart(2, '0')}</span><strong>{item.title}</strong><code>{item.filePaths[0]}</code></div>
+            ))}
+          </div>
+        </div>
+        <div className={`process-visual__layer process-visual__document${activeStage === 2 ? ' is-active' : ''}`}>
+          <div><span>Generated chapter</span><code>{chapter.filePaths[0]}</code></div>
+          <h3>{chapter.title}</h3>
+          <p>{chapter.excerpt}</p>
+          <Diagram chapter={chapter} compact />
+        </div>
+      </div>
+      <div className="process-visual__footer"><span>Repository source</span><i /><span>Structured wiki</span></div>
+    </div>
   )
 }
 
@@ -135,13 +201,61 @@ function LandingNavigation() {
 
 export default function Landing() {
   const pageRef = useRef(null)
+  const [activeStory, setActiveStory] = useState(0)
+
   useGSAP(() => {
     const media = gsap.matchMedia()
-    media.add({ motion: motionQuery, compact: '(max-width: 760px)' }, ({ conditions }) => {
+    media.add({ motion: motionQuery, compact: '(max-width: 760px)', desktop: '(min-width: 901px)' }, ({ conditions }) => {
       if (!conditions.motion) return
       const distance = conditions.compact ? 10 : 18
-      gsap.timeline().from('.landing-hero h1', { autoAlpha: 0, y: distance, duration: motion.entrance, ease: motion.ease, clearProps: 'all' }).from('.landing-hero__lede, .landing-hero__actions', { autoAlpha: 0, y: distance * 0.65, duration: motion.content, stagger: 0.06, ease: motion.ease, clearProps: 'all' }, '-=0.34').from('.product-proof', { autoAlpha: 0, y: distance, duration: 0.58, ease: 'power4.out', clearProps: 'all' }, '-=0.3')
-      gsap.utils.toArray('.landing-section, .landing-cta').forEach((section) => gsap.from(section.children, { autoAlpha: 0, y: distance, duration: 0.52, stagger: 0.08, ease: 'power3.out', clearProps: 'all', scrollTrigger: { trigger: section, start: 'top 78%', once: true } }))
+      gsap.timeline({ defaults: { ease: motion.ease } })
+        .from('[data-motion-heading="hero"] .motion-heading__word', { autoAlpha: 0, yPercent: 105, rotate: 1.4, duration: 0.68, stagger: 0.045, clearProps: 'all' })
+        .from('.landing-hero__lede, .landing-hero__actions', { autoAlpha: 0, y: distance * 0.65, duration: motion.content, stagger: 0.06, clearProps: 'all' }, '-=0.34')
+        .from('.product-proof', { autoAlpha: 0, y: distance, scale: 0.985, duration: 0.68, ease: 'power4.out', clearProps: 'all' }, '-=0.3')
+
+      gsap.utils.toArray('[data-motion-heading="section"]').forEach((heading) => {
+        gsap.from(heading.querySelectorAll('.motion-heading__word'), {
+          autoAlpha: 0,
+          yPercent: 85,
+          duration: 0.58,
+          stagger: 0.038,
+          ease: 'power3.out',
+          clearProps: 'all',
+          scrollTrigger: { trigger: heading, start: 'top 82%', once: true },
+        })
+      })
+
+      gsap.utils.toArray('.landing-reveal').forEach((section) => gsap.from(section, {
+        autoAlpha: 0,
+        y: distance,
+        duration: 0.52,
+        ease: 'power3.out',
+        clearProps: 'all',
+        scrollTrigger: { trigger: section, start: 'top 84%', once: true },
+      }))
+
+      if (conditions.desktop) {
+        gsap.utils.toArray('.process-step').forEach((step, index) => {
+          ScrollTrigger.create({
+            trigger: step,
+            start: 'top 56%',
+            end: 'bottom 44%',
+            onEnter: () => setActiveStory(index),
+            onEnterBack: () => setActiveStory(index),
+          })
+        })
+        gsap.fromTo('.process-story__progress', { scaleY: 0 }, {
+          scaleY: 1,
+          ease: 'none',
+          scrollTrigger: { trigger: '.process-story', start: 'top 62%', end: 'bottom 42%', scrub: 0.35 },
+        })
+      }
+
+      gsap.fromTo('.pipeline__path', { scaleX: 0 }, {
+        scaleX: 1,
+        ease: 'none',
+        scrollTrigger: { trigger: '.pipeline', start: 'top 78%', end: 'bottom 58%', scrub: 0.45 },
+      })
     })
     return () => media.revert()
   }, { scope: pageRef })
@@ -150,21 +264,21 @@ export default function Landing() {
     <div ref={pageRef} className="landing-shell"><a className="skip-link" href="#main-content">Skip to content</a><LandingNavigation />
       <main id="main-content" className="landing-main">
         <section className="landing-hero" aria-labelledby="landing-title">
-          <div className="landing-hero__copy"><h1 id="landing-title">Your repository,<br />beautifully documented.</h1><p className="landing-hero__lede">Transform a public GitHub repository into a structured technical wiki with generated chapters, source context, and Mermaid diagrams.</p><div className="landing-hero__actions"><Button asChild><Link to="/workspace">Generate a Wiki <ArrowRight aria-hidden="true" /></Link></Button><Button asChild variant="secondary"><Link to="/wiki/sample/spoon-knife">Explore Sample Wiki</Link></Button></div></div>
+          <div className="landing-hero__copy"><AnimatedHeading as="h1" id="landing-title" hero lines={['Your repository,', 'beautifully documented.']} /><p className="landing-hero__lede">Transform a public GitHub repository into a structured technical wiki with generated chapters, source context, and Mermaid diagrams.</p><div className="landing-hero__actions"><Button asChild><Link to="/workspace">Generate a Wiki <ArrowRight aria-hidden="true" /></Link></Button><Button asChild variant="secondary"><Link to="/wiki/sample/spoon-knife">Explore Sample Wiki</Link></Button></div></div>
           <ProductShowcase />
         </section>
 
-        <section id="how-it-works" className="landing-section landing-process" aria-labelledby="process-title"><div className="landing-section__heading"><h2 id="process-title">From repository to documentation.</h2><p>One deliberate path turns repository structure into a wiki people can actually navigate.</p></div><ol className="process-flow">{processSteps.map((step) => <li key={step.title}><span className="process-flow__number">{step.number}</span><div><h3>{step.title}</h3><p>{step.text}</p></div></li>)}</ol></section>
+        <section id="how-it-works" className="landing-section landing-process" aria-labelledby="process-title"><div className="landing-section__heading"><AnimatedHeading id="process-title" lines={['From repository', 'to documentation.']} /><p>One deliberate path turns repository structure into a wiki people can actually navigate.</p></div><div className="process-story"><div className="process-story__narrative"><span className="process-story__rail" aria-hidden="true"><i className="process-story__progress" /></span><ol className="process-flow">{processSteps.map((step, index) => <li className={`process-step${activeStory === index ? ' is-active' : ''}`} aria-current={activeStory === index ? 'step' : undefined} key={step.title}><span className="process-flow__number">{step.number}</span><div><span className="process-step__eyebrow">Stage {step.number}</span><h3>{step.title}</h3><p>{step.text}</p></div></li>)}</ol></div><div className="process-story__visual"><ProcessVisual activeStage={activeStory} /></div></div></section>
 
-        <section id="features" className="landing-section landing-features" aria-labelledby="features-title"><div className="landing-section__heading landing-section__heading--wide"><h2 id="features-title">A technical document with the evidence still attached.</h2><p>Chapters lead the reading experience. Diagrams and source paths make the generated explanation easier to inspect.</p></div><div className="feature-composition">
+        <section id="features" className="landing-section landing-features" aria-labelledby="features-title"><div className="landing-section__heading landing-section__heading--wide"><AnimatedHeading id="features-title" lines={['A technical document', 'with the evidence', 'still attached.']} /><p>Chapters lead the reading experience. Diagrams and source paths make the generated explanation easier to inspect.</p></div><div className="feature-composition landing-reveal">
           <article className="feature-proof feature-proof--chapters"><div className="feature-proof__copy"><BookOpenText aria-hidden="true" /><h3>Structured wiki chapters</h3><p>A navigable document replaces a pile of disconnected repository notes.</p></div><div className="feature-chapters" aria-label="Sample generated Spoon-Knife chapters">{previewChapters.map((chapter, index) => <div key={chapter.title}><span>{String(index + 1).padStart(2, '0')}</span><strong>{chapter.title}</strong><code>{chapter.filePaths[0]}</code></div>)}</div></article>
           <article className="feature-proof feature-proof--diagram"><div className="feature-proof__copy"><Network aria-hidden="true" /><h3>Relationships made visible</h3><p>Each chapter can pair explanation with a Mermaid diagram generated from the same context.</p></div><Diagram chapter={previewChapters[0]} compact /></article>
           <article className="feature-proof feature-proof--chat"><div className="feature-proof__copy"><MessageSquareText aria-hidden="true" /><h3>Grounded follow-up questions</h3><p>After separate indexing, chat can answer focused questions and point back to source paths.</p></div><div className="feature-chat"><span>What does this repository demonstrate?</span><code>README.md</code></div></article>
         </div></section>
 
-        <section className="landing-section architecture" aria-labelledby="architecture-title"><div className="architecture__heading"><div><h2 id="architecture-title">A generation pipeline you can follow.</h2><p>The product story mirrors the current implementation instead of simulating a fictional live process.</p></div><Button asChild variant="secondary"><Link to="/architecture">Explore the architecture <ArrowRight aria-hidden="true" /></Link></Button></div><ol className="pipeline" aria-label="Wiki generation pipeline">{pipeline.map((stage, index) => <li key={stage}><span>{String(index + 1).padStart(2, '0')}</span><strong>{stage}</strong></li>)}</ol><p className="architecture__note">Repository-grounded chat uses a separate embeddings and vector-search pipeline.</p></section>
+        <section className="landing-section architecture" aria-labelledby="architecture-title"><div className="architecture__heading"><div><AnimatedHeading id="architecture-title" lines={['A generation pipeline', 'you can follow.']} /><p>The product story mirrors the current implementation instead of simulating a fictional live process.</p></div><Button asChild variant="secondary"><Link to="/architecture">Explore the architecture <ArrowRight aria-hidden="true" /></Link></Button></div><div className="pipeline-wrap landing-reveal"><i className="pipeline__path" aria-hidden="true" /><ol className="pipeline" aria-label="Wiki generation pipeline">{pipeline.map((stage, index) => <li key={stage}><span>{String(index + 1).padStart(2, '0')}</span><strong>{stage}</strong></li>)}</ol></div><p className="architecture__note">Repository-grounded chat uses a separate embeddings and vector-search pipeline.</p></section>
 
-        <section className="landing-cta" aria-labelledby="cta-title"><div><h2 id="cta-title">Let the repository explain itself.</h2><p>Generate structured chapters and Mermaid diagrams from a public GitHub repository.</p></div><Button asChild><Link to="/workspace">Open Workspace <ArrowRight aria-hidden="true" /></Link></Button></section>
+        <section className="landing-cta landing-reveal" aria-labelledby="cta-title"><div><AnimatedHeading id="cta-title" lines={['Let the repository', 'explain itself.']} /><p>Generate structured chapters and Mermaid diagrams from a public GitHub repository.</p></div><Button asChild><Link to="/workspace">Open Workspace <ArrowRight aria-hidden="true" /></Link></Button></section>
       </main>
       <footer className="landing-footer"><div className="landing-footer__inner"><div><AutoWikiBrand /><p>Structured technical wikis generated from public GitHub repositories.</p></div><nav aria-label="Footer navigation"><a href="#how-it-works">How it works</a><Link to="/architecture">Architecture</Link><Link to="/workspace">Workspace</Link><Link to="/chat">Chat</Link></nav></div></footer>
     </div>

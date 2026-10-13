@@ -36,3 +36,15 @@ MOTION: A short hierarchy entrance and one-time section reveals only. Chapter an
 TRUTH: Copy and UI never invent files, repositories, metrics, progress, or live generation. The three product modes derive from `spoon-knife.json`; Chat remains explicitly described as a separate indexed workflow.
 
 FINISH: Prompt 13 replaces the Landing identity and shared visual tokens. Prompt 14 remains responsible for deep Workspace/Wiki shell restructuring; Prompt 15 remains out of scope.
+
+## Prompt 14 interaction contract
+
+THESIS: Scroll reveals the real repository → outline → Wiki relationship. The hero remains product-first, while the process section becomes the one authored focal sequence instead of distributing generic fades across the page.
+
+FIRST VIEWPORT: Accessible word groups reveal the two-line promise before a taller, application-scale Spoon-Knife window. The window preserves live tab and chapter selection, exposes two authentic excerpt paragraphs, and keeps the source/diagram context legible on wide screens.
+
+STORY: Desktop uses a bounded sticky visualization beside three substantial narrative stages. ScrollTrigger changes only the active conceptual stage and draws one connector; it does not pin the page or imply live work. Mobile places the visualization above a linear sequence. Reduced motion keeps the full narrative visible with compressed stage height.
+
+MOTION: Hero words enter at a 45ms stagger with a 680ms ease-out. Section headings use a 38ms word stagger. Product selections use the existing short continuity timing. All effects are scoped through `useGSAP` and `gsap.matchMedia()` and are reverted on route unmount.
+
+ACCEPTANCE: CTA interaction is available during entrance; tabs remain keyboard-operable; returning to Landing creates exactly three story stages with no duplicated wrappers; 1440, 1280, 1024, 768, 390, and 320px remain overflow-safe.

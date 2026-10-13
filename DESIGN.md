@@ -146,6 +146,20 @@ Lower sections follow an editorial sequence instead of repeating a card grid: an
 
 **The Mobile Recomposition Rule.** At phone widths, remove secondary context and restack the reading flow; never preserve a desktop multi-rail layout by shrinking it until the text becomes ornamental.
 
+### Prompt 14 immersive product system
+
+Prompt 14 turns the established visual direction into an authored repository-to-document experience. The Landing hero uses accessible word-group markup and a deliberate entrance sequence, the real Spoon-Knife product window gains enough vertical presence to read as an application, and the former static process list becomes a bounded three-stage scroll story. The visual changes discretely at repository, outline, and document boundaries; its connector progress is decorative and never implies a running generation job.
+
+Workspace is now one command stage rather than a dashboard of equivalent cards. Wiki generation owns the raised white surface, the verified sample output provides dark editorial contrast beside it, and independent indexing recedes into a quiet horizontal supporting workflow. Only backend state can change the job surfaces.
+
+The Wiki reader is a low-frame documentation shell: compact repository header, sticky chapter rail, wide article paper, and an evidence-backed context rail containing only the active chapter description and returned source paths. At narrower desktop sizes the context rail disappears; below 900px the chapter rail becomes the native selector and the document remains a single readable column.
+
+Motion follows a three-tier rhythm: 580–680ms for authored heading/product entrances, 220–300ms for selection continuity, and immediate React state changes underneath every animation. Desktop receives the bounded sticky story and connector drawing. Tablet and mobile use a linear composition without pinning. Reduced-motion mode exposes all content immediately, shortens the process sequence, removes spatial choreography, and hides indeterminate activity where a frozen line could look like percentage progress.
+
+**The Scroll Explains Relationship Rule.** Scroll motion is permitted only where it reveals repository → outline → Wiki continuity; it must never simulate worker progress or hijack navigation.
+
+**The Calm Reader Rule.** Marketing can choreograph arrival, but the documentation reader animates only chapter continuity, successful diagram arrival, and direct interaction feedback.
+
 The palette is a warm-white and mint document field with near-black type and one disciplined deep-teal operational voice. Semantic green and red remain limited to verified and failure states.
 
 ### Primary

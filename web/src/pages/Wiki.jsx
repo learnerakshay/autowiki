@@ -140,7 +140,7 @@ export function WikiReader({ job, jobId, sample = false, provenance }) {
 
   useGSAP(() => {
     if (prefersReducedMotion()) return
-    gsap.from('.wiki-document-header, .wiki-chapter-nav, .wiki-article', {
+    gsap.from('.wiki-document-header, .wiki-chapter-nav, .wiki-article, .wiki-context-rail', {
       autoAlpha: 0.72,
       y: 8,
       duration: motion.selection,
@@ -205,7 +205,8 @@ export function WikiReader({ job, jobId, sample = false, provenance }) {
           <JobStatus status="completed">{sample ? 'Pre-generated sample' : 'Generated'}</JobStatus>
         </div>
         <div className="wiki-document-header__body">
-          <div>
+          <div className="wiki-document-identity">
+            <span className="wiki-document-kicker">Technical wiki</span>
             <h1>{job.repo}</h1>
             <p>{sample
               ? 'A previously generated Wiki from a public repository. Opening it does not start a new AI generation job.'
@@ -279,6 +280,7 @@ export function WikiReader({ job, jobId, sample = false, provenance }) {
 
         <article ref={articleRef} className="wiki-article" aria-labelledby="wiki-chapter-title">
           <header className="wiki-article__header">
+            <span className="wiki-article__eyebrow">Chapter {String(selected + 1).padStart(2, '0')} · {chapters.length}</span>
             <h2 id="wiki-chapter-title">{chapter.title}</h2>
             {chapter.description ? <p>{chapter.description}</p> : null}
             {chapter.filePaths?.length ? (
@@ -302,7 +304,7 @@ export function WikiReader({ job, jobId, sample = false, provenance }) {
 
           <MarkdownDocument markdown={chapter.markdown} title={chapter.title} />
 
-          <section className="wiki-diagram-section" aria-labelledby="diagram-title">
+          <section id="wiki-diagram" className="wiki-diagram-section" aria-labelledby="diagram-title">
             <MermaidDiagram
               key={chapter.mermaid}
               titleId="diagram-title"
@@ -322,9 +324,31 @@ export function WikiReader({ job, jobId, sample = false, provenance }) {
             </Button>
           </nav>
         </article>
+
+        <aside className="wiki-context-rail" aria-label="Chapter context">
+          <div className="wiki-context-rail__section">
+            <span className="wiki-context-rail__eyebrow">Reading now</span>
+            <strong>{chapter.title}</strong>
+            {chapter.description ? <p>{chapter.description}</p> : null}
+          </div>
+          {chapter.filePaths?.length ? (
+            <div className="wiki-context-rail__section">
+              <h2>Source context</h2>
+              <ul>{chapter.filePaths.map((path) => <li key={path}><FileCode2 aria-hidden="true" size={14} /><code>{path}</code></li>)}</ul>
+            </div>
+          ) : null}
+          <div className="wiki-context-rail__section wiki-context-rail__diagram">
+            <NetworkMark />
+            <div><strong>Generated diagram</strong><p>Rendered from this chapter’s Mermaid definition.</p></div>
+          </div>
+        </aside>
       </div>
     </section>
   )
+}
+
+function NetworkMark() {
+  return <span className="wiki-context-rail__mark" aria-hidden="true"><GitFork size={16} /></span>
 }
 
 export default function Wiki() {

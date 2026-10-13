@@ -24,6 +24,7 @@ import { Button } from '../components/ui/button.jsx'
 import { Input } from '../components/ui/input.jsx'
 import { Label } from '../components/ui/label.jsx'
 import { useJobNotifications } from '../hooks/useJobNotifications.js'
+import sampleWiki from '../data/samples/spoon-knife.json'
 import { motion, motionQuery, prefersReducedMotion } from '../lib/motion.js'
 import { useJobPoll } from '../useJobPoll.js'
 
@@ -247,10 +248,11 @@ export default function Home() {
     media.add(motionQuery, () => {
       const timeline = gsap.timeline({ defaults: { ease: 'power2.out' } })
       timeline
-        .from('.workspace-intro > *', { opacity: 0, y: 12, duration: motion.content, stagger: 0.045 })
+        .from('.workspace-heading-word', { opacity: 0, yPercent: 95, duration: 0.58, stagger: 0.04, ease: 'power3.out' })
+        .from('.workspace-intro > :not(h1)', { opacity: 0, y: 12, duration: motion.content, stagger: 0.045 }, '-=0.34')
         .from('.workspace-command-grid > *', { opacity: 0, y: 12, duration: motion.content, stagger: 0.06 }, '-=0.16')
         .from('.workspace-assurance > *', { opacity: 0, y: 6, duration: 0.24, stagger: 0.04 }, '-=0.14')
-        .to('.workspace-workflow', { '--workflow-progress': '100%', duration: 0.58, ease: 'power1.inOut' }, '-=0.2')
+        .to('.workspace-proof__flow', { '--workflow-progress': '100%', duration: 0.58, ease: 'power1.inOut' }, '-=0.2')
     })
 
     return () => media.revert()
@@ -291,7 +293,10 @@ export default function Home() {
   return (
     <div ref={pageRef} className="workspace-page">
       <header className="workspace-intro">
-        <h1>What will we document today?</h1>
+        <span className="workspace-eyebrow">Repository workspace · Wiki generation</span>
+        <h1 aria-label="What will we document today?">
+          {['What', 'will', 'we', 'document', 'today?'].map((word) => <span className="workspace-heading-word" aria-hidden="true" key={word}>{word}</span>)}
+        </h1>
         <p>
           Turn a public GitHub repository into a structured technical wiki, or index its source for repository-grounded Q&amp;A.
         </p>
@@ -355,9 +360,10 @@ export default function Home() {
               </Button>
               <p>Creates chapters, technical explanations, and architecture diagrams.</p>
             </div>
-            <p className="workspace-sample-link">
-              Presenting AutoWiki? <Link to="/wiki/sample/spoon-knife">Open the pre-generated Spoon-Knife Wiki</Link> without starting a backend job.
-            </p>
+            <div className="workspace-sample-link">
+              <span><strong>Want to see the finished reader first?</strong> The sample is pre-generated and starts no backend job.</span>
+              <Button asChild variant="secondary" size="sm"><Link to="/wiki/sample/spoon-knife" aria-label="Open the pre-generated Spoon-Knife Wiki">Explore a sample Wiki <ArrowRight aria-hidden="true" size={15} /></Link></Button>
+            </div>
           </form>
 
           <WorkspaceJobCard
@@ -370,34 +376,26 @@ export default function Home() {
           />
         </section>
 
-        <aside className="workspace-side" aria-label="Supporting repository workflows">
-          <section className="workspace-workflow" aria-labelledby="workflow-title">
+        <aside className="workspace-side" aria-label="Generated Wiki preview">
+          <section className="workspace-proof" aria-labelledby="workspace-proof-title">
+            <div className="workspace-proof__topline"><span>Pre-generated sample</span><code>octocat/Spoon-Knife</code></div>
             <div className="workspace-section-heading workspace-section-heading--compact">
-              <span className="workspace-section-icon" aria-hidden="true">
-                <Files size={20} />
-              </span>
-              <div>
-                <h2 id="workflow-title">From source to chapters</h2>
-              </div>
+              <span className="workspace-section-icon" aria-hidden="true"><Files size={20} /></span>
+              <div><h2 id="workspace-proof-title">What arrives on the other side</h2></div>
             </div>
-            <ol className="workspace-workflow__track">
-              {workflowSteps.map(({ icon: StepIcon, title, description }, index) => (
-                <li key={title}>
-                  <span className="workspace-workflow__marker" aria-hidden="true">
-                    <StepIcon size={16} />
-                  </span>
-                  <div>
-                    <span className="workspace-workflow__number">0{index + 1}</span>
-                    <h3>{title}</h3>
-                    <p>{description}</p>
-                  </div>
-                </li>
-              ))}
+            <div className="workspace-proof__document">
+              <span>Generated wiki</span>
+              <h3>{sampleWiki.repo}</h3>
+              <ol>{sampleWiki.chapters.map((chapter, index) => <li key={chapter.title}><span>{String(index + 1).padStart(2, '0')}</span><strong>{chapter.title}</strong><code>{chapter.filePaths[0]}</code></li>)}</ol>
+            </div>
+            <ol className="workspace-proof__flow" aria-label="Conceptual repository to Wiki workflow">
+              {workflowSteps.map(({ icon: StepIcon, title }, index) => <li key={title}><span aria-hidden="true"><StepIcon size={15} /></span><small>0{index + 1}</small><strong>{title}</strong></li>)}
             </ol>
             <p className="workspace-workflow__note">Conceptual workflow—not live job progress.</p>
           </section>
+        </aside>
 
-          <section className="workspace-index" aria-labelledby="index-workflow-title">
+        <section className="workspace-index" aria-labelledby="index-workflow-title">
             <div className="workspace-section-heading workspace-section-heading--compact">
               <span className="workspace-section-icon workspace-section-icon--neutral" aria-hidden="true">
                 <Database size={20} />
@@ -428,8 +426,7 @@ export default function Home() {
               error={indexState.error}
               submitting={submitting.index}
             />
-          </section>
-        </aside>
+        </section>
       </div>
 
       <section className="workspace-assurance" aria-label="Workspace capabilities">

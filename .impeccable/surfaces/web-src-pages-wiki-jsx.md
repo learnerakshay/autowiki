@@ -24,3 +24,11 @@ Wiki is the Read-mode destination of the shared journey and owns one production 
 Pending, failure, missing-job, completed, and sample states retain factual copy and never imply unavailable progress. At 900px the chapter rail becomes a labeled native selector; at 760px identity and actions stack; at 520px controls become full-width and pagination preserves chapter position; 320px remains overflow-safe. Chapter and Mermaid continuity motion is short and optional, with all content immediately visible under reduced motion.
 
 FINISH: Prompt 11 final reviewer disposition is SHIP. Shared-reader behavior, exactly-one-SVG protection, provenance, sample zero-call behavior, desktop/mobile reflow, and accessible navigation are documented and verified.
+
+## Prompt 14 flagship reader
+
+The completed reader now minimizes dashboard framing. Its compact repository header sits above a three-region desktop document shell: sticky chapters, a border-light editorial article, and a conditional context rail backed only by the active chapter description and its actual `filePaths`. The center column gives the chapter title, semantic Markdown, and guarded Mermaid output significantly more visual authority.
+
+The context rail disappears below 1180px instead of leaving an empty column. At 900px the existing native chapter selector replaces the left rail; mobile retains full-width actions, readable article measure, bounded code/table overflow, diagram expansion, and adjacent chapter navigation. Live and sample data still enter the same `WikiReader`; sample provenance remains the only sample-specific reader content.
+
+Chapter state updates immediately. A short GSAP continuity transition then settles the article and diagram, while Mermaid's existing cancellation and exactly-one-SVG safeguards remain authoritative. Reduced motion keeps article and diagram content visible without spatial movement.
