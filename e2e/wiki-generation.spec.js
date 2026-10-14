@@ -56,9 +56,9 @@ test('Workspace reports real generation stages and settles cleanly on completion
   await page.getByLabel('GitHub repository').fill(REPO)
   await page.getByRole('button', { name: 'Generate Wiki' }).click()
 
-  const jobRegion = page.getByRole('region', { name: 'Wiki generation status' })
+  const jobRegion = page.getByRole('complementary', { name: 'Wiki preview or live job' })
   const progress = page.getByRole('region', { name: 'Wiki generation activity' })
-  await expect(jobRegion.getByRole('status')).toHaveText('Pending')
+  await expect(jobRegion).toContainText('Pending')
   await expect(progress.getByText('Preparing the generation job')).toBeVisible()
   await expect(progress).toContainText(REPO)
   await expect(progress).toContainText('No percentage or completion estimate is available.')
@@ -72,11 +72,11 @@ test('Workspace reports real generation stages and settles cleanly on completion
   await page.screenshot({ path: 'screenshots/prompt-08-generation-stage.png', fullPage: true })
   await expect(progress.getByText('Saving the generated wiki')).toBeVisible()
 
-  await expect(jobRegion.getByRole('status')).toHaveText('Completed')
+  await expect(jobRegion).toContainText('Wiki is ready')
   await expect(jobRegion).toContainText('4')
   await expect(progress).toHaveCount(0)
   await expect(page.locator('.workspace-activity')).toHaveCount(0)
-  await expect(jobRegion.getByRole('link', { name: 'View wiki' })).toHaveAttribute('href', '/wiki?jobId=prompt-08-progress')
+  await expect(jobRegion.getByRole('link', { name: 'Open wiki' })).toHaveAttribute('href', '/wiki?jobId=prompt-08-progress')
   await page.screenshot({ path: 'screenshots/prompt-08-generation-completed.png', fullPage: true })
 
   expect(requests.filter((request) => request === 'POST /api/wiki')).toHaveLength(1)

@@ -57,6 +57,8 @@ export function PillNav({ brand, items, activeIndex = -1, current = 'location', 
       className: 'ln__link',
       'aria-current': index === activeIndex ? current : undefined,
       onClick: (event) => { item.onClick?.(event); onNavigate?.() },
+      onMouseEnter: item.onIntent,
+      onFocus: item.onIntent,
     }
     return item.to
       ? <Link key={item.key} to={item.to} state={item.state} {...shared}>{item.label}</Link>

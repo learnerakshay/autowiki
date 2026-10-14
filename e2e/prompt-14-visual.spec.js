@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test'
 
 const widths = [1440, 1280, 1024, 768, 390, 320]
 
-test('Landing scroll story is accessible, interactive, and responsive', async ({ page }) => {
+test('Landing scroll story is accessible, interactive, and responsive', async ({ page }, testInfo) => {
   const pageErrors = []
   const consoleErrors = []
   page.on('pageerror', (error) => pageErrors.push(error.message))
@@ -35,7 +35,7 @@ test('Landing scroll story is accessible, interactive, and responsive', async ({
     }, index / 2)
     await expect(steps.nth(index)).toHaveAttribute('aria-current', 'step')
     await page.waitForTimeout(700)
-    await page.screenshot({ path: `screenshots/prompt-14-scroll-story-step-${index + 1}.png` })
+    await page.screenshot({ path: testInfo.outputPath(`prompt-14-scroll-story-step-${index + 1}.png`) })
   }
 
   await page.goto('/workspace')
@@ -61,7 +61,7 @@ test('Workspace hierarchy keeps both real actions and the sample path available'
   await expect(page.getByRole('heading', { level: 1, name: 'What will we document today?' })).toBeVisible()
   await expect(page.getByRole('button', { name: 'Generate Wiki' })).toBeVisible()
   await expect(page.getByRole('button', { name: 'Index Repository' })).toBeDisabled()
-  await expect(page.getByRole('link', { name: 'Open the pre-generated Spoon-Knife Wiki' })).toHaveAttribute('href', '/wiki/sample/spoon-knife')
+  await expect(page.getByRole('link', { name: 'Explore a sample Wiki' })).toHaveAttribute('href', '/wiki/sample/spoon-knife')
   await expect(page.getByText('Conceptual workflow—not live job progress.')).toBeVisible()
 
   await page.setViewportSize({ width: 320, height: 800 })
@@ -84,7 +84,7 @@ test('Sample Wiki uses the flagship reader at desktop and mobile sizes', async (
 
   await page.setViewportSize({ width: 390, height: 844 })
   await page.reload()
-  await expect(page.getByLabel('Chapter', { exact: true })).toBeVisible()
+  await expect(page.locator('.wiki-mobile-bar').getByRole('button').first()).toBeVisible()
   await expect(page.getByRole('complementary', { name: 'Chapter context' })).toBeHidden()
   await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
 })

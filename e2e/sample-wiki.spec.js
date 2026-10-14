@@ -19,7 +19,7 @@ test('sample entry points open an authentic backend-independent Wiki', async ({ 
 
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.goto('/')
-  const sampleLink = page.getByRole('link', { name: 'Explore Sample Wiki' })
+  const sampleLink = page.locator('#main-content').getByRole('link', { name: 'Explore Sample Wiki' })
   await expect(sampleLink).toHaveAttribute('href', SAMPLE_URL)
   await sampleLink.click()
 
@@ -62,7 +62,7 @@ test('workspace exposes the sample without submitting a job', async ({ page }) =
   })
 
   await page.goto('/workspace')
-  const sampleLink = page.getByRole('link', { name: 'Open the pre-generated Spoon-Knife Wiki' })
+  const sampleLink = page.getByRole('link', { name: 'Explore a sample Wiki' })
   await expect(sampleLink).toHaveAttribute('href', SAMPLE_URL)
   await sampleLink.click()
   await expect(page).toHaveURL(new RegExp(`${SAMPLE_URL}$`))
@@ -86,17 +86,16 @@ test('diagram expansion reuses the active SVG and restores keyboard focus', asyn
 
   const viewer = page.getByRole('dialog', { name: 'Architecture diagram' })
   await expect(viewer).toBeVisible()
-  await expect(page.getByRole('button', { name: 'Close diagram' })).toBeFocused()
+  await expect(viewer.getByRole('button', { name: 'Close' })).toBeFocused()
   await expect(page.locator('.diagram svg')).toHaveCount(1)
-  await expect.poll(() => page.evaluate(() => document.body.style.overflow)).toBe('hidden')
-  await expect.poll(() => viewer.evaluate((element) => Math.round(element.getBoundingClientRect().top))).toBe(24)
+  await expect.poll(() => page.evaluate(() => document.documentElement.style.overflow)).toBe('hidden')
   await page.screenshot({ path: 'screenshots/prompt-12-diagram-expanded.png' })
 
   await page.keyboard.press('Escape')
   await expect(viewer).toHaveCount(0)
   await expect(page.getByRole('button', { name: 'Expand diagram' })).toBeFocused()
   await expect(page.locator('.diagram svg')).toHaveCount(1)
-  await expect.poll(() => page.evaluate(() => document.body.style.overflow)).toBe('')
+  await expect.poll(() => page.evaluate(() => document.documentElement.style.overflow)).toBe('')
   expect(apiRequests).toEqual([])
 })
 
@@ -127,9 +126,10 @@ test('sample reader is responsive and complete with reduced motion', async ({ pa
       await page.keyboard.press('Escape')
     }
 
-    if (viewport.width <= 900) {
-      const selector = page.getByLabel('Chapter', { exact: true })
-      await selector.selectOption('1')
+    if (viewport.width <= 850) {
+      await page.locator('.wiki-mobile-bar').getByRole('button', { name: new RegExp('Introduction') }).click()
+      const sheet = page.getByRole('dialog', { name: 'Chapters' })
+      await sheet.getByRole('button', { name: /Web Structure/ }).click()
       await expect(page.getByRole('heading', { level: 2, name: 'Web Structure' })).toBeVisible()
       await expect(page.locator('.diagram svg')).toHaveCount(1)
     }

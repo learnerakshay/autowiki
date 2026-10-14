@@ -12,6 +12,7 @@ export default defineConfig({
   use: {
     baseURL: process.env.BASE_URL ?? "http://localhost:5173",
     browserName: "chromium",
+    deviceScaleFactor: 1,
     ...(executablePath ? { launchOptions: { executablePath } } : {}),
   },
 });

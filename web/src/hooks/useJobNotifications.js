@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { toast } from 'sonner'
+import { toast } from '../components/ui/kit/toastStore.js'
 
 export function useJobNotifications(job, jobId, labels) {
   useEffect(() => {

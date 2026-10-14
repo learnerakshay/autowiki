@@ -1,8 +1,8 @@
 import { Link, useParams } from 'react-router-dom'
 import { ArrowLeft, BookOpenText } from 'lucide-react'
-import { Button } from '../components/ui/button.jsx'
+import { Button, EmptyState, Page } from '../components/ui/kit/index.js'
 import sampleWiki from '../data/samples/spoon-knife.json'
-import { WikiReader } from './Wiki.jsx'
+import { WikiReader } from './WikiReader.jsx'
 
 const SAMPLE_SLUG = 'spoon-knife'
 
@@ -23,14 +23,11 @@ export default function SampleWiki() {
 
   if (slug !== SAMPLE_SLUG || !isValidSample(sampleWiki)) {
     return (
-      <section className="wiki-state-page" aria-labelledby="sample-missing-title">
+      <Page track="content" as="section" className="wiki-state-page" aria-labelledby="sample-missing-title">
         <Link className="wiki-back-link" to="/workspace"><ArrowLeft aria-hidden="true" size={16} />Back to Workspace</Link>
-        <div className="wiki-state-intro">
-          <span className="wiki-state-icon" aria-hidden="true"><BookOpenText size={24} /></span>
-          <div><h1 id="sample-missing-title">Sample Wiki unavailable</h1><p>The requested pre-generated sample is not part of this build.</p></div>
-        </div>
-        <Button asChild><Link to="/workspace">Generate a Wiki</Link></Button>
-      </section>
+        <h1 id="sample-missing-title">Sample Wiki unavailable</h1>
+        <EmptyState icon={BookOpenText} title="The sample is not part of this build" description="The requested pre-generated sample is unavailable." action={<Button as={Link} to="/workspace">Generate a Wiki</Button>} />
+      </Page>
     )
   }
 

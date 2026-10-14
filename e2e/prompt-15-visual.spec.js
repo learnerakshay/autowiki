@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test'
+import { stableScreenshot, stableVisual } from './helpers/stableVisual.js'
 
 const json = (route, body, status = 200) => route.fulfill({ status, contentType: 'application/json', body: JSON.stringify(body) })
 
@@ -7,12 +8,15 @@ test('capture Prompt 15 release-candidate routes', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 })
   await page.goto('/')
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
-  await page.screenshot({ path: 'screenshots/prompt-15-landing-hero.png' })
-  await page.screenshot({ path: 'screenshots/prompt-15-landing-full.png', fullPage: true })
+  await stableVisual(page)
+  await page.screenshot({ path: 'screenshots/prompt-15-landing-hero.png', ...stableScreenshot })
+  await stableVisual(page, { loadLandingSections: true })
+  await page.screenshot({ path: 'screenshots/prompt-15-landing-full.png', fullPage: true, ...stableScreenshot })
   await page.setViewportSize({ width: 390, height: 844 })
   await page.reload()
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
-  await page.screenshot({ path: 'screenshots/prompt-15-landing-mobile.png', fullPage: true })
+  await stableVisual(page, { loadLandingSections: true })
+  await page.screenshot({ path: 'screenshots/prompt-15-landing-mobile.png', fullPage: true, ...stableScreenshot })
 
   await page.setViewportSize({ width: 1440, height: 900 })
   await page.goto('/workspace')

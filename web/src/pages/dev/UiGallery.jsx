@@ -110,6 +110,10 @@ function Overlays() {
 
 export default function UiGallery() {
   const [reducedMotion, setReducedMotion] = useState(false)
+  useEffect(() => {
+    document.documentElement.dataset.reducedMotion = reducedMotion ? 'true' : 'false'
+    return () => { delete document.documentElement.dataset.reducedMotion }
+  }, [reducedMotion])
   const [seg, setSeg] = useState('week')
   const [tab, setTab] = useState('overview')
   const [chip, setChip] = useState(true)
@@ -129,7 +133,7 @@ export default function UiGallery() {
       <header className="gl-head">
         <h1>UI gallery</h1>
         <p>Dev-only. Every primitive in a matrix of states, on light and dark surfaces. Hover, focus and pressed are forced so they can be captured.</p>
-        <label className="gl-toggle"><input type="checkbox" checked={reducedMotion} onChange={(event) => setReducedMotion(event.target.checked)} /> Simulate reduced motion (CSS only; use the OS setting or DevTools emulation for the full effect)</label>
+        <label className="gl-toggle"><input type="checkbox" checked={reducedMotion} onChange={(event) => setReducedMotion(event.target.checked)} /> Simulate reduced motion</label>
         <nav className="gl-index" aria-label="Sections">
           {['tokens', 'buttons', 'fields', 'surfaces', 'status', 'tabs', 'overlays', 'feedback', 'content', 'shell'].map((id) => <a key={id} href={`#${id}`}>{id}</a>)}
         </nav>

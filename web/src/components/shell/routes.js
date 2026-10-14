@@ -4,10 +4,10 @@
 // Pages are loaded explicitly (not with React.lazy) so the route viewport can fetch the next page while the current
 // one stays on screen, then swap in a page that is already ready: no Suspense flash between routes.
 export const appRoutes = [
-  { key: 'workspace', path: '/workspace', load: () => import('../../pages/Home.jsx'), track: 'content' },
+  { key: 'workspace', path: '/workspace', load: () => import('../../pages/Home.jsx'), track: 'full' },
   { key: 'chat', path: '/chat', load: () => import('../../pages/Chat.jsx'), track: 'content' },
-  { key: 'wiki', path: '/wiki', load: () => import('../../pages/Wiki.jsx'), track: 'content' },
-  { key: 'sample', path: '/wiki/sample/:slug', load: () => import('../../pages/SampleWiki.jsx'), track: 'content' },
+  { key: 'wiki', path: '/wiki', load: () => import('../../pages/Wiki.jsx'), track: 'full' },
+  { key: 'sample', path: '/wiki/sample/:slug', load: () => import('../../pages/SampleWiki.jsx'), track: 'full' },
   { key: 'architecture', path: '/architecture', load: () => import('../../pages/Architecture.jsx'), track: 'full' },
 ]
 

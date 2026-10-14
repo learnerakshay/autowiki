@@ -206,3 +206,16 @@ test("logo: nav, footer and app header render the one component; generic file ic
   expect(await page.locator(".ln .lm-graph").getAttribute("d")).toBe(navGraph);
   expect(await page.locator(".app-footer .lm-graph").getAttribute("d")).toBe(navGraph);
 });
+
+test('every landing nav anchor works on the first click before lazy sections mount', async ({ page }) => {
+  const cdp = await page.context().newCDPSession(page)
+  await cdp.send('Emulation.setCPUThrottlingRate', { rate: 4 })
+  for (const [id, label] of [['how-it-works', 'How it works'], ['explore', 'Chapters'], ['features', 'Features'], ['pipeline', 'Pipeline']]) {
+    await page.goto('/')
+    await page.locator('.ln__links').getByRole('link', { name: label, exact: true }).click()
+    await expect(page).toHaveURL(new RegExp(`#${id}$`))
+    await expect(page.locator(`#${id}`)).toHaveAttribute('data-ready', 'true')
+    await expect(page.locator(`#${id}`)).toBeInViewport({ ratio: 0.01 })
+  }
+  await cdp.send('Emulation.setCPUThrottlingRate', { rate: 1 })
+});

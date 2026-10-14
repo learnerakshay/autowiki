@@ -147,30 +147,34 @@ Web Animations only.
 light and dark), toast triggers, dialog / sheet, and the nav, footer and background in frames. `/dev/brand` is the logo board.
 Both are behind `import.meta.env.DEV`, so production bundles do not contain them; both set `noindex`.
 
-## Migration map: what the page passes should delete
+## Migration map after Pass A
 
-Legacy tokens (second block of `styles/tokens.css`): `--canvas --background --foreground --card --muted --muted-foreground
---border --border-strong --primary* --surface-subtle --skeleton --pending* --success* --danger* --cyan-* --workspace-canvas`.
-Move each page to the tokens above, then delete the block. Tailwind's `@theme inline` colour map in `index.css` goes with it.
+Workspace and Wiki now use `<Page>` and kit controls directly. Their page styling lives in `pages/workspace.css` and
+`pages/wiki-reader.css`; the old `.workspace-*`, Wiki reader `.wiki-*`, `.diagram-*` and `.chapter-*` blocks were removed
+from `index.css`. The remaining `.wiki-pipeline-*` and `.wiki-stage-*` selectors there belong to Architecture. Shared Wiki
+generation progress styling is in `components/wiki-generation-progress.css`.
 
-Legacy primitives in `components/ui/` (shadcn style: `button.jsx`, `badge.jsx`, `card.jsx`, `input.jsx`, `label.jsx`,
-`tabs.jsx`, `skeleton.jsx`, `sonner.jsx`) are still used by the pages. Replace with the kit and delete:
-`Button` to kit `Button`, `Badge` to `Badge` / `StatusPill`, `Card` to `Surface`, `Input` + `Label` to `TextField`, `Tabs` to kit `Tabs`,
-`Skeleton` to `Skeleton`, `sonner` + `useJobNotifications` to `toast()` (then remove the `sonner` dependency and `LegacyToaster` in `AppShell`).
+`useJobNotifications` now calls kit `toast()`. `sonner.jsx`, its package and `LegacyToaster` are gone, with zero sonner call
+sites. The Workspace label-in-name defect is fixed by exposing the visible sample-link text as its accessible name.
+
+Pass B still owns legacy tokens in the second block of `styles/tokens.css` (`--canvas`, `--background`, `--foreground`,
+`--border`, `--primary*`, `--cyan-*`, etc.) and Tailwind's `@theme inline` colour map in `index.css`. Chat, Architecture,
+and a few shared components still use those values. The shared generation-progress CSS also needs its legacy token names
+replaced when the remaining pages are migrated.
+
+Legacy primitives still imported: `button.jsx` by Chat, Architecture and the landing hero; `input.jsx` and `label.jsx` by
+Chat; `tabs.jsx` by the landing preview; `card.jsx` by the shared `ErrorNotice`, `JobSkeleton`, and legacy `EmptyState`;
+`badge.jsx` by `JobStatus`; `skeleton.jsx` by `JobSkeleton`. No legacy primitive is currently safe to delete without
+also migrating those out-of-scope consumers. None is imported by Workspace or the Wiki pages.
 
 `index.css` blocks (line ranges approximate; `grep -n` the prefix):
 
 | Page | Prefix (rules) | Notes |
 |---|---|---|
-| Workspace (`Home.jsx`) | `.workspace-*` (~190) | form, job card, proof panel; keep until rebuilt on `TextField`, `Button`, `StatusPill`, `Surface` |
-| Chat (`Chat.jsx`) | `.chat-*` (~140) | composer, answer, sources; `.textarea` |
-| Wiki (`Wiki.jsx`, `SampleWiki.jsx`) | `.wiki-*` (~255), `.chapter-*`, `.mermaid-*`, `.diagram-*` | reader, sidebar, generation progress |
-| Architecture | `.architecture-*` (~175) | its own full-bleed section widths |
-| Shared | `.job-*`, `.toast-*`, `.page-stack`, `.landing-*` / `.product-*` remnants | `.toast-surface` and friends die with sonner |
+| Workspace (`Home.jsx`) | removed | New scoped `workspace.css` and kit controls |
+| Chat (`Chat.jsx`) | `.chat-*` | Pass B owns composer, answer and sources |
+| Wiki reader (`WikiReader.jsx`) | removed | New scoped `wiki-reader.css`; both sample and generated use the same reader |
+| Architecture | `.architecture-*`, `.wiki-pipeline-*`, `.wiki-stage-*` | Pass B owns these |
+| Shared and landing | `.job-*`, `.page-stack`, `.landing-*`, `.product-*` | Retain while their consumers remain |
 
-`components/shell/shell.css` holds the container-adoption overrides to delete once a page adopts `<Page>` itself:
-`.app-shell .architecture-page { background: transparent }`, the four `.architecture-*` widths set to `var(--content)`,
-`.app-shell .workspace-page { width: 100%; padding-top: 1.5rem }`, `.app-shell .chat-page` padding.
-
-Page-content accessibility findings (axe, for the pages' own passes): Workspace has a small button whose accessible name does not
-contain its visible text (`label-content-name-mismatch`).
+`components/shell/shell.css` still has Architecture and Chat adoption overrides. The Workspace override was removed.

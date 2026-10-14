@@ -44,3 +44,8 @@ h1[tabindex="-1"]:focus-visible, h2[tabindex="-1"]:focus-visible, main[tabindex=
   .press:active, .lift:hover { transform: none; }
   .press, .lift { transition: none; }
 }
+html[data-reduced-motion="true"] { scroll-behavior: auto; }
+html[data-reduced-motion="true"] .press:active,
+html[data-reduced-motion="true"] .lift:hover { transform: none; }
+html[data-reduced-motion="true"] .press,
+html[data-reduced-motion="true"] .lift { transition: none; }

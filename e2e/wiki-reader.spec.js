@@ -82,7 +82,7 @@ async function mockWikiJobs(page) {
   })
 }
 
-test('completed Wiki renders semantic Markdown and keeps one current Mermaid SVG', async ({ page, context }) => {
+test('completed Wiki renders semantic Markdown and keeps one current Mermaid SVG', async ({ page, context }, testInfo) => {
   const pageErrors = []
   const consoleErrors = []
   page.on('pageerror', (error) => pageErrors.push(error.message))
@@ -108,14 +108,14 @@ test('completed Wiki renders semantic Markdown and keeps one current Mermaid SVG
 
   await expect(page.locator('[data-sonner-toast]')).toHaveCount(0, { timeout: 7000 })
   await page.evaluate(() => window.scrollTo(0, 0))
-  await page.screenshot({ path: 'screenshots/prompt-07-wiki-desktop.png', fullPage: true })
-  await page.locator('.diagram-card').screenshot({ path: 'screenshots/prompt-07-mermaid-diagram.png' })
+  await page.screenshot({ path: testInfo.outputPath('prompt-07-wiki-desktop.png'), fullPage: true })
+  await page.locator('.diagram-card').screenshot({ path: testInfo.outputPath('prompt-07-mermaid-diagram.png') })
 
   await page.getByRole('button', { name: 'Copy Markdown' }).click()
   await expect(page.getByRole('button', { name: 'Copied' })).toBeVisible()
   expect(await page.evaluate(() => navigator.clipboard.readText())).toContain('# Overview')
 
-  const chapterButtons = page.locator('aside button')
+  const chapterButtons = page.locator('.wiki-reader-grid > .wiki-chapter-nav button')
   await chapterButtons.nth(1).click()
   await chapterButtons.nth(2).click()
   await chapterButtons.nth(0).click()
@@ -130,12 +130,12 @@ test('completed Wiki renders semantic Markdown and keeps one current Mermaid SVG
   await expect(page.locator('.diagram svg')).toHaveCount(1)
 
   await page.evaluate(() => window.scrollTo(0, 0))
-  await page.screenshot({ path: 'screenshots/prompt-07-wiki-chapter.png', fullPage: true })
+  await page.screenshot({ path: testInfo.outputPath('prompt-07-wiki-chapter.png'), fullPage: true })
   expect(pageErrors).toEqual([])
   expect(consoleErrors).toEqual([])
 })
 
-test('mobile chapter navigation and reduced motion remain functional', async ({ page }) => {
+test('mobile chapter navigation and reduced motion remain functional', async ({ page }, testInfo) => {
   await mockWikiJobs(page)
   await page.emulateMedia({ reducedMotion: 'reduce' })
 
@@ -149,10 +149,9 @@ test('mobile chapter navigation and reduced motion remain functional', async ({ 
     await page.goto('/wiki?jobId=wiki-reader')
     await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
 
-    if (viewport.width <= 900) {
-      const selector = page.getByLabel('Chapter', { exact: true })
-      await expect(selector).toBeVisible()
-      await selector.selectOption('2')
+    if (viewport.width <= 850) {
+      await page.locator('.wiki-mobile-bar').getByRole('button', { name: /Overview/ }).click()
+      await page.getByRole('dialog', { name: 'Chapters' }).getByRole('button', { name: /Rendering safety/ }).click()
       await expect(page.getByRole('heading', { level: 2, name: 'Rendering safety' })).toBeVisible()
       await expect(page.locator('.diagram svg')).toHaveCount(1)
     }
@@ -160,12 +159,12 @@ test('mobile chapter navigation and reduced motion remain functional', async ({ 
     if (viewport.width === 390) {
       await expect(page.locator('[data-sonner-toast]')).toHaveCount(0, { timeout: 7000 })
       await page.evaluate(() => window.scrollTo(0, 0))
-      await page.screenshot({ path: 'screenshots/prompt-07-wiki-mobile.png', fullPage: true })
+      await page.screenshot({ path: testInfo.outputPath('prompt-07-wiki-mobile.png'), fullPage: true })
     }
   }
 })
 
-test('pending Wiki shows honest indeterminate status', async ({ page }) => {
+test('pending Wiki shows honest indeterminate status', async ({ page }, testInfo) => {
   await mockWikiJobs(page)
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.goto('/wiki?jobId=wiki-pending')
@@ -174,15 +173,15 @@ test('pending Wiki shows honest indeterminate status', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'Generating your technical wiki' })).toBeVisible()
   await expect(page.getByText(/not live stage progress/i)).toBeVisible()
   await expect(page.locator('body')).not.toContainText('%')
-  await page.screenshot({ path: 'screenshots/prompt-07-wiki-pending.png', fullPage: true })
+  await page.screenshot({ path: testInfo.outputPath('prompt-07-wiki-pending.png'), fullPage: true })
 })
 
-test('failed and unknown Wiki jobs explain recovery honestly', async ({ page }) => {
+test('failed and unknown Wiki jobs explain recovery honestly', async ({ page }, testInfo) => {
   await mockWikiJobs(page)
   await page.goto('/wiki?jobId=wiki-failed')
   await expect(page.getByRole('heading', { name: 'Wiki generation failed' })).toBeVisible()
   await expect(page.getByRole('alert')).toContainText('Generation provider rejected the request.')
-  await page.screenshot({ path: 'screenshots/prompt-07-wiki-failed.png', fullPage: true })
+  await page.screenshot({ path: testInfo.outputPath('prompt-07-wiki-failed.png'), fullPage: true })
 
   await page.goto('/wiki?jobId=missing-job')
   await expect(page.getByRole('heading', { name: 'Wiki job unavailable' })).toBeVisible()

@@ -1,10 +1,10 @@
-import { useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { ArrowRight } from 'lucide-react'
 import { BrandLink } from '../brand/BrandLink.jsx'
 import { actions, routes } from '../../data/landingCopy.js'
 import { PillNav } from './PillNav.jsx'
-import { activeNavIndex, appNav } from './routes.js'
+import { activeNavIndex, appNav, appRoutes, loadRoute } from './routes.js'
 import { useScrollProgress } from './useScrollProgress.js'
 
 // "Generate a Wiki" lands on the Workspace and focuses its repository field (the route transition honours this).
@@ -16,12 +16,25 @@ export function AppNav() {
   const progressRef = useRef(null)
   const scrolled = useScrollProgress(progressRef, pathname)
   const onWorkspace = pathname === '/workspace'
+  const items = appNav.map((item) => ({ ...item, onIntent: () => {
+    const route = appRoutes.find((entry) => entry.key === item.key)
+    if (route) void loadRoute(route)
+  } }))
+
+  useEffect(() => {
+    const idle = window.requestIdleCallback || ((callback) => setTimeout(callback, 1200))
+    const cancel = window.cancelIdleCallback || clearTimeout
+    const handle = idle(() => {
+      appRoutes.filter((route) => route.key !== 'sample' && route.path !== pathname).forEach((route) => void loadRoute(route))
+    }, { timeout: 3000 })
+    return () => cancel(handle)
+  }, [pathname])
 
   return (
     <PillNav
       variant="app"
       brand={<BrandLink />}
-      items={appNav}
+      items={items}
       activeIndex={activeNavIndex(pathname)}
       current="page"
       linksLabel="Main navigation"
@@ -30,7 +43,7 @@ export function AppNav() {
       progressRef={progressRef}
       headerProps={{ 'data-scrolled': scrolled, 'data-past-hero': 'true', 'data-tone': 'light' }}
       cta={(
-        <Link to={routes.workspace} state={generateState} className="ln__primary" data-hidden={onWorkspace || undefined} inert={onWorkspace}>
+        <Link to={routes.workspace} state={generateState} className="ln__primary" data-hidden={onWorkspace || undefined} inert={onWorkspace} onMouseEnter={() => void loadRoute(appRoutes[0])} onFocus={() => void loadRoute(appRoutes[0])}>
           {actions.primary} <ArrowRight aria-hidden="true" />
         </Link>
       )}

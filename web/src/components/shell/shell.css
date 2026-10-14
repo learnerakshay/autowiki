@@ -18,5 +18,4 @@
  */
 .app-shell .architecture-page { background: transparent; }
 .app-shell :is(.architecture-hero, .architecture-overview-section, .architecture-section, .architecture-close) { width: var(--content); }
-.app-shell .workspace-page { width: 100%; padding-top: 1.5rem; }
 .app-shell .chat-page { padding-top: 1.5rem; padding-bottom: 5rem; }

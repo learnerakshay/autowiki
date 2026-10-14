@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useRef, useState } from 'react'
+import { Suspense, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { EffectsBoundary } from './EffectsBoundary.jsx'
 import { LOAD_ALL_EVENT } from './loadAll.js'
 
@@ -9,6 +9,11 @@ const whenIdle = (callback, timeout = 1200) => {
 const cancelIdle = (handle) => {
   if ('cancelIdleCallback' in window) cancelIdleCallback(handle)
   else clearTimeout(handle)
+}
+
+function ReadySection({ Section, onReady }) {
+  useLayoutEffect(() => { onReady(true) }, [onReady])
+  return <Section />
 }
 
 /**
@@ -26,6 +31,8 @@ const cancelIdle = (handle) => {
 export function LazySection({ id, Section, preload, minHeight, order = 0, rootMargin = '500px 0px' }) {
   const wrapperRef = useRef(null)
   const [armed, setArmed] = useState(false)
+  const [ready, setReady] = useState(false)
+
 
   useEffect(() => {
     const wrapper = wrapperRef.current
@@ -58,11 +65,11 @@ export function LazySection({ id, Section, preload, minHeight, order = 0, rootMa
   }, [armed, preload, order, rootMargin])
 
   return (
-    <div ref={wrapperRef} id={id} className="lp-lazy" style={{ minHeight: armed ? undefined : minHeight }} data-lazy-section={id}>
+    <div ref={wrapperRef} id={id} className="lp-lazy" style={{ minHeight: ready ? undefined : minHeight }} data-lazy-section={id} data-ready={ready ? 'true' : 'false'}>
       {armed ? (
         <EffectsBoundary>
           <Suspense fallback={<div style={{ minHeight }} aria-hidden="true" />}>
-            <Section />
+            <ReadySection Section={Section} onReady={setReady} />
           </Suspense>
         </EffectsBoundary>
       ) : null}

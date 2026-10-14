@@ -1,0 +1,87 @@
+.workspace-page { --page-pt: clamp(2.5rem, 5vw, 4.25rem); }
+.workspace-page .ui-page-header { max-width: 58rem; }
+.workspace-layout { display: grid; grid-template-columns: minmax(0, 1.06fr) minmax(22rem, .94fr); gap: clamp(1rem, 2vw, 1.5rem); align-items: start; }
+.workspace-layout__commands { display: grid; gap: 1rem; min-width: 0; }
+.workspace-layout__side { min-width: 0; position: sticky; top: calc(var(--nav-h) + 1.25rem); }
+.workspace-command, .workspace-index, .workspace-preview { overflow: hidden; }
+.workspace-command::before, .workspace-index::before, .workspace-preview::before { position: absolute; inset: 0 0 auto; height: 2px; background: var(--accent); content: ''; }
+.workspace-command[data-job-state="pending"]::before, .workspace-index[data-job-state="pending"]::before, .workspace-preview[data-job-state="pending"]::before { background: linear-gradient(90deg, var(--accent) 0%, var(--mint-100) 50%, var(--accent) 100%); background-size: 200% 100%; animation: workspace-sweep 2.2s linear infinite; }
+.workspace-command[data-job-state="succeeded"]::before, .workspace-index[data-job-state="succeeded"]::before, .workspace-preview[data-job-state="succeeded"]::before { background: var(--status-success); }
+.workspace-command[data-job-state="failed"]::before, .workspace-index[data-job-state="failed"]::before, .workspace-preview[data-job-state="failed"]::before { background: var(--status-danger); }
+@keyframes workspace-sweep { to { background-position: -200% 0; } }
+.workspace-command__heading, .workspace-index__heading > div { display: flex; align-items: center; gap: .75rem; }
+.workspace-command__heading > svg, .workspace-index__heading > div > svg { width: 2.5rem; height: 2.5rem; flex: none; padding: .58rem; border: 1px solid var(--line); border-radius: var(--r-m); background: var(--accent-soft); color: var(--accent-ink); }
+.workspace-command h2, .workspace-index h2 { margin: 0; color: var(--ink); font-family: var(--font-sans); font-size: clamp(1.15rem, 2vw, 1.4rem); letter-spacing: -.03em; line-height: 1.2; }
+.workspace-command form { display: grid; gap: 1.4rem; margin-top: 1.75rem; }
+.workspace-command .ui-field { gap: .5rem; }
+.workspace-command .ui-field__shell { min-height: 3.4rem; }
+.workspace-command .ui-field__hint { max-width: 50ch; }
+.workspace-command .ui-field__message { min-height: 1.4rem; }
+.workspace-repo-mark { position: relative; display: grid; width: 1.1rem; height: 1.1rem; place-items: center; }
+.workspace-repo-mark svg { position: absolute; width: 1.1rem; height: 1.1rem; transition: transform var(--spring-duration) var(--spring), opacity var(--dur-fast) ease; }
+.workspace-repo-mark svg:last-child { opacity: 0; transform: scale(.55); color: var(--status-success); }
+.workspace-repo-mark[data-valid="true"] svg:first-child { opacity: 0; transform: scale(.55); }
+.workspace-repo-mark[data-valid="true"] svg:last-child { opacity: 1; transform: scale(1); }
+.workspace-command .ui-field__shell.is-invalid { animation: workspace-nudge .35s var(--spring); }
+@keyframes workspace-nudge { 0%, 100% { transform: translateX(0); } 42% { transform: translateX(4px); } 75% { transform: translateX(-2px); } }
+.workspace-command__action { display: flex; align-items: center; gap: 1rem; }
+.workspace-command__action .ui-btn { flex: none; }
+.workspace-command__action p, .workspace-command__sample p { margin: 0; color: var(--ink-2); font-size: .86rem; line-height: 1.55; }
+.workspace-command__sample { display: grid; gap: .8rem; padding-top: 1.3rem; border-top: 1px solid var(--line); }
+.workspace-command__sample strong { color: var(--ink); }
+.workspace-command__sample .ui-btn { justify-self: start; }
+.workspace-index { display: grid; gap: 1rem; }
+.workspace-index__heading { display: flex; align-items: center; justify-content: space-between; gap: .75rem; }
+.workspace-index > p, .workspace-index__result p { margin: 0; color: var(--ink-2); font-size: .88rem; line-height: 1.6; }
+.workspace-index > .ui-btn { justify-self: start; }
+.workspace-index .workspace-index__reason { margin-top: -.4rem; font-size: .79rem; color: var(--ink-2); }
+.workspace-index .workspace-index__error { color: var(--status-danger); }
+.workspace-index__result { display: grid; gap: .65rem; border-top: 1px solid var(--line); padding-top: 1rem; }
+.workspace-index__result strong { font-variant-numeric: tabular-nums; color: var(--ink); }
+.workspace-index__result .ui-btn { justify-self: start; }
+.workspace-preview { display: grid; gap: 1.15rem; min-height: 28rem; }
+.workspace-preview__top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .5rem; font-size: .76rem; font-weight: 750; letter-spacing: .045em; }
+.workspace-preview__top code, .workspace-preview__repo { color: var(--dark-ink-2); font-size: .75rem; overflow-wrap: anywhere; }
+.workspace-preview code { border: 0; background: transparent; padding: 0; box-shadow: none; }
+.workspace-preview > h2 { max-width: 18ch; margin: .2rem 0 0; font-family: var(--font-sans); font-size: clamp(1.45rem, 3vw, 2.1rem); letter-spacing: -.04em; line-height: 1.12; }
+.workspace-preview h3 { margin: .4rem 0 1rem; font-family: var(--font-sans); font-size: 1.2rem; letter-spacing: -.03em; }
+.workspace-preview > p { margin: 0; color: var(--dark-ink-2); font-size: .86rem; line-height: 1.6; }
+.workspace-preview__window { padding: 1.15rem; border: 1px solid var(--dark-line); border-radius: var(--r-m); background: rgba(255,255,255,.055); }
+.workspace-preview__window-bar { display: flex; justify-content: space-between; gap: .5rem; border-bottom: 1px solid var(--dark-line); padding-bottom: .7rem; color: var(--dark-ink-2); font-size: .72rem; }
+.workspace-preview__chapters { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
+.workspace-preview__chapters li { display: grid; grid-template-columns: 1.6rem minmax(0,1fr); gap: .45rem .7rem; align-items: baseline; border-top: 1px solid var(--dark-line); padding: .72rem .25rem; transition: background-color var(--dur-fast) ease; }
+.workspace-preview__chapters li:hover { background: rgba(255,255,255,.055); }
+.workspace-preview__chapters li:first-child { border-top: 0; }
+.workspace-preview__chapters li span { color: var(--dark-accent); font-family: var(--font-mono); font-size: .72rem; }
+.workspace-preview__chapters li strong { min-width: 0; color: var(--dark-ink); font-size: .86rem; line-height: 1.4; }
+.workspace-preview__chapters li code { grid-column: 2; color: var(--dark-ink-2); font-size: .68rem; overflow-wrap: anywhere; }
+.workspace-preview__flow { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: .4rem; margin: .2rem 0 0; padding: 0; list-style: none; }
+.workspace-preview__flow li { display: grid; justify-items: start; gap: .45rem; padding-top: .65rem; border-top: 1px solid var(--dark-line); color: var(--dark-ink-2); font-size: .7rem; line-height: 1.35; }
+.workspace-preview__flow svg { color: var(--dark-accent); }
+.workspace-preview .workspace-preview__note { font-size: .72rem; }
+.workspace-preview__actions { display: flex; flex-wrap: wrap; gap: .6rem; }
+.workspace-preview .ui-btn--primary { background: var(--dark-accent); color: var(--dark); }
+.workspace-preview .ui-btn--secondary { border-color: var(--dark-line); background: transparent; color: var(--dark-ink); }
+.workspace-preview__error { display: flex; align-items: flex-start; gap: .55rem; color: var(--dark-ink) !important; }
+.workspace-preview__error svg { flex: none; color: #ffb3b9; }
+.workspace-preview .wiki-generation-progress { margin: 0; padding: 1rem 0 0; border-color: var(--dark-line); }
+.workspace-preview .wiki-generation-progress__heading h2 { max-width: none; color: var(--dark-ink); font-size: 1rem; }
+.workspace-preview .wiki-generation-progress__heading :is(p,code) { color: var(--dark-ink-2); }
+.workspace-preview .wiki-generation-progress__current { border-color: var(--dark-line); background: rgba(255,255,255,.06); }
+.workspace-preview .wiki-generation-progress__current > span { border-color: var(--dark-line); background: var(--dark-2); color: var(--dark-accent); }
+.workspace-preview .wiki-generation-progress__current :is(p,small) { color: var(--dark-ink); }
+.workspace-preview .wiki-generation-progress__stages li { color: var(--dark-ink-2); }
+.workspace-preview .wiki-generation-progress__stages li > span:first-child { border-color: var(--dark-line); background: var(--dark-2); }
+.workspace-preview .wiki-generation-progress__stages li:is(.is-active,.is-complete) { color: var(--dark-accent); }
+.workspace-preview .wiki-generation-progress__stages li:is(.is-active,.is-complete) > span:first-child { border-color: var(--dark-accent); background: var(--dark-2); }
+.workspace-preview .wiki-generation-progress__activity { display: none; }
+.workspace-benefits { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: .75rem; margin-top: 1.5rem; }
+.workspace-benefits .ui-surface { display: flex; align-items: flex-start; gap: .7rem; background: color-mix(in srgb, #fff 70%, var(--mint-50)); }
+.workspace-benefits svg { flex: none; color: var(--accent-ink); }
+.workspace-benefits p { display: grid; gap: .15rem; margin: 0; font-size: .77rem; line-height: 1.45; }
+.workspace-benefits strong { color: var(--ink); font-size: .82rem; }
+.workspace-benefits span { color: var(--ink-2); }
+@media (max-width: 960px) { .workspace-layout { grid-template-columns: 1fr; } .workspace-layout__side { position: static; } .workspace-preview { min-height: 0; } }
+@media (max-width: 620px) { .workspace-command__action { align-items: stretch; flex-direction: column; } .workspace-command__action .ui-btn { align-self: stretch; } .workspace-benefits { grid-template-columns: 1fr; } .workspace-index__heading { align-items: flex-start; } }
+@media (prefers-reduced-motion: reduce) { .workspace-command::before, .workspace-index::before, .workspace-preview::before { animation: none; } .workspace-command .ui-field__shell.is-invalid { animation: none; } .workspace-repo-mark svg { transition: none; } }
+@media (prefers-contrast: more), (forced-colors: active) { .workspace-command, .workspace-index, .workspace-preview, .workspace-preview__window { border: 1px solid CanvasText; } .workspace-command::before, .workspace-index::before, .workspace-preview::before { display: none; } .workspace-preview__chapters li { border-color: CanvasText; } }

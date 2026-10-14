@@ -1,13 +1,16 @@
 import { useRef } from 'react'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
+import './wiki-generation-progress.css'
 import {
   BookOpenText,
+  Check,
   Clock3,
   GitBranch,
   ListTree,
   Save,
 } from 'lucide-react'
+import { prefersReducedMotion } from '../lib/motion.js'
 
 const stages = [
   {
@@ -73,7 +76,7 @@ export function WikiGenerationProgress({ progress, repo, compact = false }) {
     const active = surfaceRef.current?.querySelector('.wiki-generation-progress__current')
     if (!active) return
 
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    if (prefersReducedMotion()) {
       gsap.set(active, { clearProps: 'all' })
       return
     }
@@ -92,6 +95,7 @@ export function WikiGenerationProgress({ progress, repo, compact = false }) {
   }, { scope: surfaceRef, dependencies: [stageKey] })
 
   const ActiveIcon = activeStage?.icon || Clock3
+  const activeIndex = stages.findIndex((item) => item.id === activeStage?.id)
 
   return (
     <section
@@ -123,9 +127,9 @@ export function WikiGenerationProgress({ progress, repo, compact = false }) {
       </div>
 
       <ol className="wiki-generation-progress__stages" aria-label="Generation stages">
-        {stages.map(({ id, shortLabel, icon: StageIcon }) => (
-          <li key={id} className={activeStage?.id === id ? 'is-active' : ''} aria-current={activeStage?.id === id ? 'step' : undefined}>
-            <span aria-hidden="true"><StageIcon size={15} /></span>
+        {stages.map(({ id, shortLabel, icon: StageIcon }, index) => (
+          <li key={id} className={activeIndex === index ? 'is-active' : index < activeIndex ? 'is-complete' : ''} aria-current={activeIndex === index ? 'step' : undefined}>
+            <span aria-hidden="true">{index < activeIndex ? <Check size={15} /> : <StageIcon size={15} />}</span>
             <span>{shortLabel}</span>
           </li>
         ))}

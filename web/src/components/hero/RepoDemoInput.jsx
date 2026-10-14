@@ -4,7 +4,6 @@ import { AlertCircle, ArrowRight, Check } from 'lucide-react'
 import { Button } from '../ui/button.jsx'
 import { actions } from '../../data/landingCopy.js'
 import { checkRepoInput, REPO_EXAMPLE, workspaceHref } from '../../lib/repoInput.js'
-import { reducedMotionQuery } from '../../lib/motion.js'
 import { GithubMark } from './GithubMark.jsx'
 
 const EMPTY_MESSAGE = `Enter a public GitHub repository, like ${REPO_EXAMPLE}.`
@@ -43,10 +42,7 @@ export function RepoDemoInput({ demo = IDLE_DEMO, exploreHref, id = 'hero-repo',
       inputRef.current?.focus()
       return
     }
-    // Hand off with a View Transition where the browser has them (a root cross-fade; the workspace page is
-    // untouched). Everywhere else this is an ordinary navigation.
-    const transition = 'startViewTransition' in document && !window.matchMedia(reducedMotionQuery).matches
-    navigate(workspaceHref(result.repo), transition ? { viewTransition: true } : undefined)
+    navigate(workspaceHref(result.repo), { state: { focus: '#repo' } })
   }
 
   return (

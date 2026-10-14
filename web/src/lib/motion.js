@@ -64,5 +64,5 @@ export function installMotionTokens(root = document.documentElement) {
 }
 
 export function prefersReducedMotion() {
-  return window.matchMedia(reducedMotionQuery).matches
+  return document.documentElement.dataset.reducedMotion === 'true' || window.matchMedia(reducedMotionQuery).matches
 }
