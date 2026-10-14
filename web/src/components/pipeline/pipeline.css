@@ -1,0 +1,112 @@
+/*
+ * Pipeline strip behavior: scroll fill, sequential node activation, hover / focus / press.
+ * Layout (grid, sizes, spacing) is untouched and lives in index.css. Motion here is transform / opacity
+ * only (plus one small drop-shadow filter on hover). Scoped under .pipeline-wrap to win over older rules.
+ */
+
+/* Faint rail under the fill; same geometry as the fill line (.pipeline__path in index.css). */
+.pipeline-wrap .pipeline__track,
+.pipeline-wrap .pipeline__glint {
+  position: absolute;
+  top: 2.45rem;
+  left: 6%;
+  height: 2px;
+  pointer-events: none;
+}
+.pipeline-wrap .pipeline__track { z-index: 0; right: 6%; background: rgba(100, 200, 173, 0.28); }
+.pipeline-wrap .pipeline__glint {
+  z-index: 0;
+  width: 16%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.95), transparent);
+  box-shadow: 0 0 12px 1px rgba(110, 235, 195, 0.7);
+  opacity: 0;
+  transform: translate3d(0, 0, 0);
+}
+.pipeline-wrap .pipeline__glint.is-travelling { animation: pipeline-glint 1.1s cubic-bezier(0.4, 0, 0.2, 1) both; }
+/* The line spans 6%..94% of the strip and the glint is 16% wide: 72% of travel is 450% of its own width. */
+@keyframes pipeline-glint {
+  0% { opacity: 0; transform: translate3d(0, 0, 0); }
+  15% { opacity: 1; }
+  85% { opacity: 1; }
+  100% { opacity: 0; transform: translate3d(450%, 0, 0); }
+}
+
+.pipeline-wrap .pipeline li {
+  border-radius: 0.75rem;
+  cursor: default;
+  outline: none;
+  transition: transform var(--spring-duration, 400ms) var(--spring, cubic-bezier(0.16, 1, 0.3, 1));
+}
+
+/* Quiet -> active. Quiet text stays above 4.5:1; the difference comes from fill, rise and weight of tone. */
+.pipeline-wrap .pipeline li > span { position: relative; transition: filter 0.25s ease-out; }
+.pipeline-wrap .pipeline li > span b { font-weight: inherit; opacity: 0.85; transition: opacity 0.3s ease-out; }
+.pipeline-wrap .pipeline li > strong {
+  opacity: 0.8;
+  transform: translate3d(0, 5px, 0);
+  transition: opacity 0.3s ease-out, transform var(--spring-duration, 400ms) var(--spring, cubic-bezier(0.16, 1, 0.3, 1));
+}
+
+/* Accent fill (border + tint) behind the number: grows in with the spring. */
+.pipeline-wrap .pipeline li > span::before {
+  position: absolute;
+  z-index: -1;
+  inset: -1px;
+  border: 1px solid #14a07f;
+  border-radius: 50%;
+  background: #d6f6e9;
+  content: "";
+  opacity: 0;
+  transform: scale(0.88);
+  transition: opacity 0.3s ease-out, transform var(--spring-duration, 400ms) var(--spring, cubic-bezier(0.16, 1, 0.3, 1));
+}
+/* One soft ring pulse on activation. */
+.pipeline-wrap .pipeline li > span::after {
+  position: absolute;
+  inset: -1px;
+  border: 2px solid rgba(30, 180, 140, 0.7);
+  border-radius: 50%;
+  content: "";
+  opacity: 0;
+  pointer-events: none;
+}
+.pipeline-wrap .pipeline li.is-pulsing > span::after { animation: pipeline-pulse 0.75s ease-out both; }
+@keyframes pipeline-pulse {
+  0% { opacity: 0.8; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.5); }
+}
+
+.pipeline-wrap .pipeline li.is-active > span::before { opacity: 1; transform: scale(1); }
+.pipeline-wrap .pipeline li.is-active > span b { opacity: 1; }
+.pipeline-wrap .pipeline li.is-active > strong { opacity: 1; transform: translate3d(0, 0, 0); }
+
+/* Hover / focus: spring lift + glow. Press: immediate scale on pointer-down. */
+.pipeline-wrap .pipeline li:hover,
+.pipeline-wrap .pipeline li:focus-visible { transform: translate3d(0, -3px, 0); }
+.pipeline-wrap .pipeline li:hover > span,
+.pipeline-wrap .pipeline li:focus-visible > span { filter: drop-shadow(0 8px 14px rgba(30, 170, 130, 0.32)); }
+.pipeline-wrap .pipeline li:active { transform: translate3d(0, -1px, 0) scale(0.97); transition-duration: 90ms; }
+.pipeline-wrap .pipeline li:focus-visible { outline: 2px solid var(--cyan-accent, #087f75); outline-offset: 4px; }
+
+/* No connector on wrapped / stacked layouts (existing behavior); nodes still activate in order. */
+@media (max-width: 720px) {
+  .pipeline-wrap .pipeline__track,
+  .pipeline-wrap .pipeline__glint { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pipeline-wrap .pipeline li,
+  .pipeline-wrap .pipeline li:hover,
+  .pipeline-wrap .pipeline li:focus-visible,
+  .pipeline-wrap .pipeline li:active { transform: none; transition: none; }
+  .pipeline-wrap .pipeline li > strong,
+  .pipeline-wrap .pipeline li > span::before { transform: none; transition: none; }
+  .pipeline-wrap .pipeline li > span::after,
+  .pipeline-wrap .pipeline__glint { display: none; }
+}
+
+@media (prefers-contrast: more) {
+  .pipeline-wrap .pipeline li > strong,
+  .pipeline-wrap .pipeline li > span b { opacity: 1; }
+  .pipeline-wrap .pipeline__track { background: #1b9477; }
+}

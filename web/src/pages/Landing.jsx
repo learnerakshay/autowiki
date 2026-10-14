@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -9,10 +9,13 @@ import { Button } from '../components/ui/button.jsx'
 import { AnimatedHeading } from '../components/hero/AnimatedHeading.jsx'
 import { Hero } from '../components/hero/Hero.jsx'
 import { Diagram } from '../components/hero/StaticDiagram.jsx'
+import { PipelineStrip } from '../components/pipeline/PipelineStrip.jsx'
+import { useDragCarousel } from '../components/story/useDragCarousel.js'
 import { sampleWiki } from '../data/heroSample.js'
 import { buildDiagram } from '../lib/mermaidGraph.js'
-import { motionQuery, prefersReducedMotion } from '../lib/motion.js'
+import { installMotionTokens, motionQuery } from '../lib/motion.js'
 import './Landing.css'
+import '../components/story/story.css'
 
 gsap.registerPlugin(useGSAP, ScrollTrigger)
 
@@ -81,9 +84,14 @@ function ProcessVisual({ activeStage }) {
   )
 }
 
-function HorizontalStory({ activeScene, onSelect }) {
+function HorizontalStory() {
+  const rootRef = useRef(null)
+  const [activeScene, setActiveScene] = useState(0)
+  const { enhanced, interacted, goTo } = useDragCarousel({ rootRef, count: previewChapters.length, onActive: setActiveScene })
+  const total = previewChapters.length
+
   return (
-    <section id="explore" className="horizontal-story" aria-labelledby="horizontal-story-title">
+    <section ref={rootRef} id="explore" className="horizontal-story" aria-labelledby="horizontal-story-title">
       <div className="horizontal-story__sticky">
         <div className="horizontal-story__heading">
           <div>
@@ -91,8 +99,9 @@ function HorizontalStory({ activeScene, onSelect }) {
             <p>Move across the real Spoon-Knife sample—from purpose, to structure, to presentation.</p>
           </div>
           <div className="horizontal-story__controls" aria-label="Sample chapter controls">
-            <button type="button" aria-label="Previous chapter" disabled={activeScene === 0} onClick={() => onSelect(activeScene - 1)}><ArrowLeft aria-hidden="true" /></button>
-            <div role="group" aria-label="Choose a sample chapter">
+            <button type="button" aria-label="Previous chapter" disabled={activeScene === 0} onClick={() => goTo(activeScene - 1)}><ArrowLeft aria-hidden="true" /></button>
+            <div className="pager-group" role="group" aria-label="Choose a sample chapter" style={{ '--active': activeScene }}>
+              <i className="pager-pill" aria-hidden="true" />
               {previewChapters.map((chapter, index) => (
                 <button
                   key={chapter.title}
@@ -100,20 +109,35 @@ function HorizontalStory({ activeScene, onSelect }) {
                   className={activeScene === index ? 'is-active' : ''}
                   aria-label={`Open ${chapter.title}`}
                   aria-pressed={activeScene === index}
-                  onClick={() => onSelect(index)}
+                  aria-current={activeScene === index ? 'true' : undefined}
+                  onClick={() => goTo(index)}
                 ><span>{index + 1}</span></button>
               ))}
             </div>
-            <button type="button" aria-label="Next chapter" disabled={activeScene === previewChapters.length - 1} onClick={() => onSelect(activeScene + 1)}><ArrowRight aria-hidden="true" /></button>
+            <button type="button" aria-label="Next chapter" disabled={activeScene === total - 1} onClick={() => goTo(activeScene + 1)}><ArrowRight aria-hidden="true" /></button>
           </div>
         </div>
 
-        <div className="horizontal-story__frame">
+        <div
+          className="horizontal-story__frame"
+          role="region"
+          aria-roledescription="carousel"
+          aria-label="Sample chapters"
+          tabIndex={enhanced ? 0 : undefined}
+        >
           <div className="horizontal-story__track">
             {previewChapters.map((chapter, index) => (
-              <article id={`horizontal-scene-${index}`} className={`horizontal-scene horizontal-scene--${index + 1}${activeScene === index ? ' is-active' : ''}`} key={chapter.title}>
+              <article
+                id={`horizontal-scene-${index}`}
+                className={`horizontal-scene horizontal-scene--${index + 1}${activeScene === index ? ' is-active' : ''}`}
+                key={chapter.title}
+                role="group"
+                aria-roledescription="slide"
+                aria-label={`${index + 1} of ${total}`}
+                aria-hidden={enhanced && activeScene !== index ? 'true' : undefined}
+              >
                 <div className="horizontal-scene__copy">
-                  <p>Chapter {String(index + 1).padStart(2, '0')} / {String(previewChapters.length).padStart(2, '0')}</p>
+                  <p>Chapter {String(index + 1).padStart(2, '0')} / {String(total).padStart(2, '0')}</p>
                   <h3>{chapter.title}</h3>
                   <p>{chapter.description}</p>
                   <div className="horizontal-scene__paths"><span>Grounded in</span>{chapter.filePaths.map((path) => <code key={path}>{path}</code>)}</div>
@@ -147,7 +171,8 @@ function HorizontalStory({ activeScene, onSelect }) {
           </div>
         </div>
 
-        <p className="horizontal-story__status" aria-live="polite">Showing {previewChapters[activeScene].title}. Scroll to move between chapters, or use the chapter controls.</p>
+        <p className="horizontal-story__status sr-only" aria-live="polite">Showing {previewChapters[activeScene].title}. Scroll to move between chapters, or use the chapter controls.</p>
+        <p className="horizontal-story__hint" aria-hidden="true" data-hidden={interacted}>Drag, scroll or use ← →</p>
       </div>
     </section>
   )
@@ -177,8 +202,9 @@ function LandingNavigation() {
 export default function Landing() {
   const pageRef = useRef(null)
   const [activeStory, setActiveStory] = useState(0)
-  const [activeHorizontalScene, setActiveHorizontalScene] = useState(0)
-  const activeHorizontalSceneRef = useRef(0)
+
+  // Publish the shared spring presets as CSS tokens before first paint so stylesheets use the same motion.
+  useLayoutEffect(() => { installMotionTokens() }, [])
 
   useGSAP(() => {
     const media = gsap.matchMedia()
@@ -220,60 +246,10 @@ export default function Landing() {
           ease: 'none',
           scrollTrigger: { trigger: '.process-story', start: 'top 62%', end: 'bottom 42%', scrub: 0.35 },
         })
-
-        const horizontalStory = pageRef.current?.querySelector('.horizontal-story')
-        const horizontalTrack = horizontalStory?.querySelector('.horizontal-story__track')
-        const horizontalFrame = horizontalStory?.querySelector('.horizontal-story__frame')
-        if (horizontalStory && horizontalTrack && horizontalFrame) {
-          horizontalStory.classList.add('is-enhanced')
-          gsap.to(horizontalTrack, {
-            x: () => -(horizontalTrack.scrollWidth - horizontalFrame.clientWidth),
-            ease: 'none',
-            scrollTrigger: {
-              trigger: horizontalStory,
-              start: 'top top',
-              end: 'bottom bottom',
-              scrub: 0.45,
-              invalidateOnRefresh: true,
-              onUpdate: ({ progress }) => {
-                const nextScene = Math.min(previewChapters.length - 1, Math.round(progress * (previewChapters.length - 1)))
-                if (activeHorizontalSceneRef.current !== nextScene) {
-                  activeHorizontalSceneRef.current = nextScene
-                  setActiveHorizontalScene(nextScene)
-                }
-              },
-            },
-          })
-        }
       }
-
-      gsap.fromTo('.pipeline__path', { scaleX: 0 }, {
-        scaleX: 1,
-        ease: 'none',
-        scrollTrigger: { trigger: '.pipeline', start: 'top 78%', end: 'bottom 58%', scrub: 0.45 },
-      })
     })
-    return () => {
-      pageRef.current?.querySelector('.horizontal-story')?.classList.remove('is-enhanced')
-      media.revert()
-    }
+    return () => media.revert()
   }, { scope: pageRef })
-
-  function selectHorizontalScene(index) {
-    const nextScene = Math.max(0, Math.min(previewChapters.length - 1, index))
-    activeHorizontalSceneRef.current = nextScene
-    setActiveHorizontalScene(nextScene)
-
-    const story = pageRef.current?.querySelector('.horizontal-story')
-    if (story?.classList.contains('is-enhanced')) {
-      const start = window.scrollY + story.getBoundingClientRect().top
-      const distance = story.offsetHeight - window.innerHeight
-      window.scrollTo({ top: start + distance * (nextScene / (previewChapters.length - 1)), behavior: 'smooth' })
-      return
-    }
-
-    document.getElementById(`horizontal-scene-${nextScene}`)?.scrollIntoView({ behavior: prefersReducedMotion() ? 'auto' : 'smooth', block: 'center' })
-  }
 
   return (
     <div ref={pageRef} className="landing-shell"><a className="skip-link" href="#main-content">Skip to content</a><LandingNavigation />
@@ -282,7 +258,7 @@ export default function Landing() {
 
         <section id="how-it-works" className="landing-section landing-process" aria-labelledby="process-title"><div className="landing-section__heading"><AnimatedHeading id="process-title" lines={['From repository', 'to documentation.']} /><p>One deliberate path turns repository structure into a wiki people can actually navigate.</p></div><div className="process-story"><div className="process-story__narrative"><span className="process-story__rail" aria-hidden="true"><i className="process-story__progress" /></span><ol className="process-flow">{processSteps.map((step, index) => <li className={`process-step${activeStory === index ? ' is-active' : ''}`} aria-current={activeStory === index ? 'step' : undefined} key={step.title}><span className="process-flow__number">{step.number}</span><div><span className="process-step__eyebrow">Stage {step.number}</span><h3>{step.title}</h3><p>{step.text}</p></div></li>)}</ol></div><div className="process-story__visual"><ProcessVisual activeStage={activeStory} /></div></div></section>
 
-        <HorizontalStory activeScene={activeHorizontalScene} onSelect={selectHorizontalScene} />
+        <HorizontalStory />
 
         <section id="features" className="landing-section landing-features" aria-labelledby="features-title"><div className="landing-section__heading landing-section__heading--wide"><AnimatedHeading id="features-title" lines={['A technical document', 'with the evidence', 'still attached.']} /><p>Chapters lead the reading experience. Diagrams and source paths make the generated explanation easier to inspect.</p></div><div className="feature-composition landing-reveal">
           <article className="feature-proof feature-proof--chapters"><div className="feature-proof__copy"><BookOpenText aria-hidden="true" /><h3>Structured wiki chapters</h3><p>A navigable document replaces a pile of disconnected repository notes.</p></div><div className="feature-chapters" aria-label="Sample generated Spoon-Knife chapters">{previewChapters.map((chapter, index) => <div key={chapter.title}><span>{String(index + 1).padStart(2, '0')}</span><strong>{chapter.title}</strong><code>{chapter.filePaths[0]}</code></div>)}</div></article>
@@ -290,7 +266,7 @@ export default function Landing() {
           <article className="feature-proof feature-proof--chat"><div className="feature-proof__copy"><MessageSquareText aria-hidden="true" /><h3>Grounded follow-up questions</h3><p>After separate indexing, chat can answer focused questions and point back to source paths.</p></div><div className="feature-chat"><span>What does this repository demonstrate?</span><code>README.md</code></div></article>
         </div></section>
 
-        <section className="landing-section architecture" aria-labelledby="architecture-title"><div className="architecture__heading"><div><AnimatedHeading id="architecture-title" lines={['A generation pipeline', 'you can follow.']} /><p>The product story mirrors the current implementation instead of simulating a fictional live process.</p></div><Button asChild variant="secondary"><Link to="/architecture">Explore the architecture <ArrowRight aria-hidden="true" /></Link></Button></div><div className="pipeline-wrap landing-reveal"><i className="pipeline__path" aria-hidden="true" /><ol className="pipeline" aria-label="Wiki generation pipeline">{pipeline.map((stage, index) => <li key={stage}><span>{String(index + 1).padStart(2, '0')}</span><strong>{stage}</strong></li>)}</ol></div><p className="architecture__note">Repository-grounded chat uses a separate embeddings and vector-search pipeline.</p></section>
+        <section className="landing-section architecture" aria-labelledby="architecture-title"><div className="architecture__heading"><div><AnimatedHeading id="architecture-title" lines={['A generation pipeline', 'you can follow.']} /><p>The product story mirrors the current implementation instead of simulating a fictional live process.</p></div><Button asChild variant="secondary"><Link to="/architecture">Explore the architecture <ArrowRight aria-hidden="true" /></Link></Button></div><PipelineStrip stages={pipeline} /><p className="architecture__note">Repository-grounded chat uses a separate embeddings and vector-search pipeline.</p></section>
 
         <section className="landing-cta landing-reveal" aria-labelledby="cta-title"><div><AnimatedHeading id="cta-title" lines={['Let the repository', 'explain itself.']} /><p>Generate structured chapters and Mermaid diagrams from a public GitHub repository.</p></div><Button asChild><Link to="/workspace">Open Workspace <ArrowRight aria-hidden="true" /></Link></Button></section>
       </main>
