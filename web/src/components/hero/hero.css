@@ -5,11 +5,10 @@
  */
 
 .landing-hero {
-  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-  --hero-ink: #0b1211;
+  --hero-ink: var(--ink);
   --hero-ink-soft: #3d4f4a;
-  --hero-line: rgba(70, 128, 112, 0.22);
-  --hero-accent: #0f8d70;
+  --hero-line: var(--line);
+  --hero-accent: var(--accent);
 
   position: relative;
   isolation: isolate;

@@ -1,0 +1,87 @@
+.ui-btn {
+  --btn-px: 1.35rem;
+  position: relative;
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0 var(--btn-px);
+  border: 1px solid transparent;
+  border-radius: var(--r-pill);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    transform var(--dur-press) var(--ease-out),
+    box-shadow var(--dur-fast) ease,
+    background-color var(--dur-fast) ease,
+    border-color var(--dur-fast) ease,
+    color var(--dur-fast) ease;
+}
+.ui-btn--sm { --btn-px: 1rem; min-height: 2.25rem; font-size: 0.82rem; }
+.ui-btn--lg { --btn-px: 1.6rem; min-height: 3rem; }
+.ui-btn--icon { width: 2.75rem; padding: 0; }
+@media (pointer: coarse) { .ui-btn--sm { min-height: 2.75rem; } }
+
+.ui-btn__icon { width: 1rem; height: 1rem; flex: none; }
+.ui-btn__icon--trailing { transition: transform var(--dur-fast) ease; }
+.ui-btn:hover .ui-btn__icon--trailing { transform: translateX(2px); }
+
+.ui-btn--primary { background: var(--btn-dark); color: #fff; }
+.ui-btn--secondary { border-color: var(--line-strong); background: rgba(255, 255, 255, 0.82); color: var(--ink); }
+.ui-btn--ghost { background: transparent; color: var(--ink-2); }
+.ui-btn--ghost:hover { background: var(--mint-100); color: var(--ink); }
+.ui-btn--primary:hover { background: var(--btn-dark-hover); }
+.ui-btn--secondary:hover { border-color: var(--accent); background: #fff; }
+.ui-btn--primary:hover, .ui-btn--secondary:hover { transform: translate3d(0, var(--lift-y), 0); box-shadow: var(--shadow-1); }
+.ui-btn:active { transform: scale(var(--press-scale)); box-shadow: none; transition-duration: var(--dur-press); }
+
+/* On dark surfaces the primary button inverts. */
+[data-surface="dark"] .ui-btn--primary { background: var(--dark-accent); color: var(--dark); }
+[data-surface="dark"] .ui-btn--primary:hover { background: #a6efdb; }
+[data-surface="dark"] .ui-btn--secondary { border-color: var(--dark-line); background: transparent; color: var(--dark-ink); }
+[data-surface="dark"] .ui-btn--secondary:hover { border-color: var(--dark-accent); background: rgba(141, 231, 207, 0.1); }
+[data-surface="dark"] .ui-btn--ghost { color: var(--dark-ink-2); }
+[data-surface="dark"] .ui-btn--ghost:hover { background: rgba(141, 231, 207, 0.1); color: var(--dark-ink); }
+
+.ui-btn:disabled, .ui-btn[aria-disabled="true"]:not(.is-loading) {
+  border-color: var(--disabled-line);
+  background: var(--disabled-bg);
+  box-shadow: none;
+  color: var(--disabled-ink);
+  cursor: not-allowed;
+  transform: none;
+}
+[data-surface="dark"] .ui-btn:disabled, [data-surface="dark"] .ui-btn[aria-disabled="true"]:not(.is-loading) {
+  border-color: var(--dark-line);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--dark-ink-2);
+}
+.ui-btn.is-loading { cursor: progress; }
+
+/* Loading: one breathing dot in the left padding, so the label never moves. Static under reduced motion. */
+.ui-dot {
+  position: absolute;
+  top: 50%;
+  left: calc(var(--btn-px) / 2 - 0.2rem);
+  width: 0.4rem;
+  height: 0.4rem;
+  margin-top: -0.2rem;
+  border-radius: 50%;
+  background: currentColor;
+}
+.ui-btn--icon .ui-dot { left: 50%; margin-left: -0.2rem; }
+@media (prefers-reduced-motion: no-preference) {
+  .ui-dot { animation: ui-breathe calc(var(--spring-duration) * 3) var(--spring) infinite alternate; }
+  @keyframes ui-breathe { from { opacity: 0.35; transform: scale(0.7); } to { opacity: 1; transform: scale(1.15); } }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ui-btn { transition-property: background-color, border-color, color; }
+  .ui-btn:hover, .ui-btn:active { transform: none; }
+}

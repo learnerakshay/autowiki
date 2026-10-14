@@ -1,0 +1,54 @@
+/* Dev-only UI gallery. Nothing here ships in production. */
+.gl { min-height: 100vh; padding: 2rem clamp(1rem, 4vw, 3rem) 5rem; background: var(--mint-50); color: var(--ink); }
+.gl-head, .gl-main { max-width: 84rem; margin-inline: auto; }
+.gl-head h1 { margin: 0; font-size: 2rem; letter-spacing: -0.04em; }
+.gl-head p { max-width: 46rem; margin: 0.4rem 0 1rem; color: var(--ink-3); font-size: 0.9rem; }
+.gl-toggle { display: inline-flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; font-size: 0.85rem; font-weight: 600; }
+.gl-toggle input { width: 1.1rem; height: 1.1rem; accent-color: var(--accent); }
+.gl-index { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.gl-index a { padding: 0.45rem 0.8rem; border: 1px solid var(--line); border-radius: 999px; background: #fff; color: var(--ink-2); font-size: 0.8rem; font-weight: 650; text-decoration: none; }
+
+.gl-section { display: grid; gap: 1rem; margin-top: 2.5rem; padding: 1.5rem; border: 1px solid var(--line); border-radius: var(--r-l); background: rgba(255, 255, 255, 0.78); }
+.gl-section > * { min-width: 0; }
+.gl-section h2 { margin: 0; font-size: 1.25rem; letter-spacing: -0.03em; }
+.gl-section h3 { margin: 0.5rem 0 0; font-size: 0.95rem; }
+.gl-note { max-width: 52rem; margin: -0.5rem 0 0; color: var(--ink-3); font-size: 0.85rem; line-height: 1.55; }
+.gl-row { display: grid; grid-template-columns: 6rem minmax(0, 1fr); align-items: center; gap: 1rem; }
+.gl-row__label { color: var(--ink-3); font-family: var(--font-mono); font-size: 0.72rem; }
+.gl-row__cells { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem; padding: 0.35rem 0; }
+.gl-dark { padding: 0.75rem; border-radius: var(--r-m); background: var(--dark); }
+.gl-cells { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; }
+.gl-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 1rem; align-items: start; }
+.gl-skeleton-row { display: flex; gap: 1rem; align-items: center; }
+.gl-swatches { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+.gl-swatches figure { display: grid; gap: 0.3rem; margin: 0; font-size: 0.7rem; text-align: center; }
+.gl-swatches i { display: block; width: 4rem; height: 2.5rem; border: 1px solid var(--line); border-radius: var(--r-xs); }
+.gl-shadows { display: flex; flex-wrap: wrap; gap: 1.25rem; }
+.gl-shadows span { display: grid; width: 10rem; height: 4.5rem; place-items: center; border-radius: var(--r-m); background: #fff; font-family: var(--font-mono); font-size: 0.72rem; }
+.gl-type p { margin: 0.15rem 0; }
+
+/* Frames contain the fixed shell layers (transform makes the frame their containing block). */
+.gl-frame { position: relative; overflow: hidden; border: 1px solid var(--line); border-radius: var(--r-m); transform: translateZ(0); }
+.gl-frame--nav { height: 7.5rem; background: var(--mint-100); }
+.gl-frame--bg { display: grid; height: 14rem; place-items: center; }
+.gl-frame--footer { border: 0; }
+
+/* Forced states (capturable without a pointer). */
+.ui-btn[data-force="hover"].ui-btn--primary { background: var(--btn-dark-hover); }
+.ui-btn[data-force="hover"].ui-btn--secondary { border-color: var(--accent); background: #fff; }
+.ui-btn[data-force="hover"].ui-btn--ghost { background: var(--mint-100); color: var(--ink); }
+.ui-btn[data-force="hover"]:not(.ui-btn--ghost) { transform: translate3d(0, var(--lift-y), 0); box-shadow: var(--shadow-1); }
+.ui-btn[data-force="focus"] { outline: var(--ring-width) solid var(--ring); outline-offset: var(--ring-offset); }
+.ui-btn[data-force="pressed"] { transform: scale(var(--press-scale)); box-shadow: none; }
+.ui-chip[data-force="hover"] { border-color: var(--accent); background: var(--mint-50); color: var(--ink); }
+.force-focus.ui-field__shell { border-color: var(--ring); outline: var(--ring-width) solid var(--ring); outline-offset: 2px; }
+
+[data-surface="dark"] .ui-btn[data-force="hover"].ui-btn--primary { background: #a6efdb; }
+[data-surface="dark"] .ui-btn[data-force="hover"].ui-btn--secondary { border-color: var(--dark-accent); background: rgba(141, 231, 207, 0.1); color: var(--dark-ink); }
+[data-surface="dark"] .ui-btn[data-force="hover"].ui-btn--ghost { background: rgba(141, 231, 207, 0.1); color: var(--dark-ink); }
+.gl h1, .gl h2, .gl h3 { font-weight: 700; }
+
+/* Simulated reduced motion (CSS only). */
+.gl[data-reduced] *, .gl[data-reduced] *::before, .gl[data-reduced] *::after { animation: none !important; transition: none !important; }
+
+@media (max-width: 40rem) { .gl-row { grid-template-columns: 1fr; gap: 0.25rem; } }

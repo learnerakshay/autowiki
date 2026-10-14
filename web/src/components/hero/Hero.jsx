@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { FileCode2, Network } from 'lucide-react'
+import { brand } from '../../config/brand.js'
 import { heroSample } from '../../data/heroSample.js'
 import { reducedMotionQuery } from '../../lib/motion.js'
 import { AnimatedHeading } from './AnimatedHeading.jsx'
@@ -14,6 +15,8 @@ import './hero.css'
 // at once but mounted when the browser is idle, behind a skeleton of the same size, so the headline and the
 // repo field are never waiting on it.
 const loadWindow = () => import('./PreviewWindow.jsx')
+// The headline is the brand motto, broken after its comma so it can never drift from brand.js.
+const headlineLines = brand.motto.split(/(?<=,)\s+/)
 const PreviewWindow = lazy(() => loadWindow().then((module) => ({ default: module.PreviewWindow })))
 const idle = (callback) => ('requestIdleCallback' in window ? requestIdleCallback(callback, { timeout: 500 }) : setTimeout(callback, 120))
 const cancelIdle = (handle) => ('cancelIdleCallback' in window ? cancelIdleCallback(handle) : clearTimeout(handle))
@@ -67,7 +70,7 @@ export function Hero() {
       <HeroBackground backdropRef={backdropRef} spotRef={spotRef} />
 
       <div className="landing-hero__copy">
-        <AnimatedHeading as="h1" id="landing-title" hero lines={['Your repository,', 'beautifully documented.']} />
+        <AnimatedHeading as="h1" id="landing-title" hero lines={headlineLines} />
         <p className="landing-hero__lede">Transform a public GitHub repository into a structured technical wiki with generated chapters, source context, and Mermaid diagrams.</p>
         <RepoDemoInput demo={demo} exploreHref={`/wiki/sample/${heroSample.slug}`} />
         <ul className="hero-facts" aria-label="What AutoWiki supports">

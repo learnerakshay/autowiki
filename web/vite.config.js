@@ -13,6 +13,7 @@ function headTags() {
     `<title>${escapeHtml(title)}</title>`,
     `<meta name="description" content="${escapeHtml(brand.description)}" />`,
     `<meta name="theme-color" content="${brand.themeColor}" />`,
+    `<meta name="color-scheme" content="light" />`,
     `<meta name="application-name" content="${escapeHtml(brand.name)}" />`,
     `<link rel="mask-icon" href="/safari-pinned-tab.svg" color="${brand.colors.tile}" />`,
     `<meta property="og:type" content="website" />`,

@@ -1,0 +1,22 @@
+/* App shell layout: nav, page region and footer in one column; the background is a fixed layer behind them. */
+.app-shell {
+  position: relative;
+  display: flex;
+  min-height: 100dvh;
+  flex-direction: column;
+  /* The legacy teal is 4.49:1 on its own tint; inside the app it is a touch darker (4.9:1). The landing keeps the original. */
+  --cyan-accent: #07766d;
+}
+.shell-main { position: relative; z-index: var(--z-content); flex: 1; padding-top: var(--nav-h); outline: none; }
+.shell-main:focus-visible { outline: none; }
+.route-track--full { width: 100%; }
+
+/*
+ * Container adoption. Pages that painted their own opaque canvas or set their own width let the shared background
+ * and the shared track through. Only what is needed to line the pages up is changed here; each page's own pass
+ * owns the rest (see the migration map in docs/design-system.md).
+ */
+.app-shell .architecture-page { background: transparent; }
+.app-shell :is(.architecture-hero, .architecture-overview-section, .architecture-section, .architecture-close) { width: var(--content); }
+.app-shell .workspace-page { width: 100%; padding-top: 1.5rem; }
+.app-shell .chat-page { padding-top: 1.5rem; padding-bottom: 5rem; }

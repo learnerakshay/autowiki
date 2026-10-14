@@ -55,6 +55,7 @@ export default function BrandBoard() {
   return (
     <main className="bb">
       <header className="bb-head">
+        <h1 className="ui-sr-only">Brand board</h1>
         <Logo variant="lockup" size="2.5rem" />
         <p>Brand board. Dev-only: this route does not exist in production builds. “{brand.motto}”</p>
       </header>

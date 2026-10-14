@@ -1,0 +1,52 @@
+.ui-field { display: grid; gap: 0.35rem; }
+.ui-field__label { color: var(--ink); font-size: 0.875rem; font-weight: 700; line-height: 1.3; }
+.ui-field__hint { margin: 0; color: var(--ink-3); font-size: 0.8125rem; line-height: 1.5; }
+
+.ui-field__shell {
+  display: flex;
+  min-height: 2.75rem;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0 0.9rem;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-s);
+  background: #fff;
+  box-shadow: inset 0 1px 0 #fff, var(--shadow-1);
+  transition: border-color var(--dur-fast) ease, box-shadow var(--dur-fast) ease, background-color var(--dur-fast) ease;
+}
+.ui-field__shell:hover { border-color: var(--accent); }
+.ui-field__shell:focus-within { border-color: var(--ring); outline: var(--ring-width) solid var(--ring); outline-offset: 2px; }
+.ui-field__shell.is-invalid { border-color: var(--status-danger); }
+.ui-field__shell.is-invalid:focus-within { outline-color: var(--status-danger); }
+.ui-field__shell.is-disabled { border-color: var(--disabled-line); background: var(--disabled-bg); box-shadow: none; color: var(--disabled-ink); cursor: not-allowed; }
+.ui-field__shell.is-multiline { align-items: flex-start; padding-block: 0.7rem; }
+
+.ui-field__control {
+  min-width: 0;
+  flex: 1;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  outline: none;
+  caret-color: var(--accent);
+}
+.ui-field__control::placeholder { color: var(--ink-3); opacity: 1; }
+.ui-field__control:disabled { color: var(--disabled-ink); cursor: not-allowed; }
+.ui-field__control:is(textarea) { min-height: 3rem; max-height: calc(var(--rows, 8) * 1.5em); resize: none; overflow-y: auto; }
+.ui-field__shell.is-mono .ui-field__control { font-family: var(--font-mono); font-size: 0.9rem; letter-spacing: -0.01em; }
+
+.ui-field__affix { display: inline-flex; flex: none; align-items: center; color: var(--ink-3); font-size: 0.85rem; }
+.ui-field__affix svg { width: 1.05rem; height: 1.05rem; }
+.ui-field__shell:focus-within .ui-field__affix--prefix { color: var(--accent-ink); }
+
+/* The message line is always rendered, so a message appearing never moves what is below it. */
+.ui-field__message { display: flex; min-height: 1.35rem; align-items: flex-start; gap: 0.4rem; margin: 0; font-size: 0.8125rem; font-weight: 600; line-height: 1.45; }
+.ui-field__message svg { width: 1rem; height: 1rem; flex: none; margin-top: 0.1rem; }
+.ui-field__message.is-error { color: var(--status-danger); }
+.ui-field__message.is-success { color: var(--status-success); }
+
+@media (prefers-reduced-motion: reduce) { .ui-field__shell { transition: none; } }
+@media (prefers-contrast: more) { .ui-field__shell { border-color: var(--ink); } }

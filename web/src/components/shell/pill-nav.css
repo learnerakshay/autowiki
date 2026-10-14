@@ -1,4 +1,8 @@
-/* Floating nav: pill bar, scroll-spy pill, hairline progress, soft scroll edge, CTA swap, mobile sheet. */
+/*
+ * Floating pill nav shared by the landing page and the app (PillNav.jsx). The `ln` prefix is historical.
+ * Pill bar, sliding active pill, hairline progress, soft scroll edge, CTA swap, mobile sheet.
+ * [data-variant="app"] only changes the bar's width track and adds the hidden-CTA state.
+ */
 
 .ln { position: fixed; z-index: 60; inset: 0 0 auto 0; pointer-events: none; }
 
@@ -183,3 +187,9 @@
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .ln__bar { background: #fff; }
 }
+
+/* ── App variant ── */
+/* The bar sits on the same track as the page content and the footer, so every left edge lines up. */
+.ln[data-variant="app"] .ln__bar { width: var(--content); max-width: none; }
+.ln__primary[data-hidden="true"] { opacity: 0; transform: translate3d(0, 8px, 0) scale(0.96); visibility: hidden; transition-delay: 0s, 0s, 0s, 0.25s; }
+@media (prefers-reduced-motion: reduce) { .ln__primary[data-hidden="true"] { transform: none; } }

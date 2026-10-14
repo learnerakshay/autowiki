@@ -1,0 +1,54 @@
+.ui-surface {
+  position: relative;
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--r-l);
+  background: #fff;
+  color: var(--ink);
+}
+.ui-surface--pad-none { padding: 0; }
+.ui-surface--pad-sm { padding: var(--space-3); }
+.ui-surface--pad-md { padding: clamp(1.25rem, 2.4vw, 1.75rem); }
+.ui-surface--pad-lg { padding: clamp(1.5rem, 3vw, 2.25rem); }
+
+.ui-surface--raised {
+  border-color: var(--line-strong);
+  background: linear-gradient(180deg, #fff 0%, var(--mint-50) 100%);
+  box-shadow: inset 0 1px 0 #fff, var(--shadow-2);
+}
+.ui-surface--dark {
+  border-color: var(--dark-line);
+  background: linear-gradient(180deg, var(--dark-2), var(--dark));
+  box-shadow: inset 0 1px 0 rgba(141, 231, 207, 0.12), var(--shadow-2);
+  color: var(--dark-ink);
+  --ring: var(--dark-accent);
+}
+
+.ui-surface.is-interactive {
+  transition: transform var(--spring-duration) var(--spring), box-shadow 0.3s ease;
+}
+.ui-surface.is-interactive:hover { transform: translate3d(0, -4px, 0); box-shadow: inset 0 1px 0 #fff, var(--shadow-3); }
+.ui-surface.is-interactive:active { transform: translate3d(0, -2px, 0) scale(var(--press-scale)); transition-duration: var(--dur-press); }
+
+/* Cursor-following glow on the 1px border ring (the orb moves by transform; the mask shows only the ring). */
+.ui-surface__glow {
+  position: absolute;
+  inset: -1px;
+  overflow: hidden;
+  padding: 1px;
+  border-radius: inherit;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.ui-surface:hover .ui-surface__glow { opacity: 1; }
+.ui-surface__orb { position: absolute; top: -11rem; left: -11rem; width: 22rem; height: 22rem; background: radial-gradient(circle, rgba(20, 190, 145, 0.95), transparent 62%); }
+
+@media (hover: none), (pointer: coarse) { .ui-surface__glow { display: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .ui-surface.is-interactive { transition: none; }
+  .ui-surface.is-interactive:hover, .ui-surface.is-interactive:active { transform: none; }
+  .ui-surface__glow { display: none; }
+}
+@media (prefers-contrast: more) { .ui-surface { border-color: var(--line-strong); } }

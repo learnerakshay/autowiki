@@ -1,0 +1,16 @@
+// The design-system kit. Import a primitive from here (or from its file) wherever it is needed; each one brings
+// only its own stylesheet. See docs/design-system.md for usage rules.
+export { Button, IconButton } from './Button.jsx'
+export { Input, TextField, TextareaField } from './Field.jsx'
+export { Surface } from './Surface.jsx'
+export { Badge, Chip, StatusPill } from './Badge.jsx'
+export { Tabs, TabList, Tab, TabPanel, SegmentedControl } from './Tabs.jsx'
+export { Tooltip } from './Tooltip.jsx'
+export { Kbd, Divider, Skeleton, SkeletonText } from './misc.jsx'
+export { Disclosure, Accordion } from './Disclosure.jsx'
+export { toast } from './toastStore.js'
+export { Toaster } from './toast.jsx'
+export { CodeBlock } from './CodeBlock.jsx'
+export { Dialog, Sheet, OverlayActions } from './Overlay.jsx'
+export { Container, Page, PageHeader, EmptyState, EmptyStateSkeleton } from './Page.jsx'
+export { useReducedMotion } from './hooks.js'

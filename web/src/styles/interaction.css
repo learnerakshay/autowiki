@@ -1,0 +1,46 @@
+/*
+ * Global interaction rules. Every interactive element shares one focus ring, one press response, one selection
+ * colour and a quiet scrollbar; the values are tokens in tokens.css. Rules use :where() so a component can
+ * still override with its own (e.g. an inset ring inside a clipped container).
+ */
+
+/* One focus-visible ring, everywhere. On dark surfaces --ring switches to the mint accent (see below). */
+:where(a, button, summary, input, select, textarea, [role="button"], [role="tab"], [role="radio"], [role="switch"], [tabindex]):focus-visible {
+  outline: var(--ring-width) solid var(--ring);
+  outline-offset: var(--ring-offset);
+}
+:where([data-surface="dark"], [data-logo-surface="dark"], .on-dark) { --ring: var(--dark-accent); }
+:where(a, button, [role="tab"], [role="radio"]):focus:not(:focus-visible) { outline: none; }
+
+/* Programmatic focus targets (the page heading after a route change, <main>) are not controls: no ring on them. */
+h1[tabindex="-1"]:focus-visible, h2[tabindex="-1"]:focus-visible, main[tabindex="-1"]:focus-visible { outline: none; }
+
+/* Pointer-down press feedback for anything that opts in. */
+.press { transition: transform var(--dur-press) var(--ease-out); }
+.press:active { transform: scale(var(--press-scale)); }
+
+/* Hover lift for anything that opts in (the shadow comes from --lift-shadow). */
+.lift { transition: transform var(--spring-duration) var(--spring), box-shadow var(--dur-base) ease; }
+.lift:hover { transform: translate3d(0, var(--lift-y), 0); box-shadow: var(--lift-shadow); }
+
+/* Visually hidden, still announced. */
+.ui-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Skip link: first tab stop on every page. */
+.skip-link:focus-visible { outline: var(--ring-width) solid var(--dark-accent); outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .press:active, .lift:hover { transform: none; }
+  .press, .lift { transition: none; }
+}

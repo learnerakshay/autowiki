@@ -26,9 +26,7 @@
 .logo__svg .lm-graph, .logo__svg .lm-lines { stroke-dasharray: 1 1; stroke-dashoffset: 0; }
 .logo__svg .lm-node { transform-box: fill-box; transform-origin: center; }
 
-/* Focus ring for the logo link (nav, footer and app header all render `.brand`). */
-.brand:focus-visible { outline: 2px solid var(--cyan-accent, #087f75); outline-offset: 3px; }
-[data-logo-surface="dark"] .brand:focus-visible { outline-color: #8de7cf; }
+/* The logo link's focus ring is the global one (styles/interaction.css); it switches to mint on dark surfaces. */
 
 @media (prefers-reduced-motion: no-preference) {
   /* Entrance: the graph draws, the nodes pop on a short stagger, then the text lines draw. */

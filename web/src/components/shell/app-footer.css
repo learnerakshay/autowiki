@@ -1,0 +1,61 @@
+/* App footer: the landing footer's dark bookend, compact. Config-driven; no wordmark. */
+.app-footer {
+  position: relative;
+  z-index: var(--z-content);
+  overflow: hidden;
+  background: radial-gradient(ellipse 70% 160% at 50% 130%, rgba(40, 200, 155, 0.14), transparent 60%), #0b1714;
+  color: var(--dark-ink-2);
+}
+.app-footer__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: clamp(1.25rem, 3vw, 3rem);
+  padding-block: clamp(2rem, 4vw, 2.75rem);
+}
+.app-footer .brand { color: var(--dark-ink); }
+.app-footer__brand p { max-width: 24rem; margin: 0.75rem 0 0; font-size: var(--fs-small); line-height: 1.6; }
+.app-footer__links ul { display: flex; flex-wrap: wrap; gap: 0 0.5rem; margin: 0; padding: 0; list-style: none; }
+.app-footer__links a {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  padding: 0 0.6rem;
+  color: #e4f3ec;
+  font-size: var(--fs-small);
+  font-weight: 600;
+  text-decoration: none;
+  transition: color var(--dur-fast) ease, transform var(--dur-press) var(--ease-out);
+}
+.app-footer__links a:hover { color: var(--dark-accent); }
+.app-footer__links a:active { transform: scale(var(--press-scale)); }
+
+.app-footer__top {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0 1.1rem;
+  border: 1px solid rgba(141, 231, 207, 0.35);
+  border-radius: var(--r-pill);
+  background: transparent;
+  color: #e4f3ec;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.84rem;
+  font-weight: 700;
+  transition: transform var(--dur-press) var(--ease-out), background-color var(--dur-fast) ease, border-color var(--dur-fast) ease;
+}
+.app-footer__top:hover { border-color: var(--dark-accent); background: rgba(141, 231, 207, 0.1); }
+.app-footer__top:active { transform: scale(var(--press-scale)); }
+.app-footer__top svg { width: 1rem; height: 1rem; }
+.app-footer__credits { margin: 0 auto; padding-bottom: 1.5rem; color: #8fb2a6; font-size: var(--fs-caption); }
+
+@media (max-width: 52rem) {
+  .app-footer__inner { grid-template-columns: 1fr; justify-items: start; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .app-footer__links a, .app-footer__top { transition: none; }
+  .app-footer__links a:active, .app-footer__top:active { transform: none; }
+}
+@media (prefers-contrast: more) { .app-footer__top { border-color: #fff; } .app-footer { color: #fff; } }

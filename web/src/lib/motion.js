@@ -36,6 +36,16 @@ export const springEases = Object.freeze({
   momentum: springEase(springs.momentum),
 })
 
+/**
+ * The presets as CSS `linear()` easing strings for the Web Animations API (the same curves as --spring /
+ * --spring-momentum), with a close ease-out where `linear()` is unsupported.
+ */
+const hasLinearEasing = typeof CSS !== 'undefined' && CSS.supports('transition-timing-function', 'linear(0, 1)')
+export const springCss = Object.freeze({
+  default: hasLinearEasing ? springToLinear(springs.default) : 'cubic-bezier(0.16, 1, 0.3, 1)',
+  momentum: hasLinearEasing ? springToLinear(springs.momentum) : 'cubic-bezier(0.16, 1, 0.3, 1)',
+})
+
 /** Pixels of release velocity (px/s) above which a drag counts as a flick and may bounce. */
 export const FLICK_VELOCITY = 600
 

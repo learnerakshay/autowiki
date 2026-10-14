@@ -1,0 +1,47 @@
+/* App background: the hero's mesh / grid / grain at a fraction of the strength, as one fixed layer. */
+.app-bg {
+  position: fixed;
+  z-index: var(--z-bg);
+  inset: 0;
+  overflow: hidden;
+  background: var(--canvas);
+  pointer-events: none;
+}
+.app-bg__mesh { position: absolute; inset: 0; background: linear-gradient(180deg, #f4fbf8 0%, #f1faf6 50%, #f7fbf9 100%); }
+
+.app-bg__blob { position: absolute; width: min(58vw, 54rem); aspect-ratio: 1; border-radius: 50%; opacity: var(--bg-mesh); }
+.app-bg__blob--a { top: -22%; left: -14%; background: radial-gradient(circle, rgba(91, 239, 187, 0.3), rgba(91, 239, 187, 0) 68%); animation: app-drift-a 44s ease-in-out infinite alternate; }
+.app-bg__blob--b { top: 4%; right: -18%; background: radial-gradient(circle, rgba(140, 246, 212, 0.34), rgba(140, 246, 212, 0) 66%); animation: app-drift-b 52s ease-in-out infinite alternate; }
+.app-bg__blob--c { bottom: -24%; left: 22%; background: radial-gradient(circle, rgba(74, 214, 183, 0.2), rgba(74, 214, 183, 0) 68%); animation: app-drift-c 48s ease-in-out infinite alternate; }
+
+@keyframes app-drift-a { from { transform: translate3d(0, 0, 0) scale(1); } to { transform: translate3d(3vw, 2vh, 0) scale(1.06); } }
+@keyframes app-drift-b { from { transform: translate3d(0, 0, 0) scale(1.03); } to { transform: translate3d(-3vw, 3vh, 0) scale(0.97); } }
+@keyframes app-drift-c { from { transform: translate3d(0, 0, 0) scale(0.98); } to { transform: translate3d(2vw, -2vh, 0) scale(1.05); } }
+.app-bg[data-paused="true"] .app-bg__blob { animation-play-state: paused; }
+
+.app-bg__grid {
+  position: absolute;
+  inset: 0;
+  opacity: var(--bg-grid);
+  background-image:
+    linear-gradient(to right, rgba(16, 110, 88, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(16, 110, 88, 0.05) 1px, transparent 1px);
+  background-position: center top;
+  background-size: 56px 56px;
+  -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 14%, #000 8%, transparent 74%);
+  mask-image: radial-gradient(ellipse 80% 70% at 50% 14%, #000 8%, transparent 74%);
+}
+.app-bg__grain {
+  position: absolute;
+  inset: 0;
+  opacity: calc(0.12 * var(--bg-grain));
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n' x='0' y='0'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .06 0 0 0 0 .32 0 0 0 0 .26 0 0 0 .7 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 160px 160px;
+}
+
+@media (prefers-reduced-motion: reduce) { .app-bg__blob { animation: none; } }
+/* Reduced transparency: a flat wash, no grain or blobs. */
+@media (prefers-reduced-transparency: reduce) {
+  .app-bg__blob, .app-bg__grain { display: none; }
+  .app-bg__mesh { background: var(--mint-50); }
+}

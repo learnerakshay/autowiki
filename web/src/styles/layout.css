@@ -1,0 +1,13 @@
+/*
+ * Width tracks. Global (not per component) because the nav, the page region and the footer all sit on them.
+ *   content  72rem  forms, cards, most pages
+ *   wide     82rem  dashboards, sidebars + documents
+ *   reading  46rem  long-form text (about 68 characters per line)
+ * Each is centred and keeps the fluid gutter (--gutter) on narrow screens. The landing's .lp-container / .lp-wide
+ * are the same tracks (--content / --wide).
+ */
+.ui-container { margin-inline: auto; }
+.ui-container--content { width: var(--content); }
+.ui-container--wide { width: var(--wide); }
+.ui-container--reading { width: var(--reading); }
+

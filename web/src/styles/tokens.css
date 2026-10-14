@@ -1,0 +1,189 @@
+/*
+ * Design tokens: the one place colour, type, space, shape, depth, layers, time and layout are defined.
+ *
+ * The landing page was built first and is the reference, so every value in the first section is the value the
+ * landing shipped with. Components (landing and app) consume these; none of them define their own.
+ *
+ * Runtime tokens: lib/motion.js `installMotionTokens()` overwrites --spring / --spring-duration (and the
+ * momentum pair) on <html> with the real spring curves. The values here are the same ease-out the landing already
+ * used as its fallback, so nothing changes if the script has not run.
+ */
+
+:root {
+  color-scheme: light;
+
+  /* ── Surface, ink, accent ── */
+  --paper: #ffffff;
+  --mint-50: #f4fbf8;
+  --mint-100: #e8fbf2;
+  --mint-200: #d3f5e7;
+  --ink: #0b1211;
+  --ink-2: #33433f;
+  --ink-3: #4a5c57; /* >= 5.7:1 on white and on the mint washes */
+  --accent: #0f8d70;
+  --accent-ink: #0a6b55;
+  --accent-soft: #dff9ef;
+  --btn-dark: #111918; /* primary button / logo tile */
+  --btn-dark-hover: #26312f;
+  --line: rgba(70, 128, 112, 0.22);
+  --line-strong: rgba(70, 128, 112, 0.4);
+
+  /* ── Dark sections (carousel, footers) ── */
+  --dark: #10231f;
+  --dark-2: #142a25;
+  --dark-ink: #f2fbf7;
+  --dark-ink-2: #a9c6bc;
+  --dark-accent: #8de7cf;
+  --dark-line: rgba(141, 231, 207, 0.18);
+
+  /* ── Status: every state is shown with an icon and text as well as colour ── */
+  --status-pending: #077068; /* 5.4:1 on --status-pending-soft */
+  --status-pending-soft: #e2f8f2;
+  --status-pending-line: #b8e4da;
+  --status-success: #176b43;
+  --status-success-soft: #eaf7f0;
+  --status-success-line: #b8dfc9;
+  --status-danger: #9f2835;
+  --status-danger-soft: #fff0f2;
+  --status-danger-line: #efc1c7;
+  --status-info: #2a5688;
+  --status-info-soft: #eef4fb;
+  --status-info-line: #c3d6ec;
+  --status-idle: #4a5c57;
+  --status-idle-soft: #f0f7f4;
+  --status-idle-line: #dfece9;
+
+  /* ── Type scale (display = hero headline recipe; every h2 reuses it) ── */
+  --fs-display: clamp(3.25rem, 6.1vw, 5.8rem);
+  --fs-h2: clamp(2.3rem, 4.3vw, 3.85rem);
+  --fs-h2-compact: clamp(1.75rem, 2.7vw, 2.45rem);
+  --fs-h3: clamp(1.4rem, 2vw, 1.75rem);
+  --fs-card: 1.0625rem;
+  --fs-body: 1.0625rem;
+  --fs-small: 0.9rem;
+  --fs-caption: 0.8125rem;
+  --fs-mono: 0.78rem;
+  --fw-display: 720;
+  --track-display: -0.058em;
+  --fw-card: 650;
+  --track-card: -0.018em;
+
+  /* ── Space, radius, shadow ── */
+  --section-y: clamp(5.5rem, 9vw, 8.5rem);
+  --space-1: 0.5rem;
+  --space-2: 0.75rem;
+  --space-3: 1rem;
+  --space-4: 1.5rem;
+  --space-5: 2.5rem;
+  --r-xs: 0.4rem;
+  --r-s: 0.65rem;
+  --r-m: 1rem;
+  --r-l: 1.5rem;
+  --r-pill: 999px;
+  --shadow-1: 0 1px 2px rgba(12, 80, 62, 0.06), 0 6px 16px rgba(14, 100, 78, 0.06);
+  --shadow-2: 0 1px 2px rgba(12, 80, 62, 0.07), 0 10px 24px rgba(14, 100, 78, 0.08), 0 28px 56px rgba(14, 120, 92, 0.1);
+  --shadow-3: 0 1px 2px rgba(12, 80, 62, 0.08), 0 14px 32px rgba(14, 100, 78, 0.1), 0 40px 80px rgba(14, 120, 92, 0.14);
+
+  /* ── Blur: large areas never get a backdrop blur; these are for small floating surfaces ── */
+  --blur-sm: 8px;
+  --blur-md: 12px;
+
+  /* ── Layers ── */
+  --z-bg: 0;
+  --z-content: 1;
+  --z-sticky: 30;
+  --z-nav: 60;
+  --z-scrim: 70;
+  --z-dialog: 80;
+  --z-toast: 90;
+  --z-tooltip: 95;
+  --z-skip: 100;
+
+  /* ── Time ── */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-press: 90ms; /* pointer-down feedback */
+  --dur-fast: 180ms; /* colour / border changes */
+  --dur-base: 250ms;
+  --dur-slow: 500ms;
+  --spring: var(--ease-out); /* overwritten at runtime with the real spring */
+  --spring-duration: 400ms;
+  --spring-momentum: var(--ease-out);
+  --spring-momentum-duration: 400ms;
+
+  /* ── Layout tracks: every page's left edge sits on one of these ── */
+  --gutter: clamp(1.25rem, 4.2vw, 3rem);
+  --content-w: 72rem;
+  --wide-w: 82rem;
+  --reading-w: 46rem;
+  --content: min(var(--content-w), calc(100% - 2 * var(--gutter)));
+  --wide: min(var(--wide-w), calc(100% - 2 * var(--gutter)));
+  --reading: min(var(--reading-w), calc(100% - 2 * var(--gutter)));
+  --nav-h: 5.5rem; /* floating nav pill + its offset: sticky stages and anchor scrolling clear it */
+
+  /* ── Interaction ── */
+  --ring: var(--accent); /* the one focus-visible ring: >= 3:1 on white, the mint washes and the accent pill */
+  --ring-width: 2px;
+  --ring-offset: 3px;
+  --press-scale: 0.97;
+  --lift-y: -2px;
+  --lift-shadow: var(--shadow-2);
+  --selection: #bff4df;
+  --scrollbar-thumb: #98a4b6;
+  --scrollbar-thumb-hover: #6f7b8f;
+  --scrollbar-track: #f0f7f4;
+  --disabled-ink: #5c6d68; /* 4.9:1 on --disabled-bg: disabled stays legible */
+  --disabled-bg: #edf4f1;
+  --disabled-line: #dfece9;
+
+  /* ── App background intensity (components/shell/AppBackground) ── */
+  --bg-mesh: 1; /* 0 hides the mesh, 1 is the default quiet wash */
+  --bg-grid: 1;
+  --bg-grain: 1;
+}
+
+@media (prefers-contrast: more) {
+  :root {
+    --ink-3: #2f403b;
+    --line: rgba(30, 90, 74, 0.55);
+    --line-strong: rgba(30, 90, 74, 0.8);
+    --ring-width: 3px;
+    --bg-mesh: 0;
+    --bg-grid: 0;
+    --bg-grain: 0;
+  }
+}
+
+/*
+ * Legacy app tokens. The Workspace, Chat, Wiki and Architecture pages still read these names; the page passes
+ * migrate them to the tokens above and then delete this block (see docs/design-system.md).
+ * `--accent-soft` is no longer redefined here: the app now uses the design-system value.
+ */
+:root {
+  --canvas: #f7fbf9;
+  --background: #ffffff;
+  --foreground: #101a19;
+  --card: #ffffff;
+  --muted: #f0f7f4;
+  --muted-foreground: #526361;
+  --border: #dfece9;
+  --border-strong: #8aa49f;
+  --primary: #111918;
+  --primary-hover: #26312f;
+  --primary-foreground: #ffffff;
+  --surface-subtle: #f3faf6;
+  --skeleton: #dceae6;
+  --pending: #077068; /* was #087f75: 4.4:1 on --pending-soft; now 5.4:1 */
+  --pending-soft: #e2f8f2;
+  --pending-border: #b8e4da;
+  --success: #176b43;
+  --success-soft: #eaf7f0;
+  --success-border: #b8dfc9;
+  --danger: #9f2835;
+  --danger-soft: #fff0f2;
+  --danger-border: #efc1c7;
+  --cyan-soft: #e7faf2;
+  --cyan-accent: #087f75; /* the app shell scopes a darker value (shell.css); the landing keeps this one */
+  --cyan-highlight: #45d9b2;
+  --cyan-border: #bce7dc;
+  --workspace-canvas: #f7fbf9;
+}

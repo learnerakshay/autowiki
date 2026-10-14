@@ -53,40 +53,11 @@
 }
 
 :root {
-  color-scheme: light;
   font-family: var(--font-sans);
   color: #101a19;
   background: #f7fbf9;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
-  --canvas: #f7fbf9;
-  --background: #ffffff;
-  --foreground: #101a19;
-  --card: #ffffff;
-  --muted: #f0f7f4;
-  --muted-foreground: #526361;
-  --border: #dfece9;
-  --border-strong: #8aa49f;
-  --primary: #111918;
-  --primary-hover: #26312f;
-  --primary-foreground: #ffffff;
-  --accent-soft: #ddfce9;
-  --surface-subtle: #f3faf6;
-  --skeleton: #dceae6;
-  --pending: #087f75;
-  --pending-soft: #e2f8f2;
-  --pending-border: #b8e4da;
-  --success: #176b43;
-  --success-soft: #eaf7f0;
-  --success-border: #b8dfc9;
-  --danger: #9f2835;
-  --danger-soft: #fff0f2;
-  --danger-border: #efc1c7;
-  --cyan-soft: #e7faf2;
-  --cyan-accent: #087f75;
-  --cyan-highlight: #45d9b2;
-  --cyan-border: #bce7dc;
-  --workspace-canvas: #f7fbf9;
 }
 
 * { box-sizing: border-box; }
@@ -95,7 +66,7 @@ html {
   min-width: 320px;
   background: var(--canvas);
   scroll-behavior: smooth;
-  scrollbar-color: #98a4b6 var(--muted);
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
   scrollbar-width: thin;
 }
 
@@ -109,15 +80,14 @@ body {
 body, button, input, textarea { font: inherit; }
 button, a, input, textarea { -webkit-tap-highlight-color: transparent; }
 input, textarea { caret-color: var(--cyan-accent); }
-::selection { color: var(--foreground); background: #bff4df; }
+::selection { color: var(--foreground); background: var(--selection); }
 
 ::-webkit-scrollbar { width: 11px; height: 11px; }
-::-webkit-scrollbar-track { background: var(--muted); }
-::-webkit-scrollbar-thumb { background: #98a4b6; border: 3px solid var(--muted); border-radius: 999px; }
-::-webkit-scrollbar-thumb:hover { background: #6f7b8f; }
+::-webkit-scrollbar-track { background: var(--scrollbar-track); }
+::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border: 3px solid var(--scrollbar-track); border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-thumb-hover); }
 
 a { text-underline-offset: 0.2em; text-decoration-thickness: 1px; }
-a:focus-visible, button:focus-visible { outline: 2px solid var(--cyan-accent); outline-offset: 3px; }
 
 .skip-link {
   position: fixed;
@@ -136,28 +106,7 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--cyan-accent); o
 
 .skip-link:focus { transform: translateY(0); }
 
-.app-header {
-  position: sticky;
-  z-index: 30;
-  top: 0;
-  display: flex;
-  width: 100%;
-  min-height: 4rem;
-  align-items: center;
-  padding: 0 1rem;
-  border-bottom: 1px solid var(--border);
-  background: rgba(255, 255, 255, 0.97);
-}
-
-.app-header__inner {
-  display: flex;
-  width: min(72rem, 100%);
-  min-width: 0;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  margin: 0 auto;
-}
+.shell-boot { min-height: 100dvh; background: var(--canvas); }
 
 .brand {
   display: inline-flex;
@@ -185,31 +134,6 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--cyan-accent); o
 }
 
 .file-glyph svg { width: 1.25rem; height: 1.25rem; }
-.nav-link svg { width: 1rem; height: 1rem; }
-.app-nav { display: flex; min-width: 0; flex-shrink: 0; align-items: center; gap: 0.25rem; }
-
-.nav-link {
-  display: inline-flex;
-  min-height: 2.75rem;
-  align-items: center;
-  gap: 0.45rem;
-  padding: 0 0.75rem;
-  border: 1px solid transparent;
-  border-radius: 0.5rem;
-  color: var(--muted-foreground);
-  font-size: 0.875rem;
-  font-weight: 600;
-  text-decoration: none;
-  transition: color 140ms ease, background-color 140ms ease, border-color 140ms ease, transform 140ms ease;
-}
-
-.nav-link:hover { border-color: var(--border); background: var(--surface-subtle); color: var(--foreground); }
-.nav-link:active { transform: translateY(1px); }
-.nav-link--active, .nav-link--active:hover { border-color: var(--pending-border); background: var(--accent-soft); color: var(--primary-hover); font-weight: 700; }
-
-.app-main { width: min(72rem, calc(100% - 2rem)); margin: 0 auto; padding: 3.5rem 0 5rem; }
-.app-main--workspace { width: 100%; padding: 0; background: var(--workspace-canvas); }
-.app-main--wiki { width: 100%; padding: 0; background: var(--workspace-canvas); }
 .page-stack { display: grid; gap: 1.5rem; }
 
 .chat-page {
@@ -1292,19 +1216,6 @@ pre {
 .toast-description { color: var(--muted-foreground) !important; }
 
 /* Prompt 11 — connected knowledge visual system */
-.app-header {
-  border-bottom-color: color-mix(in srgb, var(--cyan-border) 72%, white);
-  background: rgba(255, 255, 255, 0.94);
-  backdrop-filter: blur(12px);
-}
-
-.nav-link--active,
-.nav-link--active:hover {
-  border-color: var(--cyan-border);
-  background: var(--cyan-soft);
-  color: var(--cyan-accent);
-}
-
 .landing-hero {
   position: relative;
   isolation: isolate;
@@ -1527,7 +1438,7 @@ pre {
   .workspace-activity { display: none; }
   .wiki-generation-progress__activity { display: none; }
   .chat-pending-track span { animation: none !important; transform: none; }
-  .nav-link, .textarea { transition-duration: 0ms; }
+  .textarea { transition-duration: 0ms; }
   .architecture-node, .architecture-source, .architecture-connectors path, .architecture-hero__actions svg { transition-duration: 0ms; }
   .diagram-backdrop { backdrop-filter: none; }
 }
@@ -1587,9 +1498,6 @@ pre {
 }
 
 @media (max-width: 760px) {
-  .app-main { width: min(100% - 1.25rem, 72rem); padding: 2rem 0 4rem; }
-  .app-main--workspace { width: 100%; padding: 0; }
-  .app-main--wiki { width: 100%; padding: 0; }
   .chat-intro { grid-template-columns: minmax(0, 1fr); }
   .chat-intro__icon { width: 2.75rem; height: 2.75rem; }
   .chat-repository-field { grid-template-columns: minmax(0, 1fr); }
@@ -1631,9 +1539,6 @@ pre {
 }
 
 @media (max-width: 520px) {
-  .app-header { padding: 0 0.625rem; }
-  .app-header__inner { gap: 0.5rem; }
-  .app-nav { gap: 0; }
   .chat-page { gap: 1rem; }
   .chat-intro { gap: 0.75rem; }
   .chat-intro h1 { max-width: 13ch; font-size: clamp(2.1rem, 11vw, 2.75rem); }
@@ -1654,8 +1559,6 @@ pre {
   .chat-answer-markdown { padding: 1.5rem 1rem; }
   .chat-answer__actions { display: grid; grid-template-columns: minmax(0, 1fr); }
   .chat-answer__actions > * { width: 100%; }
-  .nav-link { width: 2.75rem; justify-content: center; padding: 0; }
-  .nav-link span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
   .wiki-state-page, .wiki-reader { width: calc(100% - 1rem); padding-top: 1.5rem; }
   .wiki-state-intro { grid-template-columns: minmax(0, 1fr); }
   .wiki-state-intro h1, .wiki-pending-header h1 { font-size: 1.85rem; }
@@ -1740,18 +1643,6 @@ pre {
 }
 
 /* Prompt 13 — Mint editorial identity */
-.app-header {
-  border-bottom-color: rgba(138, 164, 159, 0.28);
-  background: rgba(247, 251, 249, 0.92);
-  backdrop-filter: blur(18px);
-}
-
-.nav-link--active {
-  border-color: var(--cyan-border);
-  background: var(--accent-soft);
-  color: var(--foreground);
-}
-
 .landing-main { display: block; }
 
 .landing-hero {

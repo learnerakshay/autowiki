@@ -202,5 +202,7 @@ test("logo: nav, footer and app header render the one component; generic file ic
   await expect(page.locator(".pw-bar__brand .logo, .sv__brand .logo")).toHaveCount(0);
   await expect(page.locator(".brand-mark")).toHaveCount(0);
   await page.goto("/workspace");
-  expect(await page.locator(".app-header .lm-graph").getAttribute("d")).toBe(navGraph);
+  await expect(page.locator(".route-viewport")).toHaveAttribute("data-ready", "true");
+  expect(await page.locator(".ln .lm-graph").getAttribute("d")).toBe(navGraph);
+  expect(await page.locator(".app-footer .lm-graph").getAttribute("d")).toBe(navGraph);
 });

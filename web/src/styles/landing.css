@@ -1,66 +1,11 @@
 /*
- * Landing page design system: one container grid, one type scale, one set of spacing / radius / shadow
- * tokens, and the reveal-on-scroll styles. Section files (components/landing/*.css) consume these
- * tokens; none of them define their own gutters, headline recipe or card chrome.
+ * Landing page layer: the section header recipe, reveal-on-scroll, shared surfaces and buttons. Every token it uses
+ * (colour, type scale, space, radius, shadow, layout tracks) lives in styles/tokens.css and is shared with the app.
+ * Section files (components/landing/*.css) consume them; none define their own gutters, headline recipe or card chrome.
  */
 
 .landing-shell {
-  /* ── Layout tracks: every section's left edge sits on one of these two ── */
-  --gutter: clamp(1.25rem, 4.2vw, 3rem);
-  --content-w: 72rem;
-  --wide-w: 82rem;
-  --content: min(var(--content-w), calc(100% - 2 * var(--gutter)));
-  --wide: min(var(--wide-w), calc(100% - 2 * var(--gutter)));
   --svh: 1vh; /* overridden by 1svh where supported (see @supports below) */
-  --nav-h: 5.5rem; /* floating nav pill + its offset: sticky stages and anchor scrolling clear it */
-
-  /* ── Color ── */
-  --ink: #0b1211;
-  --ink-2: #33433f;
-  --ink-3: #4a5c57; /* >= 5.7:1 on white and on the mint washes */
-  --paper: #ffffff;
-  --mint-50: #f4fbf8;
-  --mint-100: #e8fbf2;
-  --mint-200: #d3f5e7;
-  --accent: #0f8d70;
-  --accent-ink: #0a6b55;
-  --accent-soft: #dff9ef;
-  --dark: #10231f;
-  --dark-2: #142a25;
-  --line: rgba(70, 128, 112, 0.22);
-  --line-strong: rgba(70, 128, 112, 0.4);
-
-  /* ── Type scale (display = hero headline recipe; every h2 reuses it) ── */
-  --fs-display: clamp(3.25rem, 6.1vw, 5.8rem);
-  --fs-h2: clamp(2.3rem, 4.3vw, 3.85rem);
-  --fs-h2-compact: clamp(1.75rem, 2.7vw, 2.45rem);
-  --fs-h3: clamp(1.4rem, 2vw, 1.75rem);
-  --fs-card: 1.0625rem;
-  --fs-body: 1.0625rem;
-  --fs-small: 0.9rem;
-  --fs-caption: 0.8125rem;
-  --fs-mono: 0.78rem;
-  --fw-display: 720;
-  --track-display: -0.058em;
-  --fw-card: 650;
-  --track-card: -0.018em;
-
-  /* ── Space, radius, border, shadow ── */
-  --section-y: clamp(5.5rem, 9vw, 8.5rem);
-  --space-1: 0.5rem;
-  --space-2: 0.75rem;
-  --space-3: 1rem;
-  --space-4: 1.5rem;
-  --space-5: 2.5rem;
-  --r-xs: 0.4rem;
-  --r-s: 0.65rem;
-  --r-m: 1rem;
-  --r-l: 1.5rem;
-  --r-pill: 999px;
-  --shadow-1: 0 1px 2px rgba(12, 80, 62, 0.06), 0 6px 16px rgba(14, 100, 78, 0.06);
-  --shadow-2: 0 1px 2px rgba(12, 80, 62, 0.07), 0 10px 24px rgba(14, 100, 78, 0.08), 0 28px 56px rgba(14, 120, 92, 0.1);
-  --shadow-3: 0 1px 2px rgba(12, 80, 62, 0.08), 0 14px 32px rgba(14, 100, 78, 0.1), 0 40px 80px rgba(14, 120, 92, 0.14);
-  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 
   overflow: clip;
   min-width: 320px;
@@ -174,8 +119,3 @@
 
 /* Spotlight / magnetic effects are pointer-fine only. */
 @media (hover: none), (pointer: coarse) { .fc__glow, .lp-magnetic { transform: none !important; } }
-
-
-@media (prefers-contrast: more) {
-  .landing-shell { --ink-3: #2f403b; --line: rgba(30, 90, 74, 0.55); --line-strong: rgba(30, 90, 74, 0.8); }
-}

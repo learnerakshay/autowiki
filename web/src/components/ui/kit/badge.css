@@ -1,0 +1,43 @@
+.ui-badge, .ui-chip, .ui-status {
+  display: inline-flex;
+  min-height: 1.75rem;
+  width: fit-content;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0 0.7rem;
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  background: var(--mint-50);
+  color: var(--ink-2);
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+}
+.ui-badge__icon, .ui-chip__icon { width: 0.9rem; height: 0.9rem; flex: none; }
+.ui-badge--accent { border-color: rgba(30, 150, 118, 0.3); background: var(--accent-soft); color: var(--accent-ink); }
+.ui-badge--info { border-color: var(--status-info-line); background: var(--status-info-soft); color: var(--status-info); }
+
+.ui-chip { min-height: 2.25rem; padding: 0 0.95rem; background: #fff; font: inherit; font-size: 0.84rem; font-weight: 650; color: var(--ink-2); }
+button.ui-chip { cursor: pointer; transition: transform var(--dur-press) var(--ease-out), background-color var(--dur-fast) ease, border-color var(--dur-fast) ease; }
+button.ui-chip:hover { border-color: var(--accent); background: var(--mint-50); color: var(--ink); }
+button.ui-chip:active { transform: scale(var(--press-scale)); }
+.ui-chip.is-selected { border-color: var(--btn-dark); background: var(--btn-dark); color: #fff; }
+@media (pointer: coarse) { button.ui-chip { min-height: 2.75rem; } }
+
+/* Status: tone comes from the state, meaning from the icon and the text. */
+.ui-status__icon { display: inline-grid; width: 1rem; height: 1rem; flex: none; place-items: center; border-radius: 50%; background: currentColor; }
+.ui-status__icon svg { width: 0.68rem; height: 0.68rem; stroke-width: 3; color: var(--status-bg, #fff); }
+.ui-status__ring { width: 0.5rem; height: 0.5rem; border-radius: 50%; background: var(--status-bg, #fff); }
+.ui-status--idle { --status-bg: var(--status-idle-soft); border-color: var(--status-idle-line); background: var(--status-idle-soft); color: var(--status-idle); }
+.ui-status--pending { --status-bg: var(--status-pending-soft); border-color: var(--status-pending-line); background: var(--status-pending-soft); color: var(--status-pending); }
+.ui-status--succeeded { --status-bg: var(--status-success-soft); border-color: var(--status-success-line); background: var(--status-success-soft); color: var(--status-success); }
+.ui-status--failed { --status-bg: var(--status-danger-soft); border-color: var(--status-danger-line); background: var(--status-danger-soft); color: var(--status-danger); }
+.ui-status--info { --status-bg: var(--status-info-soft); border-color: var(--status-info-line); background: var(--status-info-soft); color: var(--status-info); }
+
+@media (prefers-reduced-motion: no-preference) {
+  .ui-status--pending .ui-status__icon { animation: ui-breathe-ring calc(var(--spring-duration) * 3) var(--spring) infinite alternate; }
+  @keyframes ui-breathe-ring { from { opacity: 0.45; transform: scale(0.82); } to { opacity: 1; transform: scale(1.08); } }
+}
+@media (prefers-reduced-motion: reduce) { button.ui-chip { transition: none; } button.ui-chip:active { transform: none; } }
+@media (prefers-contrast: more) { .ui-badge, .ui-chip, .ui-status { border-color: currentColor; } }
