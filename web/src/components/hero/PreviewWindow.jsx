@@ -2,8 +2,7 @@ import { useMemo, useRef, useState } from 'react'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 import { Link } from 'react-router-dom'
-import { ArrowRight, BookOpenText, FileCode2, GitFork, Network, Pause, Play } from 'lucide-react'
-import { AutoWikiMark } from '../AutoWikiBrand.jsx'
+import { ArrowRight, BookOpenText, FileCode2, FileText, GitFork, Network, Pause, Play } from 'lucide-react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs.jsx'
 import { heroSample } from '../../data/heroSample.js'
 import { motion, prefersReducedMotion } from '../../lib/motion.js'
@@ -75,7 +74,7 @@ export function PreviewWindow({ demo, sheenRef }) {
 
         <div className="product-window__bar">
           <div className="pw-bar__id">
-            <span className="pw-bar__brand"><AutoWikiMark /> Generated wiki</span>
+            <span className="pw-bar__brand"><span className="file-glyph" aria-hidden="true"><FileText /></span> Generated wiki</span>
             <span className="product-window__repo"><GitFork aria-hidden="true" /> {heroSample.owner} / <strong>{heroSample.name}</strong></span>
           </div>
 

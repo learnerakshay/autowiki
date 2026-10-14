@@ -8,7 +8,7 @@
     "build": "vite build",
     "lint": "oxlint src",
     "preview": "vite preview",
-    "assets": "node ../e2e/scripts/brand-assets.mjs"
+    "assets": "node scripts/generate-brand-assets.mjs"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",

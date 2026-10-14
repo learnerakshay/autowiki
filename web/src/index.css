@@ -172,20 +172,19 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--cyan-accent); o
   text-decoration: none;
 }
 
-.brand-mark {
-  display: grid;
+.file-glyph {
+  display: inline-grid;
   width: 2rem;
   height: 2rem;
+  flex: none;
   place-items: center;
   border: 1px solid var(--cyan-border);
   border-radius: 0.5rem;
   background: var(--cyan-soft);
+  color: var(--foreground);
 }
 
-.brand-mark svg { width: 1.25rem; height: 1.25rem; }
-.brand-mark path:first-child { stroke: var(--foreground); stroke-linejoin: round; stroke-width: 1.6; }
-.brand-mark path:nth-child(2) { stroke: var(--cyan-accent); stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.6; }
-.brand-mark circle { fill: var(--cyan-highlight); }
+.file-glyph svg { width: 1.25rem; height: 1.25rem; }
 .nav-link svg { width: 1rem; height: 1rem; }
 .app-nav { display: flex; min-width: 0; flex-shrink: 0; align-items: center; gap: 0.25rem; }
 
@@ -1832,8 +1831,8 @@ pre {
 .product-window__bar > span { display: inline-flex; align-items: center; gap: 0.45rem; }
 .product-window__bar > span:last-child { justify-self: end; }
 .product-window__bar svg { width: 0.95rem; height: 0.95rem; }
-.product-window__bar .brand-mark { width: 1.4rem; height: 1.4rem; border: 0; border-radius: 0.35rem; }
-.product-window__bar .brand-mark svg { width: 0.95rem; height: 0.95rem; }
+.product-window__bar .file-glyph { width: 1.4rem; height: 1.4rem; border: 0; border-radius: 0.35rem; }
+.product-window__bar .file-glyph svg { width: 0.95rem; height: 0.95rem; }
 .product-window__repo { color: #33433f; }
 .product-window__bar-actions { display: inline-flex; align-items: center; gap: 0.75rem; }
 .product-window__bar-actions > a { display: inline-flex; min-height: 2rem; align-items: center; gap: 0.25rem; border-radius: 0.45rem; background: #14201e; padding: 0 0.6rem; color: #fff; font-size: 0.65rem; font-weight: 700; text-decoration: none; }

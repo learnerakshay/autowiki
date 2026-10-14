@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight, Menu, X } from 'lucide-react'
-import { AutoWikiBrand } from '../AutoWikiBrand.jsx'
+import { BrandLink } from '../brand/BrandLink.jsx'
 import { actions, routes, sections } from '../../data/landingCopy.js'
 import { scrollToSection } from './scrollToSection.js'
 import './nav.css'
@@ -137,7 +137,7 @@ export function LandingNav() {
     <header className="ln" data-scrolled={scrolled} data-past-hero={pastHero} data-open={open} data-tone={dark ? 'dark' : 'light'}>
       <div className="ln__edge" aria-hidden="true" />
       <div ref={barRef} className="ln__bar">
-        <AutoWikiBrand />
+        <BrandLink animated />
 
         <nav className="ln__links" aria-label="Page sections" style={{ '--count': sections.length + 1, '--spy': Math.max(0, spy) }}>
           <span className="ln__pill" aria-hidden="true" data-on={spy >= 0} />

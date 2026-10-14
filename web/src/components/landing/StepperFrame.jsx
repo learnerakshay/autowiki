@@ -1,6 +1,5 @@
 import { useEffect, useImperativeHandle, useRef } from 'react'
-import { FileCode2 } from 'lucide-react'
-import { AutoWikiMark } from '../AutoWikiBrand.jsx'
+import { FileCode2, FileText } from 'lucide-react'
 import { DiagramGraph } from '../hero/DiagramGraph.jsx'
 import { stepper } from '../../data/landingCopy.js'
 import { landingSample as sample } from '../../data/landingSample.js'
@@ -116,7 +115,7 @@ export function StepperFrame({ ref, staticStage = null }) {
   return (
     <div ref={rootRef} className="sv" aria-hidden="true" data-stage={staticStage ?? undefined}>
       <div className="sv__bar">
-        <span className="sv__brand"><AutoWikiMark /> {stepper.frameLabel}</span>
+        <span className="sv__brand"><span className="file-glyph" aria-hidden="true"><FileText /></span> {stepper.frameLabel}</span>
         <code>{sample.repo}</code>
       </div>
       <div className="sv__canvas">

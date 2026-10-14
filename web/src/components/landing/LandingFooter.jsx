@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowUp } from 'lucide-react'
-import { AutoWikiBrand } from '../AutoWikiBrand.jsx'
+import { BrandLink } from '../brand/BrandLink.jsx'
 import { brand } from '../../config/brand.js'
 import { footer, sections } from '../../data/landingCopy.js'
 import { reducedMotionQuery } from '../../lib/motion.js'
@@ -31,10 +31,10 @@ export function LandingFooter() {
   const backToTop = () => window.scrollTo({ top: 0, behavior: window.matchMedia(reducedMotionQuery).matches ? 'auto' : 'smooth' })
 
   return (
-    <footer ref={ref} className="lf" data-entered={entered}>
+    <footer ref={ref} className="lf" data-entered={entered} data-logo-surface="dark">
       <div className="lf__inner lp-container">
         <div className="lf__brand">
-          <AutoWikiBrand />
+          <BrandLink tone="dark" />
           <p>{brand.blurb}</p>
           {brand.repoUrl ? <a className="lf__source" href={brand.repoUrl} target="_blank" rel="noreferrer noopener">Source on GitHub</a> : null}
         </div>

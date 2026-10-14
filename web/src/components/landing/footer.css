@@ -14,8 +14,6 @@
   padding-block: clamp(3.5rem, 6vw, 5rem) clamp(2rem, 4vw, 3rem);
 }
 .lf .brand { color: #f2fbf7; }
-.lf .brand-mark { border-color: transparent; background: rgba(120, 240, 200, 0.14); }
-.lf .brand-mark svg { color: #8de7cf; stroke: #8de7cf; }
 .lf__brand p { max-width: 24rem; margin: 1rem 0 0; color: #a9c6bc; font-size: var(--fs-small); line-height: 1.65; }
 .lf__source { display: inline-block; margin-top: 1rem; color: #dff8ee; font-size: var(--fs-small); font-weight: 650; text-underline-offset: 0.25em; }
 .lf__label { margin: 0 0 0.9rem; color: #8fb2a6; font-family: var(--font-mono); font-size: 0.7rem; font-weight: 750; letter-spacing: 0.12em; text-transform: uppercase; }

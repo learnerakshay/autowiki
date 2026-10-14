@@ -35,7 +35,6 @@
   backdrop-filter: blur(12px);
   pointer-events: auto;
 }
-.ln .brand-mark { border-color: transparent; background: var(--accent-soft); }
 
 /* Links: equal-width columns so the active pill is a pure translate. */
 .ln__links { position: relative; display: grid; grid-auto-columns: 1fr; grid-auto-flow: column; justify-self: center; }

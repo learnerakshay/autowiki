@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+<rect width="32" height="32" rx="8" style="fill:var(--logo-tile,#111918)"/>
+<g fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--logo-glyph,#7ef0c6)">
+<path d="M16 9.5C13.6 7.6 10.6 7 7.5 7v14.5c3.1 0 6.1.7 8.5 2.5"/><path d="M16 9.5c2.4-1.9 5.4-2.5 8.5-2.5v14.5c-3.1 0-6.1.7-8.5 2.5"/><path d="M16 24v-6.5"/><path d="M16 17.5c0-2.4 3.5-1.6 3.5-4.2"/><circle cx="16" cy="17.5" r="1.7" stroke="none" style="fill:var(--logo-glyph,#7ef0c6)"/><circle cx="19.5" cy="12.8" r="1.7" stroke="none" style="fill:var(--logo-glyph,#7ef0c6)"/>
+</g>
+</svg>

@@ -189,3 +189,18 @@ test("repo input stays contained with very long, invalid and empty input", async
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   }
 });
+
+test("logo: nav, footer and app header render the one component; generic file icons never use the mark", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator(".ln .brand")).toHaveAttribute("aria-label", /home$/);
+  await expect(page.locator(".ln .logo svg")).toHaveAttribute("aria-hidden", "true");
+  const navGraph = await page.locator(".ln .lm-graph").getAttribute("d");
+  expect(navGraph).toBeTruthy();
+  expect(await page.locator(".lf .lm-graph").getAttribute("d")).toBe(navGraph);
+  await expect(page.locator(".lf .logo")).toHaveAttribute("data-tone", "dark");
+  await expect(page.locator(".pw-bar__brand")).toBeAttached({ timeout: 30000 });
+  await expect(page.locator(".pw-bar__brand .logo, .sv__brand .logo")).toHaveCount(0);
+  await expect(page.locator(".brand-mark")).toHaveCount(0);
+  await page.goto("/workspace");
+  expect(await page.locator(".app-header .lm-graph").getAttribute("d")).toBe(navGraph);
+});

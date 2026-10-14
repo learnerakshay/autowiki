@@ -50,8 +50,8 @@
 }
 .sv__bar { display: flex; min-height: 3rem; flex: none; align-items: center; justify-content: space-between; gap: 1rem; padding: 0 1.1rem; border-bottom: 1px solid var(--line); color: var(--ink-3); font-size: 0.74rem; font-weight: 650; }
 .sv__brand { display: inline-flex; align-items: center; gap: 0.5rem; color: var(--ink-2); }
-.sv__bar .brand-mark { width: 1.4rem; height: 1.4rem; border: 0; border-radius: 0.35rem; }
-.sv__bar .brand-mark svg { width: 0.95rem; height: 0.95rem; }
+.sv__bar .file-glyph { width: 1.4rem; height: 1.4rem; border: 0; border-radius: 0.35rem; }
+.sv__bar .file-glyph svg { width: 0.95rem; height: 0.95rem; }
 .sv__bar code { font-size: 0.72rem; }
 .sv__canvas { position: relative; min-height: 0; flex: 1; padding: 1.3rem 1.4rem; }
 

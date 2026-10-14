@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+<rect class="lm-tile" width="32" height="32" rx="8" style="fill:var(--logo-tile,#111918)"/>
+<g fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--logo-glyph,#7ef0c6)">
+<path class="lm-graph" pathLength="1" d="M8.5 9v14M8.5 12.5c0 3.2 6 1.6 6 3.5"/>
+<path class="lm-lines" pathLength="1" d="M13.6 9h11M19.6 16h5M13.6 23h8"/>
+<circle class="lm-node lm-node--1" cx="8.5" cy="9" r="2" stroke="none" style="fill:var(--logo-glyph,#7ef0c6)"/>
+<circle class="lm-node lm-node--2" cx="14.5" cy="16" r="2" stroke="none" style="fill:var(--logo-glyph,#7ef0c6)"/>
+<circle class="lm-node lm-node--3" cx="8.5" cy="23" r="2" stroke="none" style="fill:var(--logo-glyph,#7ef0c6)"/>
+</g>
+</svg>

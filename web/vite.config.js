@@ -14,6 +14,7 @@ function headTags() {
     `<meta name="description" content="${escapeHtml(brand.description)}" />`,
     `<meta name="theme-color" content="${brand.themeColor}" />`,
     `<meta name="application-name" content="${escapeHtml(brand.name)}" />`,
+    `<link rel="mask-icon" href="/safari-pinned-tab.svg" color="${brand.colors.tile}" />`,
     `<meta property="og:type" content="website" />`,
     `<meta property="og:site_name" content="${escapeHtml(brand.name)}" />`,
     `<meta property="og:title" content="${escapeHtml(title)}" />`,
@@ -44,6 +45,7 @@ const manifest = () => JSON.stringify({
   theme_color: brand.themeColor,
   icons: [
     { src: '/icon-192.png', sizes: '192x192', type: 'image/png' },
+    { src: '/icon-192-maskable.png', sizes: '192x192', type: 'image/png', purpose: 'maskable' },
     { src: '/icon-512.png', sizes: '512x512', type: 'image/png' },
     { src: '/icon-512-maskable.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
   ],
@@ -97,6 +99,8 @@ function brandPlugin() {
 export default defineConfig({
   plugins: [react(), tailwindcss(), brandPlugin()],
   server: {
+    // The logo imports its SVG source from ../design/brand, which sits outside this package.
+    fs: { allow: ['..'] },
     proxy: {
       '/api': 'http://localhost:5555',
     },

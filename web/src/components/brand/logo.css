@@ -1,0 +1,58 @@
+/*
+ * <Logo>. Colours arrive as --logo-c-* custom properties from src/config/brand.js (set inline by the component);
+ * motion uses the shared spring tokens published by lib/motion.js (--spring, --spring-duration).
+ */
+
+.logo {
+  --logo-tile: var(--logo-c-tile);
+  --logo-glyph: var(--logo-c-glyph);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+  vertical-align: middle;
+}
+.logo[data-tone="dark"],
+[data-logo-surface="dark"] .logo[data-tone="auto"] {
+  --logo-tile: var(--logo-c-tile-dark);
+  --logo-glyph: var(--logo-c-glyph-dark);
+}
+.logo[data-tone="mono"] { --logo-tile: transparent; --logo-glyph: currentColor; }
+
+.logo__svg { display: block; width: var(--logo-size); height: var(--logo-size); flex: none; }
+.logo__name { font-weight: 760; letter-spacing: -0.035em; line-height: 1; white-space: nowrap; }
+.logo--stacked { flex-direction: column; gap: 0.6em; text-align: center; }
+
+/* Shape defaults for the animated parts: dash-drawn paths, nodes that scale about their own centre. */
+.logo__svg .lm-graph, .logo__svg .lm-lines { stroke-dasharray: 1 1; stroke-dashoffset: 0; }
+.logo__svg .lm-node { transform-box: fill-box; transform-origin: center; }
+
+/* Focus ring for the logo link (nav, footer and app header all render `.brand`). */
+.brand:focus-visible { outline: 2px solid var(--cyan-accent, #087f75); outline-offset: 3px; }
+[data-logo-surface="dark"] .brand:focus-visible { outline-color: #8de7cf; }
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Entrance: the graph draws, the nodes pop on a short stagger, then the text lines draw. */
+  @keyframes logo-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+  @keyframes logo-pop { from { transform: scale(0); } to { transform: scale(1); } }
+  .logo--enter .lm-graph { animation: logo-draw var(--spring-duration, 0.5s) var(--spring, cubic-bezier(0.16, 1, 0.3, 1)) backwards; }
+  .logo--enter .lm-node { animation: logo-pop var(--spring-duration, 0.5s) var(--spring, cubic-bezier(0.16, 1, 0.3, 1)) backwards; }
+  .logo--enter .lm-node--1 { animation-delay: 0.04s; }
+  .logo--enter .lm-node--2 { animation-delay: 0.1s; }
+  .logo--enter .lm-node--3 { animation-delay: 0.16s; }
+  .logo--enter .lm-lines { animation: logo-draw var(--spring-duration, 0.5s) var(--spring, cubic-bezier(0.16, 1, 0.3, 1)) 0.12s backwards; }
+
+  /* Hover / focus on the logo link: the branch node leans out and every node swells, on the same spring. */
+  .logo__svg .lm-node { transition: transform var(--spring-duration, 0.5s) var(--spring, cubic-bezier(0.16, 1, 0.3, 1)); }
+  a:hover > .logo .lm-node--1, a:focus-visible > .logo .lm-node--1,
+  a:hover > .logo .lm-node--3, a:focus-visible > .logo .lm-node--3 { transform: scale(1.18); }
+  a:hover > .logo .lm-node--2, a:focus-visible > .logo .lm-node--2 { transform: translate(1px, 0) scale(1.42); }
+  a:hover > .logo .lm-node--3, a:focus-visible > .logo .lm-node--3 { transition-delay: 0.05s; }
+
+  /* Loading: nodes breathe in sequence. Indeterminate by design: there is no progress to show. */
+  @keyframes logo-breathe { from { opacity: 0.4; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
+  @keyframes logo-breathe-line { from { opacity: 0.45; } to { opacity: 1; } }
+  .logo--loading .lm-node { animation: logo-breathe calc(var(--spring-duration, 0.5s) * 3) var(--spring, ease-in-out) infinite alternate; }
+  .logo--loading .lm-node--2 { animation-delay: 0.2s; }
+  .logo--loading .lm-node--3 { animation-delay: 0.4s; }
+  .logo--loading .lm-graph, .logo--loading .lm-lines { animation: logo-breathe-line calc(var(--spring-duration, 0.5s) * 3) var(--spring, ease-in-out) infinite alternate; }
+}

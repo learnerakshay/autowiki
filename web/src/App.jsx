@@ -1,7 +1,8 @@
 import { lazy, Suspense } from 'react'
 import { NavLink, Route, Routes, useLocation } from 'react-router-dom'
 import { BookOpenText, LayoutPanelTop, MessageSquareText, Network } from 'lucide-react'
-import { AutoWikiBrand } from './components/AutoWikiBrand.jsx'
+import { BrandLink } from './components/brand/BrandLink.jsx'
+import { Logo } from './components/brand/Logo.jsx'
 import Landing from './pages/Landing.jsx'
 
 // Toasts only exist for the workspace jobs, so the toaster stays off the landing page's critical path.
@@ -11,6 +12,8 @@ const Chat = lazy(() => import('./pages/Chat.jsx'))
 const Wiki = lazy(() => import('./pages/Wiki.jsx'))
 const SampleWiki = lazy(() => import('./pages/SampleWiki.jsx'))
 const Architecture = lazy(() => import('./pages/Architecture.jsx'))
+// Dev-only brand board: `import.meta.env.DEV` is a build-time constant, so production bundles never contain it.
+const BrandBoard = import.meta.env.DEV ? lazy(() => import('./pages/dev/BrandBoard.jsx')) : null
 
 const navigation = [
   { to: '/workspace', label: 'Workspace', icon: LayoutPanelTop },
@@ -33,11 +36,15 @@ export default function App() {
     )
   }
 
+  if (BrandBoard && pathname === '/dev/brand') {
+    return <Suspense fallback={null}><BrandBoard /></Suspense>
+  }
+
   return (
     <>
       <header className="app-header">
         <div className="app-header__inner">
-          <AutoWikiBrand />
+          <BrandLink />
           <nav className="app-nav" aria-label="Main navigation">
             {navigation.map(({ to, label, icon: Icon, end }) => (
               <NavLink key={to} to={to} end={end} className={({ isActive }) => isActive ? 'nav-link nav-link--active' : 'nav-link'}>
@@ -49,7 +56,7 @@ export default function App() {
         </div>
       </header>
       <main className={mainClassName}>
-        <Suspense fallback={<p className="text-sm text-muted-foreground" role="status">Loading workspace…</p>}>
+        <Suspense fallback={<p className="flex items-center gap-2 text-sm text-muted-foreground" role="status"><Logo variant="mark" size="1.25rem" decorative loading /> Loading workspace…</p>}>
           <Routes>
             <Route path="/workspace" element={<Home />} />
             <Route path="/chat" element={<Chat />} />
