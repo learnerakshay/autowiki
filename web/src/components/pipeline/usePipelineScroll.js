@@ -7,6 +7,8 @@ import { createSpringValue } from '../../lib/spring.js'
 gsap.registerPlugin(ScrollTrigger)
 
 const clamp01 = (value) => Math.min(1, Math.max(0, value))
+// Below this width the strip becomes a vertical timeline (see pipeline.css); the fill then runs top to bottom.
+const VERTICAL_QUERY = '(max-width: 720px)'
 
 /**
  * Scroll-linked fill for the generation pipeline strip.
@@ -32,7 +34,7 @@ export function usePipelineScroll({ wrapRef, count }) {
     let teardown = null
 
     const showFinal = () => {
-      if (path) path.style.transform = 'scaleX(1)'
+      if (path) path.style.transform = 'scale(1)'
       nodes.forEach((node) => node.classList.add('is-active'))
       return () => {
         if (path) path.style.transform = ''
@@ -47,9 +49,21 @@ export function usePipelineScroll({ wrapRef, count }) {
       let inView = false
       let played = false
 
+      let vertical = false
+
       const measure = () => {
+        vertical = window.matchMedia(VERTICAL_QUERY).matches
         const single = nodes.every((node) => node.offsetTop === nodes[0].offsetTop)
-        if (single && path && getComputedStyle(path).display !== 'none' && path.offsetWidth) {
+        if (vertical && path && path.offsetHeight) {
+          // Vertical timeline: a node lights when the fill front reaches the centre of its circle.
+          thresholds = nodes.map((node) => {
+            const circle = node.firstElementChild
+            const center = node.offsetTop + circle.offsetTop + circle.offsetHeight / 2
+            return clamp01((center - path.offsetTop) / path.offsetHeight)
+          })
+          thresholds[thresholds.length - 1] = Math.min(thresholds[thresholds.length - 1], 0.995)
+          for (let i = 1; i < thresholds.length; i += 1) thresholds[i] = Math.max(thresholds[i], thresholds[i - 1])
+        } else if (single && path && getComputedStyle(path).display !== 'none' && path.offsetWidth) {
           // One row with a visible connector: a node lights when the fill front reaches its centre.
           thresholds = nodes.map((node) => {
             const circle = node.firstElementChild
@@ -60,7 +74,7 @@ export function usePipelineScroll({ wrapRef, count }) {
           // Always in reading order, whatever the geometry says.
           for (let i = 1; i < thresholds.length; i += 1) thresholds[i] = Math.max(thresholds[i], thresholds[i - 1])
         } else {
-          // Wrapped or stacked (connector hidden or meaningless): activate in order by progress through the strip.
+          // Wrapped (tablet) layout: no meaningful geometry, so activate in order by progress through the strip.
           thresholds = evenThresholds()
         }
       }
@@ -76,7 +90,7 @@ export function usePipelineScroll({ wrapRef, count }) {
 
       const apply = (value) => {
         const fill = clamp01(value)
-        if (path) path.style.transform = `scaleX(${fill.toFixed(4)})`
+        if (path) path.style.transform = vertical ? `scaleY(${fill.toFixed(4)})` : `scaleX(${fill.toFixed(4)})`
         nodes.forEach((node, index) => {
           const on = fill >= thresholds[index] - 0.0005
           if (on === node.classList.contains('is-active')) return

@@ -14,7 +14,7 @@
   position: relative;
   isolation: isolate;
   overflow: clip;
-  padding: 7.5rem 1.25rem clamp(7rem, 10vw, 10rem);
+  padding: 7.5rem 0 clamp(7rem, 10vw, 10rem);
   background: #f4fbf8;
 }
 
@@ -77,7 +77,7 @@
 .landing-hero.is-pointer-inside .hero-bg__spot { opacity: 1; }
 
 /* ───────── Copy ───────── */
-.landing-hero .landing-hero__copy { position: relative; z-index: 2; }
+.landing-hero .landing-hero__copy { position: relative; z-index: 2; width: min(62rem, calc(100% - 2 * var(--gutter))); margin-inline: auto; }
 .landing-hero .landing-hero__lede { color: var(--hero-ink-soft); }
 
 .hero-actions { display: flex; align-items: flex-start; justify-content: center; gap: 0.75rem; margin-top: 1.9rem; }
@@ -136,11 +136,12 @@
   font-size: 0.9rem;
   font-weight: 700;
   cursor: pointer;
+  transform: translate3d(var(--mx, 0px), var(--my, 0px), 0);
   transition: transform 90ms var(--ease-out), background-color 0.18s ease;
 }
 .repo-pill__submit:hover { background: #26312f; }
 .repo-pill__submit:active,
-.repo-pill__submit[data-pressed="true"] { transform: scale(0.97); background: #26312f; }
+.repo-pill__submit[data-pressed="true"] { transform: translate3d(var(--mx, 0px), var(--my, 0px), 0) scale(0.97); background: #26312f; }
 .repo-pill__submit:focus-visible { outline: 2px solid var(--cyan-accent); outline-offset: 2px; }
 .repo-pill__submit svg { width: 1rem; height: 1rem; transition: transform 0.15s ease; }
 .repo-pill__submit:hover svg { transform: translateX(2px); }
@@ -163,7 +164,7 @@
 }
 .repo-form__message svg { width: 0.95rem; height: 0.95rem; flex: none; }
 
-.landing-hero .hero-actions__secondary {
+.hero-actions .hero-actions__secondary {
   height: 3.5rem;
   padding: 0 1.4rem;
   border-color: rgba(93, 128, 119, 0.32);
@@ -171,8 +172,8 @@
   background: rgba(255, 255, 255, 0.82);
   transition: transform 90ms var(--ease-out), border-color 0.18s ease, background-color 0.18s ease;
 }
-.landing-hero .hero-actions__secondary:active { transform: scale(0.97); }
-.landing-hero .hero-actions__secondary:focus-visible { outline: 2px solid var(--cyan-accent); outline-offset: 3px; }
+.hero-actions .hero-actions__secondary:active { transform: scale(0.97); }
+.hero-actions .hero-actions__secondary:focus-visible { outline: 2px solid var(--cyan-accent); outline-offset: 3px; }
 
 .hero-facts { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; margin: 0.2rem 0 0; padding: 0; list-style: none; }
 .hero-facts li {
@@ -191,7 +192,7 @@
 .hero-facts svg { width: 0.88rem; height: 0.88rem; flex: none; color: #1d8a71; }
 
 /* ───────── Stage: parallax / tilt plane ───────── */
-.hero-stage { position: relative; z-index: 2; width: min(82rem, 100%); margin: 2.75rem auto 0; perspective: 1600px; }
+.hero-stage { position: relative; z-index: 2; width: var(--wide); margin: 2.75rem auto 0; perspective: 1600px; }
 .hero-stage__plane { transform-origin: 50% 40%; }
 .landing-hero .product-proof { width: 100%; margin: 0; }
 
@@ -232,7 +233,7 @@
   padding: 0.5rem 1rem;
   border-bottom: 1px solid rgba(70, 128, 112, 0.14);
   background: linear-gradient(180deg, rgba(248, 254, 251, 0.8), rgba(238, 251, 245, 0.7));
-  backdrop-filter: blur(16px) saturate(1.25);
+  backdrop-filter: blur(12px);
   color: #4a5c57;
   font-size: 0.72rem;
 }
@@ -309,7 +310,6 @@
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.58);
   box-shadow: inset 0 1px 2px rgba(14, 80, 62, 0.05);
-  backdrop-filter: blur(10px);
 }
 .pw-tabs[data-active="architecture"] { --index: 1; }
 .pw-tabs[data-active="sources"] { --index: 2; }
@@ -440,7 +440,7 @@
   .repo-pill__icon { margin-left: 0.7rem; }
   .repo-pill__field { height: 2.9rem; }
   .repo-pill__submit { width: 100%; height: 3rem; flex: 1 1 100%; justify-content: center; }
-  .landing-hero .hero-actions__secondary { width: 100%; height: 3rem; }
+  .hero-actions .hero-actions__secondary { width: 100%; height: 3rem; }
   .hero-facts { gap: 0.4rem; margin-top: 0.9rem; }
   .hero-facts li { padding: 0 0.7rem; font-size: 0.74rem; }
   .hero-stage { margin-top: 2rem; }
@@ -449,7 +449,9 @@
   .landing-hero .product-window { min-height: 0; border-radius: 0.95rem; }
   .landing-hero .product-window__bar { min-height: 0; padding: 0.55rem 0.65rem 0.65rem; }
   .landing-hero .pw-tab { min-width: 0; padding: 0 0.4rem; font-size: 0.78rem; }
-  .pw-tab > svg, .pw-tab__long { display: none; }
+  .pw-tab > svg { display: none; }
+  /* The full label stays in the accessibility tree (visually hidden), the short one is what's drawn. */
+  .pw-tab__long { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
   .pw-tab__short { display: inline; }
   .landing-hero .product-window__layout { display: block; }
   .landing-hero .product-window__context { padding: 1.25rem 1rem 1.5rem; }
@@ -481,7 +483,7 @@
   .hero-bg__blob, .pw-sheen i, .pw-status::before, .repo-pill__caret { animation: none; }
   .hero-bg__spot { display: none; }
   .pw-tabs__indicator { transition: none; }
-  .landing-hero .pw-tab, .repo-pill__submit, .pw-tool, .pw-explore, .landing-hero .hero-actions__secondary { transition-property: color, background-color, border-color; }
+  .landing-hero .pw-tab, .repo-pill__submit, .pw-tool, .pw-explore, .hero-actions .hero-actions__secondary { transition-property: color, background-color, border-color; }
   .landing-hero .pw-tab:active, .repo-pill__submit:active, .pw-tool:active, .pw-explore:active { transform: none; }
   .pw-reveal, .product-window__chapter-list button > *, .diagram-graph__node { transform: none !important; transition-duration: 0.15s !important; transition-delay: 0s !important; }
   .diagram-graph__edges path { transition: none !important; }
@@ -496,6 +498,7 @@
 /* ───────── Tab content swap (see useTabSwap.js) ───────── */
 .pw-panels { position: relative; display: flex; min-height: 0; flex: 1; flex-direction: column; }
 .pw-panels > [data-swap-panel][data-state="inactive"]:not([data-swap]) { display: none; }
+.pw-panels > [data-swap-panel]:focus-visible { outline: 2px solid var(--cyan-accent); outline-offset: -2px; border-radius: 8px; }
 /* The outgoing panel leaves the flow so the incoming one defines the height; it keeps its own geometry. */
 .pw-panels > [data-swap="out"] { position: absolute; inset: 0 0 auto 0; display: flex; flex-direction: column; pointer-events: none; }
 
@@ -520,3 +523,58 @@
 
 /* While GSAP owns a panel's children, CSS transitions on them (.pw-reveal etc.) must not smooth its values. */
 .landing-hero .pw-panels > [data-swap] > * { transition: none; }
+
+/* Compact variant (final CTA): same field and button, a little less tall. */
+.hero-actions--compact .repo-form { flex: 0 1 34rem; }
+
+/* Small labels inside the window clear 4.5:1 on the rail's tint. */
+.landing-hero .product-window__rail > p { color: #566b66; }
+.landing-hero .product-window__meta { color: #566b66; }
+
+/* Quiet labels inside the window: all clear 4.5:1 on the window's tinted surfaces. */
+.landing-hero .product-window__context-source,
+.landing-hero .product-window__source-line,
+.landing-hero .product-window__reading-meta,
+.landing-hero .product-window__chapter-list button,
+.landing-hero .product-window__context-head { color: #566b66; }
+.landing-hero .product-window__chapter-list button.is-active { color: #0e3e35; }
+.landing-hero .product-window__chapter-list button span { color: #566b66; }
+
+/* Placeholder while the preview window's chunk mounts: same glass frame, same height, no layout shift. */
+.landing-hero .pw-skeleton { min-height: 35.3rem; background: rgba(255, 255, 255, 0.6); }
+@media (max-width: 1280px) { .landing-hero .pw-skeleton { min-height: 39rem; } }
+@media (max-width: 980px) { .landing-hero .pw-skeleton { min-height: 63.75rem; } }
+@media (max-width: 720px) { .landing-hero .pw-skeleton { min-height: 55rem; } }
+@media (max-width: 420px) { .landing-hero .pw-skeleton { min-height: 59rem; } }
+@media (prefers-reduced-motion: no-preference) {
+  .landing-hero .product-window:not(.pw-skeleton) { animation: pw-in 0.4s ease-out both; }
+}
+@keyframes pw-in { from { opacity: 0.001; } to { opacity: 1; } }
+
+/*
+ * Entrance (CSS only, so the animation library stays off the critical path): nav, then the headline's words rise out of
+ * their masks, then lede / input / facts follow at ~75ms steps, then the window. About 1.2s end to end; nothing overlays
+ * the page, so the field is usable throughout. The lede moves without an opacity fade: it is usually the LCP element.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .ln__bar { animation: hero-nav 0.5s var(--ease-out) both; }
+  .landing-hero .motion-heading__word { animation: hero-word 0.62s var(--ease-out) both; animation-delay: calc(60ms + var(--w, 0) * 50ms); }
+  .landing-hero .landing-hero__lede { animation: hero-lede 0.46s var(--ease-out) 200ms both; }
+  .landing-hero .hero-actions { animation: hero-up 0.42s var(--ease-out) 280ms both; }
+  .landing-hero .hero-facts { animation: hero-up 0.42s var(--ease-out) 355ms both; }
+  .landing-hero .hero-stage { animation: hero-stage 0.72s cubic-bezier(0.22, 1, 0.36, 1) 500ms both; }
+}
+@keyframes hero-nav { from { opacity: 0; transform: translate3d(0, -16px, 0); } }
+@keyframes hero-word { from { opacity: 0; transform: translate3d(0, 110%, 0); } }
+@keyframes hero-lede { from { transform: translate3d(0, 14px, 0); } }
+@keyframes hero-up { from { opacity: 0; transform: translate3d(0, 14px, 0); } }
+@keyframes hero-stage { from { opacity: 0; transform: translate3d(0, 44px, 0) scale(0.965); } }
+@keyframes hero-fade { from { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .ln__bar, .landing-hero .landing-hero__copy > :not(.landing-hero__lede), .landing-hero .hero-stage { animation: hero-fade 0.3s ease-out both; }
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .landing-hero .product-window__bar { background: #f3fbf8; }
+  .landing-hero .product-window { background: #fff; }
+}

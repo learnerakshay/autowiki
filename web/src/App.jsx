@@ -2,9 +2,10 @@ import { lazy, Suspense } from 'react'
 import { NavLink, Route, Routes, useLocation } from 'react-router-dom'
 import { BookOpenText, LayoutPanelTop, MessageSquareText, Network } from 'lucide-react'
 import { AutoWikiBrand } from './components/AutoWikiBrand.jsx'
-import { Toaster } from './components/ui/sonner.jsx'
+import Landing from './pages/Landing.jsx'
 
-const Landing = lazy(() => import('./pages/Landing.jsx'))
+// Toasts only exist for the workspace jobs, so the toaster stays off the landing page's critical path.
+const Toaster = lazy(() => import('./components/ui/sonner.jsx').then((module) => ({ default: module.Toaster })))
 const Home = lazy(() => import('./pages/Home.jsx'))
 const Chat = lazy(() => import('./pages/Chat.jsx'))
 const Wiki = lazy(() => import('./pages/Wiki.jsx'))
@@ -28,12 +29,7 @@ export default function App() {
 
   if (pathname === '/') {
     return (
-      <>
-        <Suspense fallback={<p className="landing-loading" role="status">Loading AutoWiki…</p>}>
-          <Landing />
-        </Suspense>
-        <Toaster richColors closeButton />
-      </>
+      <Landing />
     )
   }
 
@@ -63,7 +59,7 @@ export default function App() {
           </Routes>
         </Suspense>
       </main>
-      <Toaster richColors closeButton />
+      <Suspense fallback={null}><Toaster richColors closeButton /></Suspense>
     </>
   )
 }

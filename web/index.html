@@ -2,14 +2,27 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#F6F8FB" />
-    <meta name="description" content="AutoWiki for Git turns GitHub repositories into structured technical wikis." />
-    <title>AutoWiki for Git</title>
+    <!--BRAND_HEAD-->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="preload" href="/fonts/Manrope-Variable-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <script>
+      // Progressive enhancement gate: reveal-on-scroll styles only apply when this runs, and a failsafe
+      // un-hides everything if the app has not initialised the reveal observers in time.
+      document.documentElement.classList.add('js')
+      setTimeout(function () { if (!window.__revealReady) document.documentElement.classList.add('reveal-failsafe') }, 3500)
+    </script>
   </head>
   <body>
     <div id="root"></div>
+    <noscript>
+      <style>.js-only { display: none !important }</style>
+      <p style="margin:0;padding:2rem;font:16px/1.6 system-ui,sans-serif">This site needs JavaScript to generate and read wikis.</p>
+    </noscript>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

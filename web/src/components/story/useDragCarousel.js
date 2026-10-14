@@ -10,11 +10,14 @@ gsap.registerPlugin(ScrollTrigger)
 const ENHANCED_QUERY = '(min-width: 901px) and (prefers-reduced-motion: no-preference)'
 const DRAG_SLOP = 10 // px of travel before a gesture is classified
 const VELOCITY_WINDOW = 100 // ms of pointer history used for release velocity
-const PARALLAX = 0.05 // text and card move +/-5% of the slide shift (10% apart)
+// Text drifts outward 5% of the slide shift, the card lags 3% (8% apart). The card's lag stays smaller than the
+// slide padding so a neighbouring card never pokes into view at rest.
+const PARALLAX_COPY = 0.05
+const PARALLAX_ART = 0.03
 const DIM = 0.35
 const SCALE_DROP = 0.03
 const PASSTHROUGH = 'button, a, input, select, textarea, [data-no-drag]'
-const SELECTABLE = 'p, h3, h4, pre, code, blockquote' // mouse drags that start on text still select it
+const CATCH_UP_MS = 100 // after recognition, the content eases onto the pointer instead of trailing it by the slop
 
 /**
  * Direct-manipulation controller for the pinned chapters carousel.
@@ -84,8 +87,8 @@ export function useDragCarousel({ rootRef, count, onActive }) {
           const away = Math.min(1, Math.abs(d))
           scene.style.opacity = away ? (1 - DIM * away).toFixed(3) : ''
           scene.style.transform = away ? `scale(${(1 - SCALE_DROP * away).toFixed(4)})` : ''
-          if (copy) copy.style.transform = away ? `translate3d(${(d * step * PARALLAX).toFixed(2)}px, 0, 0)` : ''
-          if (art) art.style.transform = away ? `translate3d(${(-d * step * PARALLAX).toFixed(2)}px, 0, 0)` : ''
+          if (copy) copy.style.transform = away ? `translate3d(${(d * step * PARALLAX_COPY).toFixed(2)}px, 0, 0)` : ''
+          if (art) art.style.transform = away ? `translate3d(${(-d * step * PARALLAX_ART).toFixed(2)}px, 0, 0)` : ''
         }
         if (pill) pill.style.transform = `translate3d(${(position * pitch).toFixed(2)}px, 0, 0)`
         if (engine.active !== lastActive) {
@@ -142,6 +145,27 @@ export function useDragCarousel({ rootRef, count, onActive }) {
       }
 
       // ── Pointer ───────────────────────────────────────────────────────────────────────────
+      let catchFrame = 0
+      const blockSelection = (event) => event.preventDefault()
+
+      /**
+       * Content offset for the pointer at `x`. It is true 1:1 from the pointer-down point, minus the slop
+       * travelled before the gesture was recognised, which decays to zero over CATCH_UP_MS (ease-out), so
+       * there is neither a jump at recognition nor a constant trailing lag afterwards.
+       */
+      const applyDrag = (x) => {
+        const t = Math.min(1, (performance.now() - pointer.lagStart) / CATCH_UP_MS)
+        const lag = pointer.lag0 * (1 - (1 - (1 - t) ** 3))
+        engine.dragBy(x - pointer.anchor - lag)
+        render()
+        return t < 1
+      }
+      const catchUp = () => {
+        catchFrame = 0
+        if (!pointer?.dragging) return
+        if (applyDrag(pointer.lastX)) catchFrame = requestAnimationFrame(catchUp)
+      }
+
       const releaseVelocity = (now) => {
         const recent = samples.filter((sample) => sample.t >= now - VELOCITY_WINDOW)
         if (recent.length < 2) return 0
@@ -152,9 +176,16 @@ export function useDragCarousel({ rootRef, count, onActive }) {
         return seconds > 0 ? (lastSample.x - first.x) / seconds : 0
       }
 
+      const endSelectionBlock = () => {
+        if (catchFrame) cancelAnimationFrame(catchFrame)
+        catchFrame = 0
+        document.removeEventListener('selectstart', blockSelection)
+      }
+
       const finishPointer = (event, velocity) => {
         const finished = pointer
         pointer = null
+        endSelectionBlock()
         frame.classList.remove('is-dragging')
         if (finished?.captured && frame.hasPointerCapture?.(finished.id)) frame.releasePointerCapture(finished.id)
         if (!finished || (!finished.dragging && !finished.froze)) return
@@ -167,10 +198,9 @@ export function useDragCarousel({ rootRef, count, onActive }) {
         if (!event.isPrimary || (event.pointerType === 'mouse' && event.button !== 0)) return
         suppressClick = false
         if (event.target.closest(PASSTHROUGH)) return
-        if (event.pointerType === 'mouse' && event.target.closest(SELECTABLE)) return
         const moving = frameId !== 0
         if (moving) engine.beginDrag() // grabbing mid-settle freezes it right here
-        pointer = { id: event.pointerId, x: event.clientX, y: event.clientY, anchor: event.clientX, dragging: false, captured: false, froze: moving }
+        pointer = { id: event.pointerId, x: event.clientX, y: event.clientY, anchor: event.clientX, lastX: event.clientX, lag0: 0, lagStart: 0, dragging: false, captured: false, froze: moving }
         samples.length = 0
         samples.push({ t: event.timeStamp, x: event.clientX })
       }
@@ -190,16 +220,20 @@ export function useDragCarousel({ rootRef, count, onActive }) {
           }
           pointer.dragging = true
           pointer.captured = true
-          pointer.anchor = event.clientX // anchor where the gesture was recognised: no jump, grab offset preserved
+          pointer.lag0 = dx // the slop travelled before recognition; eased away below
+          pointer.lagStart = performance.now()
           if (!pointer.froze) engine.beginDrag()
           frame.setPointerCapture(event.pointerId)
           frame.classList.add('is-dragging')
+          // A drag was recognised: drop any text selection the press started, and keep it from growing.
+          window.getSelection()?.removeAllRanges()
+          document.addEventListener('selectstart', blockSelection)
           interact()
         }
-        engine.dragBy(event.clientX - pointer.anchor)
+        pointer.lastX = event.clientX
         samples.push({ t: event.timeStamp, x: event.clientX })
         if (samples.length > 12) samples.shift()
-        render()
+        if (applyDrag(event.clientX) && !catchFrame) catchFrame = requestAnimationFrame(catchUp)
       }
 
       const onPointerUp = (event) => {
@@ -229,6 +263,7 @@ export function useDragCarousel({ rootRef, count, onActive }) {
           // A button pressed mid-drag retargets with the drag's own velocity instead of snapping.
           const carried = releaseVelocity(performance.now())
           pointer = null
+          endSelectionBlock()
           frame.classList.remove('is-dragging')
           engine.mode = 'settle'
           engine.velocity = -carried / engine.step
@@ -263,6 +298,7 @@ export function useDragCarousel({ rootRef, count, onActive }) {
       api.current = { goTo }
       return () => {
         api.current = null
+        endSelectionBlock()
         if (frameId) cancelAnimationFrame(frameId)
         resize.disconnect()
         trigger.kill()

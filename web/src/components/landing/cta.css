@@ -1,0 +1,25 @@
+/* Final CTA: the hero's mesh + grain, cheaper; centred headline and the same real input. */
+
+.cta { position: relative; isolation: isolate; overflow: clip; padding-block: clamp(5rem, 9vw, 7.5rem) clamp(4.5rem, 8vw, 6.5rem); background: linear-gradient(180deg, #fff 0%, var(--mint-100) 55%, var(--mint-200) 100%); }
+.cta__bg { position: absolute; inset: 0; z-index: -1; overflow: hidden; mask-image: linear-gradient(to bottom, transparent 0, #000 22%); pointer-events: none; }
+.cta__blob { position: absolute; width: min(58vw, 54rem); aspect-ratio: 1; border-radius: 50%; }
+.cta__blob--a { top: -30%; left: -12%; background: radial-gradient(circle, rgba(91, 239, 187, 0.55), rgba(91, 239, 187, 0) 68%); animation: cta-drift-a 31s ease-in-out infinite alternate; }
+.cta__blob--b { right: -14%; bottom: -34%; background: radial-gradient(circle, rgba(140, 246, 212, 0.62), rgba(140, 246, 212, 0) 66%); animation: cta-drift-b 37s ease-in-out infinite alternate; }
+@keyframes cta-drift-a { from { transform: translate3d(0, 0, 0) scale(1); } to { transform: translate3d(4vw, 3vh, 0) scale(1.07); } }
+@keyframes cta-drift-b { from { transform: translate3d(0, 0, 0) scale(1.04); } to { transform: translate3d(-3.5vw, -3vh, 0) scale(0.97); } }
+.cta[data-active="false"] .cta__blob { animation-play-state: paused; }
+.cta__grain {
+  position: absolute;
+  inset: 0;
+  opacity: 0.2;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n' x='0' y='0'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .06 0 0 0 0 .32 0 0 0 0 .26 0 0 0 .7 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 160px 160px;
+}
+
+.cta__inner { text-align: center; }
+.cta .cta__head { max-width: 46rem; margin: 0 auto; }
+.cta .lp-lede { margin-inline: auto; }
+.cta .hero-actions--compact { margin-top: clamp(1.75rem, 3vw, 2.5rem); }
+.cta__note { margin: 0.25rem 0 0; color: var(--ink-3); font-size: var(--fs-caption); line-height: 1.5; }
+
+@media (prefers-reduced-motion: reduce) { .cta__blob { animation: none; } }

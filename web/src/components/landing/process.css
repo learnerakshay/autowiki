@@ -1,0 +1,125 @@
+/*
+ * "From repository to documentation": pinned two-column stage (timeline + scrubbed visual).
+ * The stage is one viewport minus the nav tall, so nothing is cropped and there are no dead gaps between
+ * steps. Narrow / reduced-motion layouts show every step with its own inline visual.
+ */
+
+.process { padding-bottom: calc(var(--section-y) * 0.8); background: linear-gradient(180deg, #fff, var(--mint-50) 70%, #fff); }
+
+.process__stage { position: relative; height: calc(calc(100 * var(--svh)) - var(--nav-h) - 1.5rem + (var(--stages) - 1) * calc(70 * var(--svh))); }
+.process__pin { position: sticky; top: var(--nav-h); display: flex; height: calc(calc(100 * var(--svh)) - var(--nav-h) - 1.5rem); align-items: center; }
+.process__grid { display: grid; height: 100%; max-height: 40rem; grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); align-items: center; gap: clamp(2rem, 5vw, 5rem); }
+
+/* Timeline */
+.process__timeline { position: relative; }
+.process__rail { position: absolute; top: 2.4rem; bottom: 2.4rem; left: 1.375rem; width: 2px; margin-left: -1px; border-radius: 2px; background: var(--line); }
+.process__rail i { position: absolute; inset: 0; border-radius: 2px; background: linear-gradient(180deg, #64c8ad, var(--accent)); transform: scaleY(0); transform-origin: top; }
+.process__steps { display: grid; gap: clamp(0.75rem, calc(2.6 * var(--svh)), 1.6rem); margin: 0; padding: 0; list-style: none; }
+.process-step { display: grid; grid-template-columns: 2.75rem minmax(0, 1fr); gap: 1.15rem; padding-block: 0.4rem; }
+.process-step__number {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  place-items: center;
+  border: 1px solid var(--line-strong);
+  border-radius: 50%;
+  background: #fff;
+  color: #064d3f; /* stays >= 4.5:1 even at the dimmed step opacity */
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  font-weight: 750;
+  transition: background-color 0.25s ease, border-color 0.25s ease;
+}
+.process-step[data-active="true"] .process-step__number { border-color: var(--accent); background: var(--accent-soft); }
+.process-step__title { font-size: clamp(1.2rem, 1.7vw, 1.4rem); line-height: 1.25; }
+.process-step__text { max-width: 26rem; margin: 0.45rem 0 0; color: var(--ink-2); font-size: var(--fs-small); line-height: 1.65; }
+
+/* Visual frame */
+.sv {
+  display: flex;
+  height: 100%;
+  min-height: 0;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--r-l);
+  background: linear-gradient(180deg, #fff, var(--mint-50));
+  box-shadow: inset 0 1px 0 #fff, var(--shadow-3);
+}
+.sv__bar { display: flex; min-height: 3rem; flex: none; align-items: center; justify-content: space-between; gap: 1rem; padding: 0 1.1rem; border-bottom: 1px solid var(--line); color: var(--ink-3); font-size: 0.74rem; font-weight: 650; }
+.sv__brand { display: inline-flex; align-items: center; gap: 0.5rem; color: var(--ink-2); }
+.sv__bar .brand-mark { width: 1.4rem; height: 1.4rem; border: 0; border-radius: 0.35rem; }
+.sv__bar .brand-mark svg { width: 0.95rem; height: 0.95rem; }
+.sv__bar code { font-size: 0.72rem; }
+.sv__canvas { position: relative; min-height: 0; flex: 1; padding: 1.3rem 1.4rem; }
+
+.sv__heads { position: relative; z-index: 1; height: 4.2rem; }
+.sv__head { position: absolute; inset: 0 auto auto 0; display: grid; margin: 0; gap: 0.35rem; }
+.sv__head span { color: var(--ink-3); font-family: var(--font-mono); font-size: 0.68rem; font-weight: 750; letter-spacing: 0.1em; text-transform: uppercase; }
+.sv__head strong { color: var(--ink); font-size: clamp(1.4rem, 2.3vw, 2rem); font-weight: var(--fw-display); letter-spacing: -0.045em; line-height: 1.05; }
+.sv__head--outline { opacity: 0; }
+
+.sv__rows { position: relative; z-index: 1; display: grid; gap: 0.65rem; margin-top: 0.35rem; }
+.sv__rows.is-files { gap: 0.2rem; }
+.sv-row { position: relative; display: grid; height: 3.4rem; grid-template-columns: 2.4rem minmax(0, 1fr) auto; align-items: center; padding: 0 1rem; }
+.sv__rows.is-files .sv-row { height: 2.5rem; }
+.sv-row__bg { position: absolute; inset: 0; border: 1px solid var(--line); border-radius: 0.75rem; background: #fff; box-shadow: var(--shadow-1); transform-origin: left center; }
+.sv-row__title, .sv-row__meta { position: relative; }
+.sv-row .sv-row__file { position: absolute; inset: 0 auto 0 1rem; display: flex; align-items: center; gap: 0.6rem; color: var(--ink-2); font-family: var(--font-mono); font-size: 0.8rem; font-weight: 600; }
+.sv-row__file svg { width: 0.95rem; height: 0.95rem; color: var(--accent); }
+.sv-row__meta { opacity: 0; }
+.sv-row b { color: var(--accent-ink); font-family: var(--font-mono); font-size: 0.72rem; font-weight: 750; }
+.sv-row__title { color: var(--ink); font-size: 1rem; font-weight: var(--fw-card); letter-spacing: var(--track-card); opacity: 0; transform-origin: left top; white-space: nowrap; }
+.sv-row__path { justify-self: end; padding: 0.22rem 0.45rem; border-radius: 0.35rem; background: #e5f6ee; color: var(--accent-ink); font-family: var(--font-mono); font-size: 0.72rem; }
+
+/* Chapter overlay (stage 3). It sits under the rows so the travelling title stays on top. */
+.sv__chapter {
+  position: absolute;
+  z-index: 0;
+  inset: 0.85rem;
+  display: flex;
+  min-height: 0;
+  flex-direction: column;
+  gap: 0.75rem;
+  overflow: hidden;
+  padding: 1.15rem 1.3rem;
+  border: 1px solid var(--line);
+  border-radius: var(--r-m);
+  background: #fff;
+  box-shadow: var(--shadow-2);
+  opacity: 0;
+  pointer-events: none;
+}
+.sv__chapter-top { display: flex; align-items: center; justify-content: space-between; gap: 1rem; color: var(--ink-3); font-size: 0.72rem; font-weight: 650; opacity: 0; }
+.sv__chapter-title { margin: 0; color: var(--ink); font-size: clamp(1.4rem, 2vw, 1.8rem); font-weight: var(--fw-display); letter-spacing: -0.045em; line-height: 1.1; opacity: 0; }
+.sv__chapter-text { margin: 0; color: var(--ink-2); font-size: 0.9rem; line-height: 1.65; }
+.sv__chapter-text .is-rest { color: transparent; user-select: none; }
+.sv__chapter .diagram-graph { width: 100%; margin-top: auto; }
+.sv code { border-radius: 0.35rem; background: #e5f6ee; padding: 0.2rem 0.42rem; color: var(--accent-ink); font-size: 0.7rem; }
+
+/* ── Stacked (narrow / reduced motion) ── */
+.process__stacked .process__steps--stacked { gap: clamp(2.5rem, 7vw, 4rem); }
+.process__stacked .process-step { grid-template-columns: 2.75rem minmax(0, 1fr); }
+.process__stacked .sv { height: auto; margin-top: 1.25rem; }
+.process__stacked .sv__canvas { min-height: 24rem; }
+/* Each stacked stage only needs the height of what it shows. */
+.process__stacked .sv[data-stage="0"] .sv__canvas { min-height: 14.5rem; }
+.process__stacked .sv[data-stage="1"] .sv__canvas { min-height: 17rem; }
+.process__stacked .sv[data-stage="2"] .sv__canvas { min-height: 27rem; }
+
+@media (max-width: 900px) {
+  .process { padding-bottom: calc(var(--section-y) * 0.5); }
+  .process__stacked .process-step { grid-template-columns: 1fr; gap: 0.9rem; }
+  .process__stacked .process-step__number { width: 2.4rem; height: 2.4rem; }
+}
+@media (max-width: 520px) {
+  .process__stacked .sv[data-stage="2"] .sv__canvas { min-height: 31.5rem; }
+  .sv__canvas { padding: 1rem; }
+  .sv-row { grid-template-columns: 2rem minmax(0, 1fr) auto; padding: 0 0.75rem; }
+  .sv-row__path { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .process-step__number { transition: none; }
+}

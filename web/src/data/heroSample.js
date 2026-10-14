@@ -22,10 +22,19 @@ const proseParagraphs = (markdown) => markdown
   .filter((paragraph) => paragraph && !/^(#|-|\d+\.|```|\|)/.test(paragraph))
   .map((paragraph) => paragraph.replace(/[`*_]/g, ''))
 
+/** First fenced code block of a chapter, if it has one: { lang, code }. */
+function firstCodeFence(markdown) {
+  const match = markdown.match(/```([\w-]*)\n([\s\S]*?)```/)
+  return match ? { lang: match[1] || 'text', code: match[2].trimEnd() } : null
+}
+
+const firstSentence = (paragraph = '') => (paragraph.match(/^.+?[.!?](?=\s|$)/)?.[0] ?? paragraph).trim()
+
 const [owner, name] = sampleWiki.repo.split('/')
 
 export const heroSample = {
   slug: sampleWiki.id,
+  url: sampleWiki.sourceRepositoryUrl,
   repo: sampleWiki.repo,
   owner,
   name,
@@ -35,6 +44,8 @@ export const heroSample = {
     description: chapter.description,
     filePaths: chapter.filePaths,
     excerpt: proseParagraphs(chapter.markdown).slice(0, 2),
+    lead: firstSentence(proseParagraphs(chapter.markdown)[0]),
+    code: firstCodeFence(chapter.markdown),
     mermaidPreview: chapter.mermaid.split('\n').slice(0, 3).join('\n'),
     diagram: buildDiagram(chapter.mermaid, DIAGRAM_LIMITS),
   })),

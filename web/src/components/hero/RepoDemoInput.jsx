@@ -2,16 +2,21 @@ import { useId, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { AlertCircle, ArrowRight, Check } from 'lucide-react'
 import { Button } from '../ui/button.jsx'
+import { actions } from '../../data/landingCopy.js'
 import { checkRepoInput, REPO_EXAMPLE, workspaceHref } from '../../lib/repoInput.js'
+import { reducedMotionQuery } from '../../lib/motion.js'
 import { GithubMark } from './GithubMark.jsx'
 
 const EMPTY_MESSAGE = `Enter a public GitHub repository, like ${REPO_EXAMPLE}.`
+
+// For uses without an autoplay demo (the final CTA): the field behaves normally, nothing types into it.
+const IDLE_DEMO = { running: false, phase: 'idle', typed: '', stop() {} }
 
 /**
  * Real repository field + the demo caret. The demo types into a decorative overlay, never into the
  * input itself, so the user's own text can't be clobbered and focusing the field simply hides the overlay.
  */
-export function RepoDemoInput({ demo, exploreHref }) {
+export function RepoDemoInput({ demo = IDLE_DEMO, exploreHref, id = 'hero-repo', compact = false, showSecondary = true }) {
   const navigate = useNavigate()
   const inputRef = useRef(null)
   const messageId = useId()
@@ -38,13 +43,16 @@ export function RepoDemoInput({ demo, exploreHref }) {
       inputRef.current?.focus()
       return
     }
-    navigate(workspaceHref(result.repo))
+    // Hand off with a View Transition where the browser has them (a root cross-fade; the workspace page is
+    // untouched). Everywhere else this is an ordinary navigation.
+    const transition = 'startViewTransition' in document && !window.matchMedia(reducedMotionQuery).matches
+    navigate(workspaceHref(result.repo), transition ? { viewTransition: true } : undefined)
   }
 
   return (
-    <div className="hero-actions">
+    <div className={`hero-actions${compact ? ' hero-actions--compact' : ''}`}>
       <form className="repo-form" onSubmit={handleSubmit} noValidate>
-        <label className="sr-only" htmlFor="hero-repo">GitHub repository</label>
+        <label className="sr-only" htmlFor={id}>GitHub repository</label>
         <div
           className="repo-pill"
           data-status={showError ? 'invalid' : result.status}
@@ -55,7 +63,7 @@ export function RepoDemoInput({ demo, exploreHref }) {
           <div className="repo-pill__field">
             <input
               ref={inputRef}
-              id="hero-repo"
+              id={id}
               name="repo"
               type="text"
               inputMode="url"
@@ -63,6 +71,7 @@ export function RepoDemoInput({ demo, exploreHref }) {
               autoCapitalize="none"
               autoCorrect="off"
               spellCheck={false}
+              maxLength={260}
               placeholder="github.com/owner/repo"
               aria-label="GitHub repository, as owner/repo or a github.com URL"
               aria-invalid={showError}
@@ -79,16 +88,18 @@ export function RepoDemoInput({ demo, exploreHref }) {
           </div>
           {result.status === 'valid' ? <Check className="repo-pill__ok" aria-hidden="true" /> : null}
           <button type="submit" className="repo-pill__submit" data-pressed={demo.phase === 'pressing'}>
-            Generate <ArrowRight aria-hidden="true" />
+            {actions.primary} <ArrowRight aria-hidden="true" />
           </button>
         </div>
         <p id={messageId} className="repo-form__message" data-tone={showError ? 'error' : 'quiet'} aria-live="polite">
           {showError ? <><AlertCircle aria-hidden="true" />{message}</> : null}
         </p>
       </form>
-      <Button asChild variant="secondary" className="hero-actions__secondary">
-        <Link to={exploreHref}>Explore Sample Wiki</Link>
-      </Button>
+      {showSecondary ? (
+        <Button asChild variant="secondary" className="hero-actions__secondary">
+          <Link to={exploreHref}>{actions.secondary}</Link>
+        </Button>
+      ) : null}
     </div>
   )
 }

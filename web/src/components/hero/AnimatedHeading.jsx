@@ -1,4 +1,4 @@
-// Word-split heading used by the hero and every landing section. Moved out of Landing.jsx unchanged.
+// Word-split hero headline (masked line + word spans). Section headings use SectionHeading instead.
 export function AnimatedHeading({ as: Heading = 'h2', id, lines, hero = false }) {
   return (
     <Heading
@@ -7,10 +7,11 @@ export function AnimatedHeading({ as: Heading = 'h2', id, lines, hero = false })
       aria-label={lines.join(' ')}
       data-motion-heading={hero ? 'hero' : 'section'}
     >
-      {lines.map((line) => (
+      {lines.map((line, lineIndex) => (
         <span className="motion-heading__line" aria-hidden="true" key={line}>
           {line.split(' ').map((word, index) => (
-            <span className="motion-heading__word" key={`${word}-${index}`}>{word}</span>
+            // --w is the word's position in the whole heading; the entrance CSS staggers on it.
+            <span className="motion-heading__word" style={{ '--w': lines.slice(0, lineIndex).reduce((total, previous) => total + previous.split(' ').length, 0) + index }} key={`${word}-${index}`}>{word}</span>
           ))}
         </span>
       ))}

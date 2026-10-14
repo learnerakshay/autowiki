@@ -1,0 +1,101 @@
+/* Features: bento on a real 12-column grid; cards with depth, spring lift, spotlight border and live miniatures. */
+
+.features { background: linear-gradient(180deg, #fff, var(--mint-100) 32%, var(--mint-50)); }
+.features__grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: clamp(1rem, 2vw, 1.5rem); }
+.fc--chapters { grid-column: span 5; }
+.fc--diagram { grid-column: span 7; }
+.fc--sources { grid-column: 1 / -1; }
+
+.fc {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: clamp(1.25rem, 2.4vw, 1.75rem);
+  padding: clamp(1.35rem, 2.6vw, 2rem);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-l);
+  background: linear-gradient(180deg, #fff 0%, var(--mint-50) 100%);
+  box-shadow: inset 0 1px 0 #fff, var(--shadow-2);
+  transition: transform var(--spring-duration, 400ms) var(--spring, var(--ease-out)), box-shadow 0.3s ease;
+}
+.fc:hover { transform: translate3d(0, -4px, 0); box-shadow: inset 0 1px 0 #fff, var(--shadow-3); }
+.fc:active { transform: translate3d(0, -2px, 0) scale(0.99); transition-duration: 90ms; }
+
+/* Cursor-following glow on the 1px border ring (the orb is moved by transform; the mask shows only the ring). */
+.fc__glow {
+  position: absolute;
+  inset: -1px;
+  overflow: hidden;
+  padding: 1px;
+  border-radius: inherit;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.fc:hover .fc__glow { opacity: 1; }
+.fc__orb { position: absolute; top: -11rem; left: -11rem; width: 22rem; height: 22rem; background: radial-gradient(circle, rgba(20, 190, 145, 0.95), transparent 62%); }
+
+.fc__copy { max-width: 32rem; }
+.fc__icon { display: grid; width: 2.5rem; height: 2.5rem; place-items: center; margin-bottom: 1rem; border-radius: 0.75rem; background: var(--accent-soft); box-shadow: inset 0 0 0 1px rgba(30, 150, 118, 0.22); color: var(--accent-ink); }
+.fc__icon svg { width: 1.15rem; height: 1.15rem; }
+.fc__demo { min-width: 0; margin-top: auto; padding: 0.35rem 1.1rem; border-radius: var(--r-m); background: rgba(255, 255, 255, 0.78); box-shadow: inset 0 0 0 1px rgba(70, 128, 112, 0.14); }
+.fc--diagram .fc__demo { display: grid; place-items: center; padding-block: 1.25rem; }
+.fc--chapters .fc__demo { display: flex; flex: 1; flex-direction: column; justify-content: center; }
+.fc--chapters .mini-rows { flex: 1; grid-auto-rows: minmax(3.4rem, 1fr); }
+.fc--diagram .diagram-graph { width: 100%; max-width: 38rem; margin-top: 0; }
+.fc code { border-radius: 0.35rem; background: #e5f6ee; padding: 0.2rem 0.45rem; color: var(--accent-ink); font-size: 0.74rem; }
+
+.fc--sources { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); align-items: center; gap: clamp(1.5rem, 4vw, 3.5rem); }
+.fc--sources .fc__demo { margin-top: 0; }
+
+/* Miniature: chapter rows */
+.mini-rows, .mini-sources { display: grid; margin: 0; padding: 0; list-style: none; }
+.mini-row { position: relative; display: grid; min-height: 3.4rem; grid-template-columns: 2rem minmax(0, 1fr) auto; align-items: center; gap: 0.6rem; padding: 0 0.5rem; border-bottom: 1px solid var(--line); }
+.mini-row:last-child, .mini-source:last-child { border-bottom: 0; }
+.mini-row > * { position: relative; }
+.mini-row span { color: var(--accent-ink); font-family: var(--font-mono); font-size: 0.72rem; font-weight: 750; }
+.mini-row strong { overflow: hidden; color: var(--ink); font-size: 0.95rem; font-weight: var(--fw-card); letter-spacing: var(--track-card); text-overflow: ellipsis; white-space: nowrap; }
+.mini-row::before { position: absolute; inset: 3px 0; border-radius: 0.6rem; background: var(--accent-soft); content: ""; opacity: 0; }
+.mini-row[data-featured="true"]::before { opacity: 1; }
+
+/* Miniature: source ledger */
+.mini-source { display: grid; min-height: 3.5rem; grid-template-columns: 1.1rem auto minmax(0, 1fr); align-items: center; gap: 0.75rem; border-bottom: 1px solid var(--line); }
+.mini-source svg { width: 1rem; height: 1rem; color: var(--accent); }
+.mini-source code { position: relative; overflow: hidden; font-size: 0.8rem; }
+.mini-source span { overflow: hidden; color: var(--ink-3); font-size: 0.85rem; text-align: right; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Play-once-on-view + replay-on-hover. Hidden/animated states exist only under html.js. */
+.js:not(.reveal-failsafe) .fc[data-played="false"] .mini-row,
+.js:not(.reveal-failsafe) .fc[data-played="false"] .mini-source { opacity: 0; }
+.js .mini-rows[data-playing="true"] .mini-row { animation: mini-in 0.55s var(--ease-out) both; animation-delay: calc(var(--i) * 100ms); }
+.js .mini-rows[data-playing="true"] .mini-row[data-featured="true"]::before { animation: mini-fade 0.5s ease-out 1s both; }
+.js .fc[data-played="true"] .mini-source { animation: mini-in 0.5s var(--ease-out) both; animation-delay: calc(var(--i) * 260ms); }
+.js .fc[data-played="true"] .mini-source code::after {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, transparent 20%, rgba(60, 220, 170, 0.45) 50%, transparent 80%);
+  content: "";
+  opacity: 0;
+  pointer-events: none;
+  animation: mini-sweep 0.9s var(--ease-out) both;
+  animation-delay: calc(0.5s + var(--i) * 260ms);
+}
+@keyframes mini-in { from { opacity: 0; transform: translate3d(-14px, 0, 0); } to { opacity: 1; transform: none; } }
+@keyframes mini-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes mini-sweep { 0% { opacity: 0; transform: translate3d(-100%, 0, 0); } 25% { opacity: 1; } 100% { opacity: 0; transform: translate3d(100%, 0, 0); } }
+
+@media (max-width: 900px) {
+  .fc--chapters, .fc--diagram, .fc--sources { grid-column: 1 / -1; }
+  .fc--sources { grid-template-columns: minmax(0, 1fr); }
+  .mini-row code { display: none; }
+}
+@media (max-width: 480px) { .mini-source span { display: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .fc, .fc:hover, .fc:active { transform: none; transition: box-shadow 0.18s ease; }
+  .fc__glow { display: none; }
+  .js .mini-rows[data-playing="true"] .mini-row, .js .fc[data-played="true"] .mini-source, .js .mini-rows[data-playing="true"] .mini-row[data-featured="true"]::before { animation: none; }
+  .js .fc[data-played="true"] .mini-source code::after { display: none; }
+}
+@media (prefers-contrast: more) { .fc { border-color: var(--line-strong); } .fc code { background: #fff; box-shadow: inset 0 0 0 1px var(--line-strong); } }

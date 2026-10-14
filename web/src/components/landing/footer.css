@@ -1,0 +1,88 @@
+/* Footer: dark bookend, config-driven content, oversized wordmark that rises in without shifting layout. */
+
+.lf {
+  position: relative;
+  overflow: hidden;
+  background: radial-gradient(ellipse 70% 120% at 50% 110%, rgba(40, 200, 155, 0.14), transparent 60%), #0b1714;
+  color: #cfe3da;
+}
+.lf__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) repeat(2, minmax(0, 0.7fr)) auto;
+  align-items: start;
+  gap: clamp(1.75rem, 4vw, 4rem);
+  padding-block: clamp(3.5rem, 6vw, 5rem) clamp(2rem, 4vw, 3rem);
+}
+.lf .brand { color: #f2fbf7; }
+.lf .brand-mark { border-color: transparent; background: rgba(120, 240, 200, 0.14); }
+.lf .brand-mark svg { color: #8de7cf; stroke: #8de7cf; }
+.lf__brand p { max-width: 24rem; margin: 1rem 0 0; color: #a9c6bc; font-size: var(--fs-small); line-height: 1.65; }
+.lf__source { display: inline-block; margin-top: 1rem; color: #dff8ee; font-size: var(--fs-small); font-weight: 650; text-underline-offset: 0.25em; }
+.lf__label { margin: 0 0 0.9rem; color: #8fb2a6; font-family: var(--font-mono); font-size: 0.7rem; font-weight: 750; letter-spacing: 0.12em; text-transform: uppercase; }
+.lf__col ul { display: grid; gap: 0.1rem; margin: 0; padding: 0; list-style: none; }
+.lf__col a {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  color: #e4f3ec;
+  font-size: var(--fs-small);
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.15s ease, transform 90ms var(--ease-out);
+}
+.lf__col a:hover { color: #8de7cf; }
+.lf__col a:active { transform: scale(0.97); }
+.lf a:focus-visible, .lf button:focus-visible { outline: 2px solid #8de7cf; outline-offset: 3px; border-radius: 0.35rem; }
+
+.lf__top {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0 1.1rem;
+  border: 1px solid rgba(141, 231, 207, 0.35);
+  border-radius: 999px;
+  background: transparent;
+  color: #e4f3ec;
+  font-size: 0.84rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 90ms var(--ease-out), background-color 0.18s ease, border-color 0.18s ease;
+}
+.lf__top:hover { border-color: #8de7cf; background: rgba(141, 231, 207, 0.1); }
+.lf__top:active { transform: scale(0.97); }
+.lf__top svg { width: 1rem; height: 1rem; }
+.lf__credits { margin: 0; padding-bottom: 1.5rem; color: #8fb2a6; font-size: var(--fs-caption); }
+
+/* Signature: a wordmark far larger than the type scale, rising into place as the footer enters. */
+.lf__wordmark {
+  display: block;
+  height: clamp(5rem, 17vw, 15rem);
+  overflow: hidden;
+  line-height: 0.82;
+  text-align: center;
+  user-select: none;
+}
+.lf__wordmark span {
+  display: block;
+  color: rgba(141, 231, 207, 0.34);
+  mask-image: linear-gradient(180deg, #000 30%, transparent 92%);
+  font-size: clamp(5rem, 19vw, 17rem);
+  font-weight: 760;
+  letter-spacing: -0.07em;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translate3d(0, 55%, 0);
+  transition: opacity 0.6s ease-out, transform var(--spring-duration, 400ms) var(--spring, var(--ease-out));
+}
+.lf[data-entered="true"] .lf__wordmark span { opacity: 1; transform: translate3d(0, 6%, 0); }
+html:not(.js) .lf__wordmark span, .reveal-failsafe .lf__wordmark span { opacity: 1; transform: translate3d(0, 6%, 0); }
+
+@media (max-width: 860px) {
+  .lf__inner { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .lf__brand { grid-column: 1 / -1; }
+  .lf__top { grid-column: 1 / -1; justify-self: start; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lf__wordmark span { transition: none; transform: translate3d(0, 6%, 0); opacity: 1; }
+}

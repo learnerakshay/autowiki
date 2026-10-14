@@ -1,69 +1,164 @@
 /*
- * Chapters carousel: interaction and motion only. Section height, slide size, spacing, type and color
- * stay in Landing.css; nothing here sets a width or height on the section, frame, track or slides.
- * The single visual exception is the hint line that replaces the old faint status text.
+ * Chapters carousel (dark section). Layout, motion hooks and drag affordances.
+ * Enhanced mode (>= 901px, motion allowed): a sticky stage exactly one viewport tall holds a compact
+ * heading row and a frame that takes the remaining height; slides size themselves to that frame with
+ * svh-based clamps, so the whole slide is visible from 1280x720 to 1908x908 without hardcoded heights.
+ * Stacked mode (narrow / reduced motion): the slides are ordinary vertical content.
  */
 
-/* Grab / drag affordances (only when the row layout is active). */
-.horizontal-story.is-enhanced .horizontal-story__frame { cursor: grab; touch-action: pan-y; }
-.horizontal-story.is-enhanced .horizontal-story__frame.is-dragging { cursor: grabbing; }
-.horizontal-story .horizontal-story__frame.is-dragging,
-.horizontal-story .horizontal-story__frame.is-dragging * { user-select: none; -webkit-user-select: none; }
-.horizontal-story .horizontal-story__frame:focus-visible { outline: 2px solid #8de7cf; outline-offset: 4px; }
+.horizontal-story { position: relative; background: var(--dark); color: #effcf7; }
+.horizontal-story::before {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 60% 50% at 85% 0%, rgba(40, 200, 155, 0.12), transparent 70%), radial-gradient(ellipse 50% 45% at 5% 100%, rgba(40, 200, 155, 0.08), transparent 70%);
+  content: "";
+  pointer-events: none;
+}
 
-/* Pagination: a single pill slides between the buttons (the engine writes its transform while enhanced). */
-.horizontal-story .pager-group { position: relative; }
-.horizontal-story .pager-pill {
+/* Soft hand-offs at both section edges; their opacity is scrubbed by scroll (see HorizontalStory). */
+.hs__bridge { position: absolute; z-index: 2; right: 0; left: 0; height: clamp(4rem, calc(11 * var(--svh)), 6.25rem); pointer-events: none; }
+.hs__bridge--top { top: calc(-1 * clamp(4rem, calc(11 * var(--svh)), 6.25rem)); background: linear-gradient(to bottom, transparent 0%, rgba(16, 35, 31, 0.18) 30%, rgba(16, 35, 31, 0.62) 68%, var(--dark) 100%); }
+.hs__bridge--bottom { bottom: calc(-1 * clamp(4rem, calc(11 * var(--svh)), 6.25rem)); background: linear-gradient(to bottom, var(--dark) 0%, rgba(16, 35, 31, 0.62) 32%, rgba(16, 35, 31, 0.18) 70%, transparent 100%); }
+
+.horizontal-story__sticky { position: relative; display: flex; flex-direction: column; gap: clamp(0.75rem, calc(2.2 * var(--svh)), 1.4rem); padding-block: var(--section-y); }
+
+/* Heading row: compact heading left, pager right. */
+.hs__top { display: flex; align-items: flex-end; justify-content: space-between; gap: 2rem; }
+.horizontal-story .lp-h2 { color: #f5fff9; }
+.horizontal-story .lp-eyebrow { color: #6ed3b7; }
+.horizontal-story .lp-lede { color: #b4cdc3; }
+
+.horizontal-story__controls { display: flex; flex: 0 0 auto; align-items: center; gap: 0.55rem; }
+.horizontal-story__controls > button,
+.pager-group button {
+  display: grid;
+  height: 2.75rem;
+  place-items: center;
+  border: 1px solid #36564d;
+  border-radius: 0.65rem;
+  background: transparent;
+  color: #dff8ee;
+  cursor: pointer;
+}
+.horizontal-story__controls > button { width: 2.75rem; background: #18332d; }
+.horizontal-story__controls > button:hover:not(:disabled) { border-color: #67d7b8; background: #1d3d36; }
+.horizontal-story__controls > button:disabled { cursor: not-allowed; opacity: 0.4; }
+.horizontal-story__controls svg { width: 1rem; height: 1rem; }
+.horizontal-story__controls button:focus-visible { outline: 2px solid #8de7cf; outline-offset: 3px; }
+.horizontal-story__controls .pager-group button { width: 2.3rem; color: #b9d3c9; font-family: var(--font-mono); font-size: 0.7rem; }
+
+/* Pager: one pill slides between the buttons (the engine writes its transform while enhanced). */
+.pager-group { position: relative; display: flex; gap: 0.4rem; }
+.pager-pill {
   position: absolute;
   top: 0;
   left: 0;
   width: 2.3rem;
   height: 100%;
   border: 1px solid #67d7b8;
-  border-radius: 0.55rem;
+  border-radius: 0.65rem;
   background: #dff9ef;
   pointer-events: none;
   transform: translate3d(calc(var(--active, 0) * 2.7rem), 0, 0);
   transition: transform var(--spring-duration, 400ms) var(--spring, cubic-bezier(0.16, 1, 0.3, 1));
 }
 .horizontal-story.is-enhanced .pager-pill { transition: none; }
+.pager-group button { position: relative; z-index: 1; transition: transform 90ms cubic-bezier(0.16, 1, 0.3, 1), border-color 160ms ease, color 160ms ease; }
+.pager-group button:hover { border-color: #67d7b8; color: #fff; }
+.pager-group button.is-active, .pager-group button.is-active:hover { border-color: transparent; color: #0d5b49; }
+.horizontal-story__controls button:active:not(:disabled) { transform: scale(0.97); }
+.horizontal-story__controls > button { transition: transform 90ms cubic-bezier(0.16, 1, 0.3, 1), border-color 160ms ease, background-color 160ms ease; }
+.pager-group button::after { position: absolute; inset: 0 -3.5px; content: ""; } /* 44px hit area, no visual change */
 
-.horizontal-story .horizontal-story__controls .pager-group button {
-  position: relative;
-  z-index: 1;
-  background: transparent;
-  transition: transform 90ms cubic-bezier(0.16, 1, 0.3, 1), border-color 160ms ease, color 160ms ease;
+/* Frame + track */
+.horizontal-story__frame { min-width: 0; border-radius: var(--r-l); }
+.horizontal-story__frame:focus-visible { outline: 2px solid #8de7cf; outline-offset: 4px; }
+.horizontal-story__track { display: grid; gap: 1.25rem; }
+.horizontal-scene {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.3fr);
+  align-items: center;
+  gap: clamp(1.5rem, 4vw, 4rem);
+  padding: clamp(1.5rem, 4vw, 3.25rem);
+  border: 1px solid #2c4941;
+  border-radius: var(--r-l);
+  background: linear-gradient(155deg, #19352f, #122823);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
-.horizontal-story .horizontal-story__controls .pager-group button:hover { background: transparent; border-color: #67d7b8; color: #dff8ee; }
-.horizontal-story .horizontal-story__controls .pager-group button.is-active,
-.horizontal-story .horizontal-story__controls .pager-group button.is-active:hover { border-color: transparent; background: transparent; color: #0d5b49; }
-.horizontal-story .horizontal-story__controls button:active:not(:disabled) { transform: scale(0.97); }
-.horizontal-story .horizontal-story__controls > button { transition: transform 90ms cubic-bezier(0.16, 1, 0.3, 1), border-color 160ms ease, background-color 160ms ease, color 160ms ease; }
 
-/* The pager squares are 2.3rem wide; extend each hit area to 44px without moving anything visually. */
-.horizontal-story .pager-group button::after { position: absolute; inset: 0 -3.5px; content: ""; }
+.horizontal-scene__copy { min-width: 0; }
+.hs-kicker { margin: 0 0 1.1rem; color: #6ed3b7; font-family: var(--font-mono); font-size: 0.72rem; font-weight: 750; letter-spacing: 0.1em; text-transform: uppercase; }
+.horizontal-scene h3 { margin: 0; color: #f5fff9; font-size: clamp(2rem, 3.6vw, 3.3rem); font-weight: var(--fw-display); letter-spacing: -0.05em; line-height: 1.02; }
+.hs-desc { max-width: 28rem; margin: 1rem 0 0; color: #b4cdc3; font-size: 1rem; line-height: 1.65; }
+.horizontal-scene__paths { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; margin-top: 1.75rem; }
+.horizontal-scene__paths span { color: #93b5a9; font-size: 0.75rem; font-weight: 700; }
+.horizontal-scene__paths code { padding: 0.32rem 0.55rem; border: 1px solid #36594f; border-radius: 0.4rem; background: #1b3831; color: #b9f1df; font-size: 0.74rem; }
 
-/* Visible hint: readable (>= 4.5:1 on the dark panel), >= 12px, gone after the first interaction. */
-.horizontal-story .horizontal-story__hint {
-  margin: 1.2rem 0 0;
-  color: #b9d3c9;
-  font-size: 0.75rem;
-  line-height: 1.4;
-  text-align: right;
-  transition: opacity 0.3s ease-out;
+/* Artifact card (white, on the dark panel) */
+.hs-artifact { display: flex; min-width: 0; flex-direction: column; overflow: hidden; border: 1px solid #c8e4da; border-radius: var(--r-m); background: #fbfffd; color: var(--ink); box-shadow: 0 30px 75px rgba(0, 0, 0, 0.3); }
+.hs-artifact__bar { display: flex; min-height: 3rem; flex: none; align-items: center; gap: 0.6rem; padding: 0 1.1rem; border-bottom: 1px solid #dcebe6; color: #2f5148; font-family: var(--font-mono); font-size: 0.74rem; font-weight: 700; }
+.hs-artifact__bar svg { width: 1rem; color: #0f8d70; }
+.hs-artifact__bar small { margin-left: auto; color: #55706a; font-family: var(--font-sans); font-size: 0.7rem; font-weight: 600; }
+.hs-artifact__body { display: flex; min-height: 0; flex: 1; flex-direction: column; justify-content: center; gap: 1.25rem; padding: clamp(1.1rem, 3vw, 2rem); background: linear-gradient(160deg, #fbfffd, #eef9f4); }
+.hs-artifact__lead { margin: 0; color: #20312d; font-size: 0.98rem; line-height: 1.65; }
+.hs-artifact__lead--big { font-size: clamp(1.15rem, 2.1vw, 1.7rem); font-weight: 650; letter-spacing: -0.035em; line-height: 1.2; }
+.hs-artifact pre { overflow: auto; margin: 0; padding: 1.1rem 1.25rem; border: 1px solid #cce6dc; border-radius: 0.65rem; background: #eff9f5; color: #194d40; font: 0.8rem/1.7 var(--font-mono); }
+.hs-artifact .diagram-graph { align-self: center; width: 100%; margin-top: 0; }
+
+/* Hint (visible), status (screen readers) */
+.horizontal-story__hint { margin: 0; color: #b9d3c9; font-size: 0.75rem; line-height: 1.4; text-align: right; transition: opacity 0.3s ease-out; }
+.horizontal-story__hint[data-hidden="true"] { opacity: 0; }
+.horizontal-story:not(.is-enhanced) .horizontal-story__hint { display: none; }
+
+/* ── Enhanced: pinned stage, one viewport tall ── */
+@media (min-width: 901px) and (prefers-reduced-motion: no-preference) {
+  .horizontal-story.is-enhanced { height: calc(calc(100 * var(--svh)) + (var(--count) - 1) * calc(72 * var(--svh))); }
+  .horizontal-story.is-enhanced .horizontal-story__sticky {
+    position: sticky;
+    top: 0;
+    height: calc(100 * var(--svh));
+    padding-block: var(--nav-h) clamp(0.75rem, calc(2.4 * var(--svh)), 1.5rem);
+  }
+  .horizontal-story.is-enhanced .horizontal-story__frame { flex: 1; overflow: hidden; cursor: grab; touch-action: pan-y; }
+  .horizontal-story.is-enhanced .horizontal-story__frame.is-dragging { cursor: grabbing; }
+  .horizontal-story.is-enhanced .horizontal-story__track { display: flex; width: 100%; height: 100%; gap: 0; }
+  .horizontal-story.is-enhanced .horizontal-scene {
+    height: 100%;
+    flex: 0 0 100%;
+    padding: clamp(1rem, calc(4 * var(--svh)), 3rem) clamp(1.25rem, 3.5vw, 3.25rem);
+  }
+  .horizontal-story.is-enhanced .horizontal-scene h3 { font-size: clamp(1.7rem, calc(5.6 * var(--svh)), 3.3rem); }
+  .horizontal-story.is-enhanced .hs-kicker { margin-bottom: clamp(0.5rem, calc(1.8 * var(--svh)), 1.1rem); }
+  .horizontal-story.is-enhanced .hs-desc { margin-top: clamp(0.5rem, calc(1.6 * var(--svh)), 1rem); font-size: clamp(0.88rem, calc(2.1 * var(--svh)), 1rem); }
+  .horizontal-story.is-enhanced .horizontal-scene__paths { margin-top: clamp(0.75rem, calc(3 * var(--svh)), 1.75rem); }
+  .horizontal-story.is-enhanced .hs-artifact { max-height: 100%; }
+  .horizontal-story.is-enhanced .hs-artifact__bar { min-height: clamp(2.4rem, calc(6 * var(--svh)), 3rem); }
+  .horizontal-story.is-enhanced .hs-artifact__body { gap: clamp(0.6rem, calc(2 * var(--svh)), 1.25rem); padding: clamp(0.9rem, calc(3 * var(--svh)), 2rem) clamp(1rem, 2.4vw, 2rem); }
+  .horizontal-story.is-enhanced .hs-artifact__lead { font-size: clamp(0.85rem, calc(2.1 * var(--svh)), 0.98rem); }
+  .horizontal-story.is-enhanced .hs-artifact__lead--big { font-size: clamp(1.05rem, calc(3.3 * var(--svh)), 1.7rem); }
+  .horizontal-story.is-enhanced .hs-artifact pre { padding: clamp(0.7rem, calc(2 * var(--svh)), 1.1rem) 1.1rem; font-size: clamp(0.7rem, calc(1.8 * var(--svh)), 0.8rem); }
+  .horizontal-story.is-enhanced .diagram-graph--large { gap: clamp(1.1rem, calc(4.4 * var(--svh)), 2.1rem); }
+  .horizontal-story.is-enhanced .diagram-graph--large .diagram-graph__node { padding-block: clamp(0.3rem, calc(1.1 * var(--svh)), 0.55rem); font-size: clamp(0.62rem, calc(1.5 * var(--svh)), 0.7rem); }
+  .horizontal-story.is-enhanced .diagram-graph--compact { gap: clamp(0.8rem, calc(3 * var(--svh)), 1.25rem); }
 }
-.horizontal-story .horizontal-story__hint[data-hidden="true"] { opacity: 0; }
-/* Not a draggable row on narrow screens / reduced motion: keep the line's space, hide the words. */
-.horizontal-story:not(.is-enhanced) .horizontal-story__hint { visibility: hidden; }
-@media (max-width: 900px) { .horizontal-story .horizontal-story__hint { text-align: left; } }
 
+/* Selection is suppressed only while a recognised drag is in progress. */
+.horizontal-story .horizontal-story__frame.is-dragging,
+.horizontal-story .horizontal-story__frame.is-dragging * { user-select: none; -webkit-user-select: none; }
+
+/* ── Stacked (narrow / reduced motion) ── */
+@media (max-width: 900px) {
+  .hs__top { align-items: flex-start; flex-direction: column; gap: 1.5rem; }
+  .horizontal-scene { grid-template-columns: minmax(0, 1fr); gap: 1.5rem; padding: 1.5rem; }
+  .horizontal-scene h3 { font-size: clamp(1.9rem, 8vw, 2.6rem); }
+  .horizontal-story__controls { width: 100%; justify-content: space-between; }
+}
 @media (prefers-reduced-motion: reduce) {
-  .horizontal-story .pager-pill { transition: none; }
-  .horizontal-story .horizontal-story__controls button:active:not(:disabled) { transform: none; }
-  .horizontal-story .horizontal-story__hint { transition: none; }
+  .pager-pill, .pager-group button, .horizontal-story__controls > button, .horizontal-story__hint { transition: none; }
+  .horizontal-story__controls button:active:not(:disabled) { transform: none; }
 }
-
 @media (prefers-contrast: more) {
-  .horizontal-story .horizontal-story__hint { color: #fff; }
-  .horizontal-story .pager-pill { border-color: #fff; }
+  .horizontal-story__hint, .hs-desc, .horizontal-story .lp-lede { color: #fff; }
+  .pager-pill { border-color: #fff; }
 }

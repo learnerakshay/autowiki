@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { brand } from '../config/brand.js'
 
 export function AutoWikiMark() {
   return (
@@ -16,9 +17,9 @@ export function AutoWikiMark() {
 
 export function AutoWikiBrand({ className = '' }) {
   return (
-    <Link to="/" className={`brand ${className}`.trim()} aria-label="AutoWiki home">
+    <Link to="/" className={`brand ${className}`.trim()} aria-label={`${brand.name} home`}>
       <AutoWikiMark />
-      <span>AutoWiki</span>
+      <span>{brand.name}</span>
     </Link>
   )
 }

@@ -1,0 +1,181 @@
+/*
+ * Landing page design system: one container grid, one type scale, one set of spacing / radius / shadow
+ * tokens, and the reveal-on-scroll styles. Section files (components/landing/*.css) consume these
+ * tokens; none of them define their own gutters, headline recipe or card chrome.
+ */
+
+.landing-shell {
+  /* ── Layout tracks: every section's left edge sits on one of these two ── */
+  --gutter: clamp(1.25rem, 4.2vw, 3rem);
+  --content-w: 72rem;
+  --wide-w: 82rem;
+  --content: min(var(--content-w), calc(100% - 2 * var(--gutter)));
+  --wide: min(var(--wide-w), calc(100% - 2 * var(--gutter)));
+  --svh: 1vh; /* overridden by 1svh where supported (see @supports below) */
+  --nav-h: 5.5rem; /* floating nav pill + its offset: sticky stages and anchor scrolling clear it */
+
+  /* ── Color ── */
+  --ink: #0b1211;
+  --ink-2: #33433f;
+  --ink-3: #4a5c57; /* >= 5.7:1 on white and on the mint washes */
+  --paper: #ffffff;
+  --mint-50: #f4fbf8;
+  --mint-100: #e8fbf2;
+  --mint-200: #d3f5e7;
+  --accent: #0f8d70;
+  --accent-ink: #0a6b55;
+  --accent-soft: #dff9ef;
+  --dark: #10231f;
+  --dark-2: #142a25;
+  --line: rgba(70, 128, 112, 0.22);
+  --line-strong: rgba(70, 128, 112, 0.4);
+
+  /* ── Type scale (display = hero headline recipe; every h2 reuses it) ── */
+  --fs-display: clamp(3.25rem, 6.1vw, 5.8rem);
+  --fs-h2: clamp(2.3rem, 4.3vw, 3.85rem);
+  --fs-h2-compact: clamp(1.75rem, 2.7vw, 2.45rem);
+  --fs-h3: clamp(1.4rem, 2vw, 1.75rem);
+  --fs-card: 1.0625rem;
+  --fs-body: 1.0625rem;
+  --fs-small: 0.9rem;
+  --fs-caption: 0.8125rem;
+  --fs-mono: 0.78rem;
+  --fw-display: 720;
+  --track-display: -0.058em;
+  --fw-card: 650;
+  --track-card: -0.018em;
+
+  /* ── Space, radius, border, shadow ── */
+  --section-y: clamp(5.5rem, 9vw, 8.5rem);
+  --space-1: 0.5rem;
+  --space-2: 0.75rem;
+  --space-3: 1rem;
+  --space-4: 1.5rem;
+  --space-5: 2.5rem;
+  --r-xs: 0.4rem;
+  --r-s: 0.65rem;
+  --r-m: 1rem;
+  --r-l: 1.5rem;
+  --r-pill: 999px;
+  --shadow-1: 0 1px 2px rgba(12, 80, 62, 0.06), 0 6px 16px rgba(14, 100, 78, 0.06);
+  --shadow-2: 0 1px 2px rgba(12, 80, 62, 0.07), 0 10px 24px rgba(14, 100, 78, 0.08), 0 28px 56px rgba(14, 120, 92, 0.1);
+  --shadow-3: 0 1px 2px rgba(12, 80, 62, 0.08), 0 14px 32px rgba(14, 100, 78, 0.1), 0 40px 80px rgba(14, 120, 92, 0.14);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  overflow: clip;
+  min-width: 320px;
+  background: var(--paper);
+  color: var(--ink);
+  font-size: var(--fs-body);
+  line-height: 1.7;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+@supports (height: 1svh) { .landing-shell { --svh: 1svh; } }
+
+.landing-shell :where(h1, h2, h3, h4) { text-wrap: balance; }
+.landing-shell :where(p, li, blockquote) { text-wrap: pretty; }
+.landing-shell :where(.tnum, [data-tnum]) { font-variant-numeric: tabular-nums; }
+
+/* ── Containers ── */
+.lp-container { width: var(--content); margin-inline: auto; }
+.lp-wide { width: var(--wide); margin-inline: auto; }
+.lp-section { position: relative; padding-block: var(--section-y); scroll-margin-top: calc(var(--nav-h) - 1rem); }
+.lp-lazy { scroll-margin-top: calc(var(--nav-h) - 1rem); }
+
+/* ── Section header ── */
+.lp-head { max-width: 48rem; margin: 0 0 clamp(2.25rem, 4.5vw, 3.75rem); }
+.lp-eyebrow {
+  margin: 0 0 1.1rem;
+  color: var(--accent-ink);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 750;
+  letter-spacing: 0.12em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+.lp-h2 {
+  margin: 0;
+  color: var(--ink);
+  font-size: var(--fs-h2);
+  font-weight: var(--fw-display);
+  letter-spacing: var(--track-display);
+  line-height: 1.01;
+}
+.lp-lede { max-width: 40rem; margin: 1.25rem 0 0; color: var(--ink-2); font-size: var(--fs-body); line-height: 1.7; }
+.lp-head--compact { margin-bottom: 0; }
+.lp-head--compact .lp-eyebrow { margin-bottom: 0.6rem; }
+.lp-head--compact .lp-h2 { font-size: var(--fs-h2-compact); line-height: 1.04; }
+.lp-head--compact .lp-lede { margin-top: 0.6rem; font-size: var(--fs-small); line-height: 1.55; }
+
+/* Card titles share one medium weight everywhere. */
+.lp-card-title { margin: 0; color: var(--ink); font-size: var(--fs-card); font-weight: var(--fw-card); letter-spacing: var(--track-card); line-height: 1.3; }
+.lp-card-text { margin: 0.4rem 0 0; color: var(--ink-2); font-size: var(--fs-small); line-height: 1.6; }
+
+/* Word masks: each word rises out of its own clip box. */
+.mw { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: 0.08em; margin-bottom: -0.08em; }
+.mw__in { display: inline-block; }
+
+/* ── Reveal on scroll (progressive enhancement) ──
+   Hidden states only exist under html.js, and are lifted by .reveal-failsafe if the app never starts. */
+.js:not(.reveal-failsafe) [data-reveal="heading"]:not(.is-revealed) .mw__in { transform: translate3d(0, 112%, 0); }
+.js [data-reveal="heading"] .mw__in {
+  transition: transform var(--spring-duration, 400ms) var(--spring, var(--ease-out)) calc(var(--i, 0) * 55ms);
+}
+.js:not(.reveal-failsafe) [data-reveal="item"]:not(.is-revealed) { opacity: 0; transform: translate3d(0, 14px, 0); }
+.js [data-reveal="item"] {
+  transition:
+    opacity 0.5s ease-out calc(120ms + var(--reveal-i, 0) * 75ms),
+    transform var(--spring-duration, 400ms) var(--spring, var(--ease-out)) calc(120ms + var(--reveal-i, 0) * 75ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js [data-reveal="heading"] .mw__in,
+  .js [data-reveal="item"] { transition: none; }
+  .js [data-reveal="heading"]:not(.is-revealed) .mw__in { transform: none; }
+  .js [data-reveal="item"]:not(.is-revealed) { opacity: 1; transform: none; }
+}
+
+/* ── Shared surfaces ── */
+.lp-surface {
+  position: relative;
+  border: 1px solid var(--line);
+  border-radius: var(--r-l);
+  background: linear-gradient(180deg, #fff, var(--mint-50));
+  box-shadow: inset 0 1px 0 #fff, var(--shadow-2);
+}
+
+.lp-btn {
+  display: inline-flex;
+  min-height: 3rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0 1.35rem;
+  border: 1px solid transparent;
+  border-radius: var(--r-pill);
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1;
+  text-decoration: none;
+  transition: transform 90ms var(--ease-out), background-color 0.18s ease, border-color 0.18s ease;
+}
+.lp-btn:active { transform: scale(0.97); }
+.lp-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.lp-btn svg { width: 1rem; height: 1rem; flex: none; transition: transform 0.15s ease; }
+.lp-btn:hover svg { transform: translateX(2px); }
+.lp-btn--primary { background: #111918; color: #fff; }
+.lp-btn--primary:hover { background: #26312f; }
+.lp-btn--ghost { border-color: var(--line-strong); background: rgba(255, 255, 255, 0.82); color: var(--ink); }
+.lp-btn--ghost:hover { background: #fff; border-color: var(--accent); }
+@media (prefers-reduced-motion: reduce) { .lp-btn { transition-property: background-color, border-color; } .lp-btn:active { transform: none; } }
+
+/* Spotlight / magnetic effects are pointer-fine only. */
+@media (hover: none), (pointer: coarse) { .fc__glow, .lp-magnetic { transform: none !important; } }
+
+
+@media (prefers-contrast: more) {
+  .landing-shell { --ink-3: #2f403b; --line: rgba(30, 90, 74, 0.55); --line-strong: rgba(30, 90, 74, 0.8); }
+}

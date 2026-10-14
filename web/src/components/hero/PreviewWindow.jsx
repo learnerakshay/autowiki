@@ -15,7 +15,7 @@ import { streamDuration } from './streamTiming.js'
 const TABS = [
   { value: 'chapters', label: 'Wiki chapters', short: 'Chapters', icon: BookOpenText },
   { value: 'architecture', label: 'Architecture diagrams', short: 'Diagrams', icon: Network },
-  { value: 'sources', label: 'Source context', short: 'Sources', icon: FileCode2 },
+  { value: 'sources', label: 'Source context', short: 'Source', icon: FileCode2 },
 ]
 
 const TAB_ORDER = TABS.map((tab) => tab.value)

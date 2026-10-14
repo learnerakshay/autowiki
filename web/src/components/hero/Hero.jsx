@@ -1,17 +1,26 @@
-import { useRef, useSyncExternalStore } from 'react'
-import { useGSAP } from '@gsap/react'
-import gsap from 'gsap'
+import { lazy, Suspense, useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { FileCode2, Network } from 'lucide-react'
 import { heroSample } from '../../data/heroSample.js'
 import { reducedMotionQuery } from '../../lib/motion.js'
 import { AnimatedHeading } from './AnimatedHeading.jsx'
 import { GithubMark } from './GithubMark.jsx'
 import { HeroBackground } from './HeroBackground.jsx'
-import { PreviewWindow } from './PreviewWindow.jsx'
 import { RepoDemoInput } from './RepoDemoInput.jsx'
 import { useHeroActive, useHeroMotion } from './useHeroMotion.js'
 import { useHeroDemo } from './useHeroDemo.js'
 import './hero.css'
+
+// The preview window is the heaviest part of the hero (three panels, two diagrams, streaming text). It is fetched
+// at once but mounted when the browser is idle, behind a skeleton of the same size, so the headline and the
+// repo field are never waiting on it.
+const loadWindow = () => import('./PreviewWindow.jsx')
+const PreviewWindow = lazy(() => loadWindow().then((module) => ({ default: module.PreviewWindow })))
+const idle = (callback) => ('requestIdleCallback' in window ? requestIdleCallback(callback, { timeout: 500 }) : setTimeout(callback, 120))
+const cancelIdle = (handle) => ('cancelIdleCallback' in window ? cancelIdleCallback(handle) : clearTimeout(handle))
+
+function WindowSkeleton() {
+  return <div className="product-proof" aria-hidden="true"><div className="product-window pw-skeleton" /></div>
+}
 
 // Only facts that are true of the current implementation.
 const FACTS = [
@@ -37,6 +46,12 @@ export function Hero() {
 
   const reducedMotion = useSyncExternalStore(subscribeReducedMotion, getReducedMotion, () => false)
   const active = useHeroActive(heroRef)
+  const [windowReady, setWindowReady] = useState(false)
+  useEffect(() => {
+    loadWindow()
+    const handle = idle(() => setWindowReady(true))
+    return () => cancelIdle(handle)
+  }, [])
 
   const demo = useHeroDemo({
     text: heroSample.repo,
@@ -46,30 +61,6 @@ export function Hero() {
   })
 
   useHeroMotion({ heroRef, stageRef, planeRef, spotRef, sheenRef, backdropRef }, active && !reducedMotion)
-
-  // Entrance: nav, headline (masked word rise), then lede / input / facts at ~75ms steps, then the window.
-  // Total ~1.3s and nothing overlays the page, so the field is usable the whole time.
-  useGSAP(() => {
-    const media = gsap.matchMedia()
-    media.add({ calm: '(prefers-reduced-motion: no-preference)', reduced: reducedMotionQuery }, ({ conditions }) => {
-      const hero = heroRef.current
-      const header = hero.closest('.landing-shell')?.querySelector('.landing-header__inner')
-      const copy = hero.querySelectorAll('.landing-hero__lede, .hero-actions, .hero-facts')
-      const stage = stageRef.current
-
-      if (conditions.reduced) {
-        gsap.from([header, ...hero.querySelectorAll('.landing-hero__copy > *'), stage], { autoAlpha: 0, duration: 0.3, ease: 'power1.out', clearProps: 'all' })
-        return
-      }
-
-      gsap.timeline({ defaults: { ease: 'power3.out' } })
-        .from(header, { autoAlpha: 0, y: -16, duration: 0.5, clearProps: 'all' }, 0)
-        .from(hero.querySelectorAll('[data-motion-heading="hero"] .motion-heading__word'), { autoAlpha: 0, yPercent: 110, duration: 0.62, stagger: 0.05, clearProps: 'all' }, 0.06)
-        .from(copy, { autoAlpha: 0, y: 14, duration: 0.46, stagger: 0.075, clearProps: 'all' }, 0.5)
-        .from(stage, { autoAlpha: 0, y: 44, scale: 0.965, duration: 0.72, ease: 'power4.out', clearProps: 'all' }, 0.62)
-    })
-    return () => media.revert()
-  }, { scope: heroRef })
 
   return (
     <section ref={heroRef} className="landing-hero" aria-labelledby="landing-title" data-hero-active={active}>
@@ -86,7 +77,9 @@ export function Hero() {
 
       <div ref={stageRef} className="hero-stage">
         <div ref={planeRef} className="hero-stage__plane">
-          <PreviewWindow demo={demo} sheenRef={sheenRef} />
+          {windowReady ? (
+            <Suspense fallback={<WindowSkeleton />}><PreviewWindow demo={demo} sheenRef={sheenRef} /></Suspense>
+          ) : <WindowSkeleton />}
         </div>
       </div>
     </section>

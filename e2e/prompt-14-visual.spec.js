@@ -13,22 +13,28 @@ test('Landing scroll story is accessible, interactive, and responsive', async ({
   await page.setViewportSize({ width: 1440, height: 900 })
   await page.goto('/')
   await expect(page.getByRole('heading', { level: 1, name: 'Your repository, beautifully documented.' })).toBeVisible()
-  await expect(page.getByRole('button', { name: 'Generate', exact: true })).toBeVisible()
+  await expect(page.locator('.landing-hero').getByRole('button', { name: 'Generate a Wiki', exact: true })).toBeVisible()
 
   const tabs = page.getByRole('tab')
   await tabs.nth(0).focus()
   await page.keyboard.press('ArrowRight')
   await expect(tabs.nth(1)).toHaveAttribute('data-state', 'active')
 
+  // The stepper is a pinned stage: scrolling through it moves one scrubbed value, so walk its progress.
+  await page.evaluate(() => { document.documentElement.style.scrollBehavior = 'auto'; window.dispatchEvent(new Event('landing:load-all')) })
+  await expect(page.locator('.process__stage')).toBeVisible()
   const steps = page.locator('.process-step')
-  await page.evaluate(() => { document.documentElement.style.scrollBehavior = 'auto' })
+  await expect(steps).toHaveCount(3)
   for (let index = 0; index < 3; index += 1) {
-    await steps.nth(index).evaluate((element) => {
-      const top = element.getBoundingClientRect().top + window.scrollY
-      window.scrollTo(0, top + element.clientHeight / 2 - window.innerHeight / 2)
-    })
+    await page.evaluate((progress) => {
+      const stage = document.querySelector('.process__stage')
+      const pin = document.querySelector('.process__pin')
+      const nav = parseFloat(getComputedStyle(pin).top)
+      const top = stage.getBoundingClientRect().top + window.scrollY - nav
+      window.scrollTo(0, top + (stage.offsetHeight - pin.offsetHeight) * progress)
+    }, index / 2)
     await expect(steps.nth(index)).toHaveAttribute('aria-current', 'step')
-    await page.waitForTimeout(550)
+    await page.waitForTimeout(700)
     await page.screenshot({ path: `screenshots/prompt-14-scroll-story-step-${index + 1}.png` })
   }
 

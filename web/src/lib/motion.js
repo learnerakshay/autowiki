@@ -44,9 +44,12 @@ export const FLICK_VELOCITY = 600
  * `--spring` / `--spring-duration` and `--spring-momentum` / `--spring-momentum-duration`.
  */
 export function installMotionTokens(root = document.documentElement) {
-  root.style.setProperty('--spring', springToLinear(springs.default))
+  // CSS linear() easing needs Chrome 113 / Safari 17.2 / Firefox 112; elsewhere fall back to a close ease-out curve.
+  const linearEasing = typeof CSS !== 'undefined' && CSS.supports('transition-timing-function', 'linear(0, 1)')
+  const fallback = 'cubic-bezier(0.16, 1, 0.3, 1)'
+  root.style.setProperty('--spring', linearEasing ? springToLinear(springs.default) : fallback)
   root.style.setProperty('--spring-duration', `${Math.round(springDuration.default * 1000)}ms`)
-  root.style.setProperty('--spring-momentum', springToLinear(springs.momentum))
+  root.style.setProperty('--spring-momentum', linearEasing ? springToLinear(springs.momentum) : fallback)
   root.style.setProperty('--spring-momentum-duration', `${Math.round(springDuration.momentum * 1000)}ms`)
 }
 
