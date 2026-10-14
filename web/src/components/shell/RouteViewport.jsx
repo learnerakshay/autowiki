@@ -6,21 +6,20 @@ import { subscribeMotion, prefersReducedMotion, reduced, springCss, springDurati
 import { Logo } from '../brand/Logo.jsx'
 import { appRoutes, loadRoute, loadedPage, routeFor } from './routes.js'
 import './route-viewport.css'
+import { ErrorBoundary, ChunkError } from './ErrorBoundary.jsx'
+import { RouteSkeleton } from './RouteSkeleton.jsx'
+import { scrollPositions, routeTitles } from '../../lib/navigation.js'
 
 const LOADER_DELAY = 150 // the breathing mark only appears if a page takes longer than this, so quick loads never flash it
 const FADE_OUT_MS = 90
 
 function RoutePage({ routeKey }) {
+  const location = useLocation()
   const Page = loadedPage(routeKey)
   if (!Page) {
-    return (
-      <div className="route-error" role="alert">
-        <p>This page could not be loaded.</p>
-        <button type="button" onClick={() => window.location.reload()}>Reload</button>
-      </div>
-    )
+    return <ChunkError />
   }
-  return createElement(Page)
+  return <ErrorBoundary resetKey={location.key}>{createElement(Page)}</ErrorBoundary>
 }
 
 const spring = () => ({ duration: springDuration.default * 1000, easing: springCss.default, fill: 'backwards' })
@@ -38,9 +37,22 @@ function playHeading(region) {
 }
 
 function restoreScroll(target, navigationType, saved) {
+  if (navigationType === 'POP' && saved.has(target.key)) {
+    window.scrollTo({ top: saved.get(target.key), left: 0, behavior: 'instant' })
+    if (target.hash) {
+      const anchor = document.getElementById(decodeURIComponent(target.hash.slice(1)))
+      const heading = anchor?.matches('h1,h2,h3,h4,h5,h6') ? anchor : anchor?.querySelector('h1,h2,h3,h4,h5,h6')
+      if (heading) { heading.tabIndex = -1; heading.focus({ preventScroll: true }) }
+    }
+    return
+  }
   const id = target.hash ? decodeURIComponent(target.hash.slice(1)) : ''
   const anchor = id ? document.getElementById(id) : null
-  if (anchor) { anchor.scrollIntoView({ behavior: 'instant' }); return }
+  if (anchor) {
+    anchor.scrollIntoView({ behavior: 'instant' })
+    const heading = anchor.matches('h1,h2,h3,h4,h5,h6') ? anchor : anchor.querySelector('h1,h2,h3,h4,h5,h6') || anchor
+    heading.setAttribute('tabindex', '-1'); heading.focus({ preventScroll: true }); return
+  }
   window.scrollTo({ top: navigationType === 'POP' ? (saved.get(target.key) ?? 0) : 0, left: 0, behavior: 'instant' })
 }
 
@@ -72,7 +84,7 @@ export function RouteViewport() {
   const shownRef = useRef(null)
   const token = useRef(0)
   const fade = useRef(null)
-  const scrollAt = useRef(new Map())
+  const scrollAt = useRef(scrollPositions)
 
   useEffect(() => subscribeMotion(() => {
     if (prefersReducedMotion()) {
@@ -95,6 +107,7 @@ export function RouteViewport() {
     if (current && current.location.pathname === location.pathname) {
       // Same page (query / state change, or back to the page that is still showing): nothing to swap.
       queueMicrotask(() => setLoading(false))
+      if (location.hash || navigationType === 'POP') restoreScroll(location, navigationType, scrollAt.current)
       return undefined
     }
     const target = location
@@ -120,10 +133,10 @@ export function RouteViewport() {
         // The first render of the shell is a page load, not a route change: leave focus at the start of the document so
         // the skip link stays the first tab stop.
         const heading = region?.querySelector('h1')
-        const title = (heading?.getAttribute('aria-label') || heading?.textContent || '').trim()
-        if (moveFocus) focusPage(region, target)
-        if (title) document.title = `${title} · ${brand.name}`
-        setAnnouncement(title ? `${title}, ${brand.name}` : '')
+        const title = routeTitles[route?.key] || (heading?.getAttribute('aria-label') || heading?.textContent || '').trim()
+        if (moveFocus && !target.hash) focusPage(region, target)
+        if (title) document.title = `${title} — ${brand.name}`
+        setAnnouncement(title ? `${heading?.textContent.trim() || title}, ${brand.name}` : '')
       }
 
       if (!departing) { apply(false); return }
@@ -155,12 +168,12 @@ export function RouteViewport() {
               {appRoutes.map(({ key, path }) => <Route key={key} path={path} element={<RoutePage routeKey={key} />} />)}
             </Routes>
           </div>
-        ) : null}
+        ) : <RouteSkeleton route={routeFor(location.pathname)?.key} search={location.search} />}
       </div>
       {loading ? (
         <p className="route-loader" role="status">
           <Logo variant="mark" size="1.25rem" decorative loading />
-          Loading workspace…
+          Loading {(routeTitles[routeFor(location.pathname)?.key] || 'page').toLowerCase()}…
         </p>
       ) : null}
       <p className="ui-sr-only" role="status" aria-live="polite">{announcement}</p>

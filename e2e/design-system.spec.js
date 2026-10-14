@@ -43,7 +43,7 @@ test("route change: focus moves to the new page's h1, the title is announced, sc
   await route(page, "workspace");
   await expect(page.locator("h1").first()).toBeFocused();
   await expect(page.locator('[role="status"][aria-live="polite"]').last()).toContainText("What will we document today?");
-  await expect(page).toHaveTitle(/What will we document today\? · /);
+  await expect(page).toHaveTitle('Workspace — AutoWiki');
   expect(await page.evaluate(() => Math.round(window.scrollY))).toBe(0);
   expect(await navHandle.evaluate((element) => element.isConnected)).toBe(true); // the nav was not remounted
 });
@@ -171,7 +171,9 @@ test("toast: stacks, is announced politely, and a swipe dismisses it", async ({ 
   await page.getByRole("button", { name: "Info toast" }).click();
   await page.getByRole("button", { name: "Success toast" }).click();
   await expect(page.locator(".ui-toast")).toHaveCount(2);
-  await expect(page.locator(".ui-toaster")).toHaveAttribute("aria-live", "polite");
+  await expect(page.locator('.ui-toast [role="status"]')).toHaveCount(2);
+  await expect(page.locator('.ui-toast [role="status"]').first()).toHaveAttribute('aria-live', 'polite');
+  await expect(page.locator('.ui-toast [role="status"]').last()).toHaveAttribute('aria-live', 'polite');
   const box = await page.locator(".ui-toast").last().boundingBox();
   await page.mouse.move(box.x + 40, box.y + box.height / 2);
   await page.mouse.down();

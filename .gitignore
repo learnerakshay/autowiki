@@ -147,3 +147,5 @@ wiki-output/
 # Local verification captures/logs; baseline screenshots remain reviewable.
 docs/verification/pass-b-artifacts/
 e2e/test-results/
+.pass-c/
+docs/verification/pass-c-artifacts/

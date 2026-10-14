@@ -1,6 +1,5 @@
 /* Preserved landing rules; current landing CSS follows this layer. */
 .landing-main { overflow: clip; }
-.landing-loading { margin: 0; padding: 2rem; color: var(--muted-foreground); font-size: 0.875rem; }
 .landing-hero {
   border-bottom: 1px solid var(--border);
   background: var(--canvas);
@@ -18,7 +17,6 @@
   line-height: 0.98;
 }
 .landing-hero__lede { max-width: 34rem; margin: 1.75rem 0 0; color: var(--muted-foreground); font-size: 1.0625rem; line-height: 1.75; }
-.job-reference { margin: 0; color: var(--muted-foreground); font-size: 0.8125rem; line-height: 1.5; }
 code {
   border-radius: 0.25rem;
   background: var(--muted);
@@ -28,11 +26,6 @@ code {
   font-size: 0.85em;
   overflow-wrap: anywhere;
 }
-.result-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.75rem; margin: 0; }
-.result-grid > div { min-width: 0; border: 1px solid var(--border); border-radius: 0.625rem; background: var(--surface-subtle); padding: 0.875rem; }
-.result-grid dt { color: var(--muted-foreground); font-size: 0.75rem; font-weight: 600; }
-.result-grid dd { margin: 0.3rem 0 0; color: var(--foreground); font-size: 1rem; font-weight: 700; font-variant-numeric: tabular-nums; }
-.preserve { margin: 0; white-space: pre-wrap; }
 article ul { list-style: none; margin: 0; padding: 0; }
 pre {
   max-width: 100%;
@@ -61,8 +54,6 @@ pre {
 .landing-hero__lede { max-width: 32rem; color: #405c6d; }
 @media (prefers-reduced-motion: reduce) {
 html { scroll-behavior: auto; }
-.animate-spin { animation: none !important; }
-.animate-pulse { animation: none !important; opacity: 0.72; }
 }
 @media (max-width: 1120px) {
 .landing-hero h1 { font-size: clamp(3.25rem, 5.2vw, 4rem); }
@@ -73,7 +64,6 @@ html { scroll-behavior: auto; }
 .landing-hero__lede { max-width: 42rem; }
 }
 @media (max-width: 760px) {
-.result-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 520px) {
 .diagram { min-height: 15rem; padding: 0.75rem; }
@@ -154,9 +144,6 @@ html { scroll-behavior: auto; }
 .product-window__bar .file-glyph { width: 1.4rem; height: 1.4rem; border: 0; border-radius: 0.35rem; }
 .product-window__bar .file-glyph svg { width: 0.95rem; height: 0.95rem; }
 .product-window__repo { color: #33433f; }
-.product-window__bar-actions { display: inline-flex; align-items: center; gap: 0.75rem; }
-.product-window__bar-actions > a { display: inline-flex; min-height: 2rem; align-items: center; gap: 0.25rem; border-radius: 0.45rem; background: #14201e; padding: 0 0.6rem; color: #fff; font-size: 0.65rem; font-weight: 700; text-decoration: none; }
-.product-window__bar-actions > a svg { width: 0.72rem; height: 0.72rem; }
 .product-window__layout {
   display: grid;
   min-height: 18.75rem;
@@ -169,8 +156,7 @@ html { scroll-behavior: auto; }
   border-right: 1px solid var(--border);
   background: #f7fbf9;
 }
-.product-window__rail > p,
-.product-window__label {
+.product-window__rail > p {
   margin: 0 0 0.72rem;
   color: #73837f;
   font-size: 0.66rem;

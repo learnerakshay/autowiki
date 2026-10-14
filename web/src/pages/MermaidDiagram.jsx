@@ -3,6 +3,7 @@ import { AlertTriangle, Download, Maximize2, Minus, Plus, RotateCcw } from 'luci
 import { CodeBlock, Dialog, IconButton, Sheet, Skeleton } from '../components/ui/kit/index.js'
 import { projectDistance } from '../lib/carouselEngine.js'
 import { prefersReducedMotion } from '../lib/motion.js'
+import { whenIdle, cancelIdle } from '../lib/idle.js'
 import { renderSource } from './mermaidRuntime.js'
 
 function svgNode(markup, label) {
@@ -179,10 +180,10 @@ export default function MermaidDiagram({ source, valid, titleId, label = 'Reposi
     const observer = new IntersectionObserver(([entry]) => {
       if (!entry.isIntersecting) return
       observer.disconnect()
-      idle = window.requestIdleCallback ? requestIdleCallback(render, { timeout: 500 }) : setTimeout(render, 0)
+      idle = whenIdle(render, 500, 0)
     }, { rootMargin: '150px' })
     observer.observe(cardRef.current.closest('.wiki-diagram-section') || cardRef.current)
-    return () => { active = false; renderRef.current = null; observer.disconnect(); if (window.cancelIdleCallback) cancelIdleCallback(idle); else clearTimeout(idle); currentSvg?.remove() }
+    return () => { active = false; renderRef.current = null; observer.disconnect(); cancelIdle(idle); currentSvg?.remove() }
   }, [renderId, source, valid, label, onFailure])
 
   useEffect(() => { if (expanded && !svg) void renderRef.current?.() }, [expanded, svg])

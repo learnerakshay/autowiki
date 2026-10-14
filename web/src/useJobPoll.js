@@ -35,7 +35,7 @@ export function useJobPoll(resource, jobId) {
         if (nextJob.status === 'pending') timer = setTimeout(poll, 2000)
       } catch (pollError) {
         if (!active) return
-        const retryable = !pollError.status || pollError.status >= 500
+        const retryable = pollError.status >= 500
         if (retryable && transientFailures < 2) {
           transientFailures += 1
           timer = setTimeout(poll, 2000)

@@ -1,3 +1,4 @@
+import { whenIdle, cancelIdle } from '../../lib/idle.js'
 import { useEffect, useRef } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { ArrowRight } from 'lucide-react'
@@ -6,6 +7,9 @@ import { actions, routes } from '../../data/landingCopy.js'
 import { PillNav } from './PillNav.jsx'
 import { activeNavIndex, appNav, appRoutes, loadRoute } from './routes.js'
 import { useScrollProgress } from './useScrollProgress.js'
+import { Button, Kbd } from '../ui/kit/index.js'
+import { Search } from 'lucide-react'
+import { openPalette, prefetchPalette } from '../../lib/palette.js'
 
 // "Generate a Wiki" lands on the Workspace and focuses its repository field (the route transition honours this).
 const generateState = { focus: '#repo' }
@@ -22,12 +26,10 @@ export function AppNav() {
   } }))
 
   useEffect(() => {
-    const idle = window.requestIdleCallback || ((callback) => setTimeout(callback, 1200))
-    const cancel = window.cancelIdleCallback || clearTimeout
-    const handle = idle(() => {
+    const handle = whenIdle(() => {
       appRoutes.filter((route) => route.key !== 'sample' && route.path !== pathname).forEach((route) => void loadRoute(route))
-    }, { timeout: 3000 })
-    return () => cancel(handle)
+    }, 3000, 1200)
+    return () => cancelIdle(handle)
   }, [pathname])
 
   return (
@@ -43,9 +45,10 @@ export function AppNav() {
       progressRef={progressRef}
       headerProps={{ 'data-scrolled': scrolled, 'data-past-hero': 'true', 'data-tone': 'light' }}
       cta={(
+        <><Button variant="ghost" className="palette-trigger" aria-label="Open command palette" onClick={openPalette} onPointerEnter={() => void prefetchPalette().catch(() => {})} onFocus={() => void prefetchPalette().catch(() => {})}><Search aria-hidden="true" size={18} /><Kbd>Ctrl K</Kbd></Button>
         <Link to={routes.workspace} state={generateState} className="ln__primary" data-hidden={onWorkspace || undefined} inert={onWorkspace} onMouseEnter={() => void loadRoute(appRoutes[0])} onFocus={() => void loadRoute(appRoutes[0])}>
           {actions.primary} <ArrowRight aria-hidden="true" />
-        </Link>
+        </Link></>
       )}
       sheetActions={onWorkspace ? null : (
         <Link to={routes.workspace} state={generateState} className="ln__primary ln__primary--sheet">{actions.primary} <ArrowRight aria-hidden="true" /></Link>

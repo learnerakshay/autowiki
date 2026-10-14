@@ -1,5 +1,5 @@
 /* Dev-only brand board. Self-contained; nothing here ships in production. */
-.bb { min-height: 100vh; padding: 2rem clamp(1rem, 4vw, 3rem) 4rem; background: #f7fbf9; color: #0b1211; font-family: inherit; }
+.bb { min-height: 100svh; padding: 2rem clamp(1rem, 4vw, 3rem) 4rem; background: #f7fbf9; color: #0b1211; font-family: inherit; }
 .bb-head { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem 2rem; max-width: 80rem; margin: 0 auto 2rem; }
 .bb-head p { margin: 0; color: #4a5c57; font-size: 0.9rem; }
 .bb-grid { display: grid; max-width: 80rem; margin: 0 auto; grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr)); gap: 1.25rem; }

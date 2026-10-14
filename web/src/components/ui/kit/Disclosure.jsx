@@ -1,7 +1,7 @@
 import { useId, useRef, useState } from 'react'
 import { ChevronDown } from 'lucide-react'
 import clsx from 'clsx'
-import { prefersReducedMotion, springCss, springDuration } from '../../../lib/motion.js'
+import { prefersReducedMotion, reduced, springCss, springDuration } from '../../../lib/motion.js'
 import './disclosure.css'
 
 /**
@@ -27,7 +27,13 @@ export function Disclosure({ title, defaultOpen = false, open: openProp, onOpenC
     animation.current?.cancel()
     if (open) node.hidden = false
     const to = open ? node.scrollHeight : 0
-    if (prefersReducedMotion() || from === to) { node.hidden = !open; return }
+    if (from === to) { node.hidden = !open; return }
+    if (prefersReducedMotion()) {
+      const run = node.animate([{ opacity: open ? 0 : 1 }, { opacity: open ? 1 : 0 }], { duration: reduced.fade * 1000, easing: getComputedStyle(node).getPropertyValue('--ease-out').trim() })
+      animation.current = run
+      run.onfinish = () => { node.hidden = !open; animation.current = null }
+      return
+    }
     node.style.overflow = 'hidden'
     const run = node.animate([{ height: `${from}px` }, { height: `${to}px` }], { duration: springDuration.default * 1000, easing: springCss.default })
     animation.current = run

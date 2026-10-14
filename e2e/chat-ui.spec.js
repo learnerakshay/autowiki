@@ -136,7 +136,7 @@ test('Chat presents failed and unknown jobs with their submitted context', async
   await page.getByLabel('Repository', { exact: true }).fill(REPO)
   await page.getByLabel('Question', { exact: true }).fill('Where is the request validated?')
   await page.getByRole('button', { name: 'Ask', exact: true }).click()
-  await expect(page.locator('.qa-error')).toContainText('The retrieval provider rejected this request.')
+  await expect(page.getByRole('alert')).toContainText('The retrieval provider rejected this request.')
   await expect(page.locator('.qa-answer-header p')).toHaveText('Where is the request validated?')
   await expect(page.locator('.ui-toast')).toHaveCount(0, { timeout: 7000 })
   await page.evaluate(() => window.scrollTo(0, 0))

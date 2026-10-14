@@ -79,6 +79,9 @@ export default function Home() {
   const [searchParams] = useSearchParams()
   const location = useLocation()
   const [repo, setRepo] = useState(() => (searchParams.get('repo') ?? '').trim().slice(0, 140))
+  const prefill = searchParams.get('repo')
+  const [seenPrefill, setSeenPrefill] = useState(prefill)
+  if (prefill !== seenPrefill) { setSeenPrefill(prefill); if (prefill !== null) setRepo(prefill.trim().slice(0,140)) }
   const [fieldError, setFieldError] = useState('')
   const [wikiJobId, setWikiJobId] = useState('')
   const [indexJobId, setIndexJobId] = useState('')

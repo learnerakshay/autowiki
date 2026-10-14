@@ -72,12 +72,18 @@ html {
 
 body {
   min-width: 320px;
-  min-height: 100vh;
+  min-height: 100svh;
   margin: 0;
   background: var(--canvas);
 }
 
 body, button, input, textarea { font: inherit; }
+.shell-recovery { max-width: var(--reading-w); margin: var(--space-5) auto; padding: var(--space-4); color: var(--ink); animation: recovery-fade var(--dur-fast) var(--ease-out); }
+.shell-recovery h1 { margin-block: var(--space-4); font-size: var(--fs-h2-compact); font-weight: var(--fw-card); line-height: 1.2; }
+.shell-recovery p { margin-block: var(--space-3); color: var(--ink-2); }
+.shell-recovery > div { display: flex; flex-wrap: wrap; gap: var(--space-3); }
+.shell-recovery > div > a { display: inline-flex; min-height: 44px; align-items: center; border: 1px solid var(--line-strong); border-radius: var(--r-s); padding-inline: var(--space-3); color: var(--ink); background: var(--paper); }
+@keyframes recovery-fade { from { opacity: 0; } to { opacity: 1; } }
 button, a, input, textarea { -webkit-tap-highlight-color: transparent; }
 input, textarea { caret-color: var(--cyan-accent); }
 ::selection { color: var(--foreground); background: var(--selection); }

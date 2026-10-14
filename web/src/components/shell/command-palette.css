@@ -1,0 +1,13 @@
+.command-palette .ui-field { margin-bottom: .5rem; }
+.command-palette input { font-size: 1rem; }
+.command-palette .ui-field .ui-field__shell .ui-field__control { font-size: var(--fs-body); min-height: 44px; }
+.command-palette .ui-overlay__header > div { min-width: 0; flex: 1; }
+.command-palette .ui-btn--icon { min-width: 44px; flex-shrink: 0; }
+.command-palette ul { max-height: min(26rem, 45dvh); overflow: auto; margin: 0; padding: 0; list-style: none; }
+.command-palette li { border-radius: var(--r-s); }
+.command-palette li[aria-selected="true"] { background: var(--accent-soft); }
+.command-palette li { display: flex; align-items: center; justify-content: space-between; gap: 1rem; width: 100%; min-height: 48px; border: 0; background: none; padding: .75rem; color: var(--ink); font: inherit; text-align: left; cursor: pointer; }
+.command-palette li svg { flex: none; }
+.ui-layer[data-state="closed"] .command-palette { transform: scale(.98); }
+@media (prefers-reduced-motion: reduce) { .ui-layer[data-state="closed"] .command-palette { transform: none; } }
+@media (forced-colors: active) { .command-palette li[aria-selected="true"] { outline: 2px solid Highlight; } }

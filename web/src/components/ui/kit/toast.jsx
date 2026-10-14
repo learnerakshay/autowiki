@@ -14,6 +14,8 @@ function ToastItem({ item }) {
   const [paused, setPaused] = useState(false)
   const remaining = useRef(item.duration)
   const drag = useRef(null)
+  const restore = useRef(null)
+  const dismiss = () => { toast.dismiss(item.id); if (restore.current?.isConnected) restore.current.focus({ preventScroll: true }) }
 
   // Auto-dismiss, paused while hovered or focused (the remaining time is kept, not reset).
   useEffect(() => {
@@ -65,34 +67,35 @@ function ToastItem({ item }) {
       <div
         ref={ref}
         className={clsx('ui-toast', `ui-toast--${item.tone}`)}
+        data-toast-id={item.id}
         style={item.swipe ? { '--swipe-x': `${item.swipe}px` } : undefined}
         onPointerEnter={() => setPaused(true)}
         onPointerLeave={() => { if (!drag.current) setPaused(false) }}
-        onFocus={() => setPaused(true)}
-        onBlur={() => setPaused(false)}
+        onFocus={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) restore.current = event.relatedTarget; setPaused(true) }}
+        onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setPaused(false) }}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerUp}
       >
         <span className="ui-toast__icon" aria-hidden="true"><Icon /></span>
-        <div className="ui-toast__copy">
+        <div className="ui-toast__copy" role={item.announce ? 'status' : undefined} aria-live={item.announce ? 'polite' : undefined}>
           <p className="ui-toast__title">{item.title}</p>
           {item.description ? <p className="ui-toast__description">{item.description}</p> : null}
           {item.action ? <button type="button" className="ui-toast__action" onClick={() => { item.action.onClick?.(); toast.dismiss(item.id) }}>{item.action.label}</button> : null}
         </div>
-        <button type="button" className="ui-toast__close" aria-label="Dismiss notification" onClick={() => toast.dismiss(item.id)}><X aria-hidden="true" /></button>
+        <button type="button" className="ui-toast__close" aria-label="Dismiss notification" onClick={dismiss}><X aria-hidden="true" /></button>
       </div>
     </div>
   )
 }
 
 /** Renders the toast stack (bottom-right, bottom-centre on phones). Mount it once. Announced politely. */
-export function Toaster({ limit = 4 }) {
+export function Toaster({ limit = 3 }) {
   const current = useSyncExternalStore(subscribe, snapshot, () => [])
   if (typeof document === 'undefined') return null
   return createPortal(
-    <div className="ui-toaster" role="region" aria-label="Notifications" aria-live="polite" aria-relevant="additions text">
+    <div className="ui-toaster" role="region" aria-label="Notifications">
       {current.slice(-limit).map((item) => <ToastItem key={item.id} item={item} />)}
     </div>,
     document.body,

@@ -10,35 +10,35 @@
 .arch-stack dd { margin: .5rem 0 0; font-size: var(--fs-small); }
 .arch-section { padding-block: 4rem; scroll-margin-top: var(--nav-h); }
 .arch-section .ui-page-header { max-width: 64rem; }
-.arch-overview { display: grid; grid-template-columns: minmax(0, 1fr) 20rem; padding: 0; align-items: start; gap: 1rem; }
+.arch-overview { display: grid; grid-template-columns: minmax(0, 1fr) 24rem; padding: 0; align-items: start; gap: 1rem; }
 .arch-canvas { min-width: 0; }
 .arch-canvas-bar { display: flex; justify-content: space-between; gap: 1rem; border-bottom: 1px solid var(--line); padding: 1rem; font-size: var(--fs-caption); color: var(--ink-3); }
-.arch-canvas-stage { position: relative; aspect-ratio: 1000 / 480; background: var(--mint-50); }
+.arch-canvas-stage { position: relative; width: 100%; aspect-ratio: 1000 / 480; min-height: 480px; background: var(--mint-50); }
 .arch-connectors { position: absolute; width: 100%; height: 100%; inset: 0; }
-.arch-connectors g { opacity: .25; transition: opacity var(--dur-fast); }
+.arch-connectors g { opacity: 1; }
 .arch-connectors g.is-active { opacity: 1; }
 .arch-connectors path { fill: none; stroke: var(--ink-3); stroke-width: 1.5; }
-.arch-connectors .is-active path { stroke: var(--accent-ink); stroke-dasharray: 7 5; }
+.arch-connectors .is-active path { stroke: var(--accent-ink); stroke-width: 3; stroke-dasharray: 7 5; }
 .arch-connectors marker path { fill: var(--accent-ink); stroke: none; }
-.arch-connectors text { fill: var(--ink-3); font-size: 11px; font-family: var(--font-sans); paint-order: stroke; stroke: var(--mint-50); stroke-width: 4px; }
+.arch-connectors text { fill: var(--ink-2); font-size: 20px; font-family: var(--font-sans); paint-order: stroke; stroke: var(--mint-50); stroke-width: 4px; }
 .arch-overview[data-in-view="true"] .arch-connectors .is-active path { animation: arch-edge-flow 1.8s linear infinite; }
 @keyframes arch-edge-flow { to { stroke-dashoffset: -24; } }
 .arch-node.ui-btn { position: absolute; width: 22%; height: 16.67%; padding: .6rem; border-radius: var(--r-s); opacity: 1; box-shadow: var(--shadow-1); }
 .arch-node .ui-btn__label { display: flex; align-items: center; gap: .6rem; width: 100%; text-align: left; white-space: normal; }
 .arch-node svg { width: 1.1rem; height: 1.1rem; flex: none; color: var(--accent-ink); }
 .arch-node small, .arch-node strong { display: block; }
-.arch-node small { font-size: .62rem; color: var(--ink-3); font-weight: 400; }
+.arch-node small { font-size: .75rem; color: var(--ink-2); font-weight: 400; }
 .arch-node strong { font-size: .8rem; line-height: 1.3; }
 .arch-node.is-related, .arch-node[aria-pressed="true"] { opacity: 1; }
 .arch-node[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
 .arch-alternative { border-top: 1px solid var(--line); margin: 0; padding: 1.25rem; font-size: var(--fs-small); color: var(--ink-3); line-height: 1.7; }
-.arch-detail { padding: 1.5rem; }
+.arch-detail { padding: 1rem; }
 .arch-detail > span { color: var(--accent-ink); font-size: var(--fs-caption); }
-.arch-detail h2 { font-size: var(--fs-h3); line-height: 1.2; margin: .6rem 0 1rem; }
-.arch-detail p { color: var(--ink-3); font-size: var(--fs-small); line-height: 1.7; }
-.arch-detail > div { margin-top: 1.5rem; }
-.arch-detail ul { padding: 0; list-style: none; display: grid; gap: .5rem; }
-.arch-detail li button { display: grid; width: 100%; border: 1px solid var(--line); border-radius: var(--r-s); background: var(--mint-50); padding: .65rem; gap: .3rem; text-align: left; color: var(--ink); font: inherit; cursor: pointer; }
+.arch-detail h2 { font-size: var(--fs-h3); line-height: 1.2; margin: .4rem 0 .5rem; }
+.arch-detail p { margin: 0; color: var(--ink-3); font-size: var(--fs-small); line-height: 1.5; }
+.arch-detail > div { margin-top: .5rem; }
+.arch-detail ul { padding: 0; list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem; }
+.arch-detail li button { display: grid; width: 100%; min-height: 44px; border: 1px solid var(--line); border-radius: var(--r-s); background: var(--mint-50); padding: .4rem; gap: .3rem; text-align: left; color: var(--ink); font: inherit; cursor: pointer; }
 .arch-detail li span, .arch-detail li small { font-size: var(--fs-caption); color: var(--ink-3); }
 .arch-detail li strong { display: flex; align-items: center; gap: .3rem; font-size: var(--fs-small); }
 .arch-files { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: 1rem; }
@@ -57,15 +57,24 @@
 .arch-stage-detail dd { margin: .5rem 0 1rem; color: var(--ink-3); line-height: 1.7; font-size: var(--fs-small); }
 .arch-stage-detail dl > div { border-top: 1px solid var(--line); padding-top: 1rem; }
 .arch-flow { max-width: var(--reading-w); }
+.arch-rag .ui-tabs__panel { min-height: 48rem; }
+@media (max-width: 720px) { .arch-backbone .pipeline { grid-template-columns: minmax(0, 1fr); } .arch-backbone .pipeline li { grid-template-rows: auto auto; } .arch-backbone .pipeline li > span { grid-row: span 2; } .arch-backbone .pipeline li > p { grid-column: 2; margin-top: 0; } .arch-backbone .pipeline-wrap .pipeline__track, .arch-backbone .pipeline-wrap .pipeline__path { left: 1.625rem; right: auto; } }
 .arch-flow h3 { font-size: var(--fs-h3); }
 .arch-flow p { color: var(--ink-3); line-height: 1.7; }
 .arch-flow ol { padding: 0; list-style: none; }
 .arch-flow li { display: grid; grid-template-columns: 2rem 1fr; gap: 1rem; padding-block: 1.25rem; border-top: 1px solid var(--line); }
 .arch-flow li > span { font-family: var(--font-mono); color: var(--accent-ink); }
 .arch-independent { display: flex; align-items: start; flex-wrap: wrap; gap: .5rem; padding: 1.5rem; border: 1px solid var(--line); border-radius: var(--r-m); font-size: var(--fs-small); color: var(--ink-3); }
-.arch-backbone { --ink: var(--dark-ink); --ink-3: var(--dark-ink-2); }
+.arch-backbone { --ink: var(--dark-ink); --ink-3: var(--dark-ink-2); background: var(--dark); }
 .arch-backbone > p { color: var(--dark-ink-2); }
-.arch-backbone .pipeline { gap: 1rem; }
+.arch-backbone .pipeline { gap: 1rem; grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.arch-backbone > p:first-child { margin: 0 0 1.5rem; }
+.arch-backbone .pipeline li { grid-template-rows: auto auto 1fr; align-content: start; align-items: start; }
+.arch-backbone .pipeline li > strong { color: var(--dark-ink); opacity: 1; transform: none; }
+.arch-backbone .pipeline li > span { background: var(--paper); border-color: var(--accent); color: var(--accent-ink); box-shadow: var(--shadow-1); }
+.arch-backbone .pipeline li > span { font-size: var(--fs-caption); }
+.arch-backbone .pipeline li > span::before { background: var(--accent-soft); border-color: var(--accent); }
+.arch-backbone .pipeline-wrap .pipeline__track, .arch-backbone .pipeline-wrap .pipeline__path { left: calc((100% - 4rem) / 10); right: calc((100% - 4rem) / 10); background: var(--dark-accent); }
 .arch-backbone .pipeline p { color: var(--dark-ink-2); font-size: var(--fs-small); line-height: 1.7; }
 .arch-terminal { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 2rem; padding: 2rem 0; border-block: 1px solid var(--dark-line); }
 .arch-terminal p, .arch-warning { color: var(--dark-ink-2); font-size: var(--fs-small); line-height: 1.7; }
@@ -89,7 +98,9 @@
 .arch-close p { color: var(--ink-3); line-height: 1.7; }
 .arch-close > div:last-child { display: flex; gap: .75rem; flex-wrap: wrap; }
 .arch-deferred { content-visibility: auto; contain-intrinsic-size: auto 700px; }
-.arch-deferred--WikiPipeline { min-height: 650px; }
+.arch-deferred--WikiPipeline { min-height: 0; }
+.arch-deferred--WikiPipeline[data-ready="false"] { min-height: 450px; }
+.arch-deferred--WikiPipeline .ui-skeleton-text { max-width: 32rem; }
 .arch-deferred--RagExplorer { min-height: 800px; }
 .arch-deferred--JobArchitecture { min-height: 650px; }
 .arch-deferred--EngineeringDecisions { min-height: 850px; }
@@ -103,4 +114,17 @@ html[data-reduced-motion="true"] .arch-connectors .is-active path { animation: n
 .arch-node:not(.is-related):not([aria-pressed="true"]) { background: var(--mint-50); border-color: var(--line); }
 .arch-node:not(.is-related):not([aria-pressed="true"]) svg { opacity: .6; }
 .arch-stage-list code { overflow-wrap: anywhere; }
+.arch-deferred--WikiPipeline[data-ready="true"] { min-height: 0; }
+.arch-limits-groups { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 2rem; }
+.arch-limits-groups h3 { display: flex; align-items: center; gap: .75rem; font-size: var(--fs-card); }
+.arch-limits-groups .arch-limitations li { padding-block: 1rem; }
+@media (max-width: 768px) { .arch-canvas-stage { min-height: 0; } .arch-limits-groups { grid-template-columns: minmax(0,1fr); gap: 1rem; } }
 @media (max-width: 520px) { .arch-commit-flow { display: grid; gap: 1.25rem; } .arch-commit-flow li { padding: .75rem 1rem; } .arch-commit-flow li:not(:last-child)::after { display: block; left: 1.28rem; height: 1.25rem; } .arch-terminal { grid-template-columns: minmax(0,1fr); } }
+@media (max-width: 720px) {
+  .arch-backbone .pipeline { grid-template-columns: minmax(0,1fr); }
+  .arch-backbone .pipeline li { grid-template-columns: 3.25rem minmax(0,1fr); grid-template-rows: auto auto; }
+  .arch-backbone .pipeline li > span { grid-row: span 2; }
+  .arch-backbone .pipeline li > strong, .arch-backbone .pipeline li > p { grid-column: 2; }
+  .arch-backbone .pipeline li > p { margin-top: 0; }
+  .arch-backbone .pipeline-wrap .pipeline__track, .arch-backbone .pipeline-wrap .pipeline__path { left: 1.625rem; right: auto; }
+}

@@ -15,9 +15,13 @@ const EXIT_MS = 420
 
 export function toast(input) {
   const options = typeof input === 'string' ? { title: input } : input
-  const id = options.id ?? `toast-${++counter}`
-  const next = { tone: 'info', duration: options.tone === 'error' ? 9000 : 5000, ...options, id, leaving: false }
+  const id = options.id ?? options.key ?? `toast-${++counter}`
+  const next = { tone: 'info', announce: true, duration: options.tone === 'error' ? 8000 : 4000, ...options, id, leaving: false }
   items = [...items.filter((item) => item.id !== id), next]
+  while (items.length > 3) {
+    const index = items.findIndex((item) => typeof document === 'undefined' || !document.querySelector(`[data-toast-id="${CSS.escape(item.id)}"]`)?.contains(document.activeElement))
+    items.splice(index < 0 ? 0 : index, 1)
+  }
   emit()
   return id
 }

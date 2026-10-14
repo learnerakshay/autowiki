@@ -10,6 +10,7 @@ import { HeroBackground } from './HeroBackground.jsx'
 import { RepoDemoInput } from './RepoDemoInput.jsx'
 import { useHeroActive, useHeroMotion } from './useHeroMotion.js'
 import { useHeroDemo } from './useHeroDemo.js'
+import { whenIdle, cancelIdle } from '../../lib/idle.js'
 import './hero.css'
 
 // The preview window is the heaviest part of the hero (three panels, two diagrams, streaming text). It is fetched
@@ -19,8 +20,7 @@ const loadWindow = () => import('./PreviewWindow.jsx')
 // The headline is the brand motto, broken after its comma so it can never drift from brand.js.
 const headlineLines = brand.motto.split(/(?<=,)\s+/)
 const PreviewWindow = lazy(() => loadWindow().then((module) => ({ default: module.PreviewWindow })))
-const idle = (callback) => ('requestIdleCallback' in window ? requestIdleCallback(callback, { timeout: 500 }) : setTimeout(callback, 120))
-const cancelIdle = (handle) => ('cancelIdleCallback' in window ? cancelIdleCallback(handle) : clearTimeout(handle))
+const idle = (callback) => whenIdle(callback, 500, 120)
 
 function WindowSkeleton() {
   return <div className="product-proof" aria-hidden="true"><div className="product-window pw-skeleton" /></div>

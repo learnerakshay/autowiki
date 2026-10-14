@@ -191,6 +191,10 @@
 /* ── App variant ── */
 /* The bar sits on the same track as the page content and the footer, so every left edge lines up. */
 .ln[data-variant="app"] .ln__bar { width: var(--content); max-width: none; }
+.ln[data-variant="app"] .ln__cta { display: flex; align-items: center; gap: .5rem; }
+.palette-trigger .ui-btn__label { display: flex; align-items: center; gap: .4rem; }
+@media (max-width: 53.75em) { .palette-trigger .ui-kbd { display: none; } .palette-trigger { width: 44px; padding: 0; } }
+@media (max-width: 420px) { .ln[data-variant="app"] .ln__primary:not(.ln__primary--sheet) { display: none; } }
 .ln__primary[data-hidden="true"] { opacity: 0; transform: translate3d(0, 8px, 0) scale(0.96); visibility: hidden; transition-delay: 0s, 0s, 0s, 0.25s; }
 @media (prefers-reduced-motion: reduce) { .ln__primary[data-hidden="true"] { transform: none; } }
 

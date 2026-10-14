@@ -6,7 +6,20 @@
   flex-direction: column;
   /* The legacy teal is 4.49:1 on its own tint; inside the app it is a touch darker (4.9:1). The landing keeps the original. */
   --cyan-accent: #07766d;
+  --ink-3: var(--ink-2);
+  --muted-foreground: var(--ink-2);
 }
+.app-shell p { font-weight: 400; }
+.app-shell :is(.ui-badge, .ui-kbd) { font-size: var(--fs-caption); }
+.app-shell .lp-eyebrow { font-size: var(--fs-caption); }
+.app-shell .ui-field .ui-field__shell .ui-field__control { font-size: var(--fs-body); min-height: 44px; }
+.app-shell .ui-btn--icon { flex-shrink: 0; min-width: 44px; }
+.app-shell .ui-seg__item { min-height: 44px; }
+.app-shell .ui-actions { display: flex; gap: .75rem; flex-wrap: wrap; }
+.app-shell a:not(.ui-btn):not(.ln__link):not(.brand-link) { min-height: 24px; }
+.app-shell .wiki-markdown a { display: inline-flex; align-items: center; }
+@media (pointer: coarse) { .app-shell a:not(.ui-btn):not(.ln__link):not(.brand-link), .app-shell .wiki-context-section nav button { min-width: 44px; min-height: 44px; } }
+.app-shell .ui-page > .ui-container { padding-bottom: calc(2rem + env(safe-area-inset-bottom)); }
 .shell-main { position: relative; z-index: var(--z-content); flex: 1; padding-top: var(--nav-h); outline: none; }
 .shell-main:focus-visible { outline: none; }
 .route-track--full { width: 100%; }

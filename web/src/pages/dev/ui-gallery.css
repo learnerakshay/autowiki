@@ -1,5 +1,5 @@
 /* Dev-only UI gallery. Nothing here ships in production. */
-.gl { min-height: 100vh; padding: 2rem clamp(1rem, 4vw, 3rem) 5rem; background: var(--mint-50); color: var(--ink); }
+.gl { min-height: 100svh; padding: 2rem clamp(1rem, 4vw, 3rem) 5rem; background: var(--mint-50); color: var(--ink); }
 .gl-head, .gl-main { max-width: 84rem; margin-inline: auto; }
 .gl-head h1 { margin: 0; font-size: 2rem; letter-spacing: -0.04em; }
 .gl-head p { max-width: 46rem; margin: 0.4rem 0 1rem; color: var(--ink-3); font-size: 0.9rem; }

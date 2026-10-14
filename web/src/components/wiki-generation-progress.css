@@ -23,7 +23,7 @@
   overflow: hidden;
   max-width: 48%;
   color: var(--foreground);
-  font-size: 0.6875rem;
+  font-size: var(--fs-caption);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -52,7 +52,7 @@
 }
 
 .wiki-generation-progress__current p { margin: 0; color: var(--foreground); font-size: 0.875rem; font-weight: 750; line-height: 1.4; font-variant-numeric: tabular-nums; }
-.wiki-generation-progress__current small { display: block; margin-top: 0.2rem; color: #42556b; font-size: 0.6875rem; line-height: 1.45; }
+.wiki-generation-progress__current small { display: block; margin-top: 0.2rem; color: #42556b; font-size: var(--fs-caption); line-height: 1.45; }
 .wiki-generation-progress__stages {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -69,7 +69,7 @@
   align-items: center;
   gap: 0.4rem;
   color: var(--muted-foreground);
-  font-size: 0.6875rem;
+  font-size: var(--fs-caption);
   font-weight: 650;
   line-height: 1.25;
 }

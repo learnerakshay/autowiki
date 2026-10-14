@@ -58,6 +58,7 @@ test('architecture explorer exposes real workflows, evidence, and keyboard inter
   await expect(page.getByRole('heading', { name: 'Pinecone index' })).toBeVisible()
   await expect(page.getByText('Supports Index and Chat only. Wiki generation never depends on this vector path.')).toBeVisible()
   const vectorPath = page.locator('.arch-detail').getByRole('button', { name: 'Copy source path src/service/vectorStore.js' })
+  await page.locator('.arch-detail').getByRole('button', { name: 'Implementation evidence' }).click()
   await vectorPath.click()
   await expect(page.locator('.ui-toast')).toContainText('Source path copied')
   expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('src/service/vectorStore.js')

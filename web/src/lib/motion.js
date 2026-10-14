@@ -1,4 +1,5 @@
 import { settleTime, springEase, springToLinear } from './spring.js'
+import { installReducedCss } from './reducedCss.js'
 
 export const motionQuery = '(prefers-reduced-motion: no-preference)'
 export const reducedMotionQuery = '(prefers-reduced-motion: reduce)'
@@ -54,6 +55,7 @@ export const FLICK_VELOCITY = 600
  * `--spring` / `--spring-duration` and `--spring-momentum` / `--spring-momentum-duration`.
  */
 export function installMotionTokens(root = document.documentElement) {
+  installReducedCss()
   // CSS linear() easing needs Chrome 113 / Safari 17.2 / Firefox 112; elsewhere fall back to a close ease-out curve.
   const linearEasing = typeof CSS !== 'undefined' && CSS.supports('transition-timing-function', 'linear(0, 1)')
   const fallback = 'cubic-bezier(0.16, 1, 0.3, 1)'

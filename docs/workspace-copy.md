@@ -83,3 +83,7 @@ The live stage names, stage text and chapter counters are rendered by `WikiGener
 Repository validation errors are reused verbatim from `lib/repoInput.js`. Completion is shown on the page only. Polling stops on route departure; there are no completion toasts.
 
 Pass B: Status check failed describes a polling error; Job not found offers Start over because records are process-local. Only an API failed job is called a generation failure. Finished, not saved is neutral; Succeeded requires saved:true. Failure announcements use one inline live region, without a duplicate toast.
+
+Pass C: Polling still stops when its page unmounts; no off-route completion toast is emitted. Palette repository actions only navigate with `?repo=` and never submit Wiki, Index or Chat work. Connection notices say “Status checks may fail and can be retried manually.” A return notice says “Retry failed status checks manually.” Dismissing the notice does not announce restored connectivity.
+
+Network-error status checks now stop immediately and require Retry status check; returning online does not retry. Pending responses still schedule the next poll at the fixed two-second interval. Existing bounded fixed-interval checks after HTTP 5xx responses remain unchanged (the offline banner does not trigger them).

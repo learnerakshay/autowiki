@@ -14,7 +14,10 @@ export function safeError(message, fallback = 'The service could not complete th
 export async function apiRequest(path, options) {
   let response
   try { response = await fetch(path, options) }
-  catch { throw new Error(friendlyError()) }
+  catch {
+    if (typeof window !== 'undefined' && typeof window.dispatchEvent === 'function') window.dispatchEvent(new Event('autowiki:network-error'))
+    throw new Error(friendlyError())
+  }
   let body
   try { body = await response.json() } catch { /* Never expose a raw response body. */ }
 

@@ -1,15 +1,7 @@
+import { whenIdle, cancelIdle } from '../../lib/idle.js'
 import { Suspense, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { EffectsBoundary } from './EffectsBoundary.jsx'
 import { LOAD_ALL_EVENT } from './loadAll.js'
-
-const whenIdle = (callback, timeout = 1200) => {
-  if ('requestIdleCallback' in window) return requestIdleCallback(callback, { timeout })
-  return setTimeout(callback, 200)
-}
-const cancelIdle = (handle) => {
-  if ('cancelIdleCallback' in window) cancelIdleCallback(handle)
-  else clearTimeout(handle)
-}
 
 function ReadySection({ Section, onReady }) {
   useLayoutEffect(() => { onReady(true) }, [onReady])

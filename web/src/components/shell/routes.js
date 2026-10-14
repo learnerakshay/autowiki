@@ -9,6 +9,7 @@ export const appRoutes = [
   { key: 'wiki', path: '/wiki', load: () => import('../../pages/Wiki.jsx'), track: 'full' },
   { key: 'sample', path: '/wiki/sample/:slug', load: () => import('../../pages/SampleWiki.jsx'), track: 'full' },
   { key: 'architecture', path: '/architecture', load: () => import('../../pages/Architecture.jsx'), track: 'full' },
+  { key: 'not-found', path: '*', load: () => import('../../pages/NotFound.jsx'), track: 'full' },
 ]
 
 /** Top-level nav items. The sample wiki lives under /wiki, so it highlights "Wiki" too. */
@@ -28,7 +29,7 @@ export function activeNavIndex(pathname) {
 
 /** The route record for a pathname (params are matched, not parsed), or undefined. */
 export function routeFor(pathname) {
-  return appRoutes.find(({ path }) => new RegExp(`^${path.replace(/:[^/]+/g, '[^/]+')}/?$`).test(pathname))
+  return appRoutes.find(({ path }) => path !== '*' && new RegExp(`^${path.replace(/:[^/]+/g, '[^/]+')}/?$`).test(pathname)) || appRoutes.at(-1)
 }
 
 const loaded = new Map()

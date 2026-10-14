@@ -1,0 +1,11 @@
+.route-skeleton { min-height: calc(100svh - var(--nav-h)); }
+.route-skeleton > .ui-container { display: grid; gap: 1.5rem; }
+.route-skeleton__body { display: grid; grid-template-columns: 1.5fr 1fr; gap: 1.5rem; }
+.route-skeleton__body > .ui-surface { display: grid; align-content: start; gap: 1.5rem; }
+.route-skeleton--chat .route-skeleton__body { grid-template-columns: minmax(0, 1fr); }
+.route-skeleton--wiki .route-skeleton__body, .route-skeleton--not-found .route-skeleton__body { grid-template-columns: minmax(0,1fr); }
+.route-skeleton__flow { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 1rem; }
+.route-skeleton--reader .route-skeleton__body { grid-template-columns: 13rem minmax(0,46rem) 12rem; }
+@media (max-width: 1190px) { .route-skeleton--reader .route-skeleton__body { grid-template-columns: 13rem minmax(0,46rem); } .route-skeleton__context { display: none; } }
+@media (max-width: 850px) { .route-skeleton--reader .route-skeleton__body { grid-template-columns: minmax(0,1fr); } .route-skeleton__rail { display: none; } }
+@media (max-width: 768px) { .route-skeleton__body { grid-template-columns: minmax(0,1fr); } }

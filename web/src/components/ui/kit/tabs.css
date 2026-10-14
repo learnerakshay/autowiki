@@ -53,7 +53,7 @@
   white-space: nowrap;
   transition: color var(--dur-fast) ease, transform var(--dur-press) var(--ease-out);
 }
-.ui-seg--md .ui-seg__item, .ui-seg:not([class*="ui-seg--"]) .ui-seg__item { min-height: 2.25rem; }
+.ui-seg--md .ui-seg__item, .ui-seg:not([class*="ui-seg--"]) .ui-seg__item { min-height: 2.75rem; }
 .ui-seg--sm .ui-seg__item { min-height: 1.9rem; padding: 0 0.8rem; font-size: 0.78rem; }
 @media (pointer: coarse) { .ui-seg__item, .ui-seg--sm .ui-seg__item { min-height: 2.75rem; } }
 .ui-seg__item:hover:not(:disabled), .ui-seg__item[data-active="true"] { color: var(--ink); }

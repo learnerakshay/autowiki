@@ -49,3 +49,4 @@ html[data-reduced-motion="true"] .press:active,
 html[data-reduced-motion="true"] .lift:hover { transform: none; }
 html[data-reduced-motion="true"] .press,
 html[data-reduced-motion="true"] .lift { transition: none; }
+.app-shell :where(h1,h2,h3,h4,h5,h6,[id]) { scroll-margin-top: calc(var(--nav-h) + 1rem); }

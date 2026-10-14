@@ -1,0 +1,9 @@
+.offline-banner { position: fixed; z-index: var(--z-sticky); top: calc(var(--nav-h) + .5rem); left: var(--gutter); right: var(--gutter); max-width: var(--content-w); margin-inline: auto; display: flex; align-items: center; gap: 1rem; padding: .75rem 1rem; box-shadow: var(--shadow-2); }
+.offline-banner p { flex: 1; margin: 0; color: var(--ink-2); font-size: var(--fs-small); line-height: 1.5; }
+.offline-banner > svg { flex: none; color: var(--accent-ink); }
+@media (max-width: 850px) {
+  .offline-banner { top: var(--nav-h); padding: .25rem .75rem; gap: .5rem; }
+  .offline-banner > svg { display: none; }
+  .offline-banner p { font-size: var(--fs-caption); line-height: 1.4; }
+  .offline-banner .ui-btn { flex: none; }
+}
