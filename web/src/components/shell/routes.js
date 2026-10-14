@@ -5,7 +5,7 @@
 // one stays on screen, then swap in a page that is already ready: no Suspense flash between routes.
 export const appRoutes = [
   { key: 'workspace', path: '/workspace', load: () => import('../../pages/Home.jsx'), track: 'full' },
-  { key: 'chat', path: '/chat', load: () => import('../../pages/Chat.jsx'), track: 'content' },
+  { key: 'chat', path: '/chat', load: () => import('../../pages/Chat.jsx'), track: 'full' },
   { key: 'wiki', path: '/wiki', load: () => import('../../pages/Wiki.jsx'), track: 'full' },
   { key: 'sample', path: '/wiki/sample/:slug', load: () => import('../../pages/SampleWiki.jsx'), track: 'full' },
   { key: 'architecture', path: '/architecture', load: () => import('../../pages/Architecture.jsx'), track: 'full' },

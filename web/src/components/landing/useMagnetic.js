@@ -1,3 +1,5 @@
+import { useReducedMotion } from '../ui/kit/hooks.js'
+import { motionPreference } from '../../lib/motion.js'
 import { useEffect } from 'react'
 import { reducedMotionQuery } from '../../lib/motion.js'
 
@@ -10,11 +12,12 @@ const finePointer = '(hover: hover) and (pointer: fine)'
  * Pointer-fine devices only; skipped under reduced motion; its loop sleeps whenever settled.
  */
 export function useMagnetic(rootRef, selector, { max = 6, radius = 150 } = {}) {
+  const reducedMotion = useReducedMotion()
   useEffect(() => {
     const root = rootRef.current
     const target = root?.querySelector(selector)
     if (!root || !target) return undefined
-    if (!window.matchMedia(finePointer).matches || window.matchMedia(reducedMotionQuery).matches) return undefined
+    if (!window.matchMedia(finePointer).matches || motionPreference(reducedMotionQuery).matches) return undefined
 
     const state = { x: 0, y: 0, tx: 0, ty: 0 }
     let frame = 0
@@ -50,5 +53,5 @@ export function useMagnetic(rootRef, selector, { max = 6, radius = 150 } = {}) {
       target.style.removeProperty('--mx')
       target.style.removeProperty('--my')
     }
-  }, [rootRef, selector, max, radius])
+  }, [rootRef, selector, max, radius, reducedMotion])
 }

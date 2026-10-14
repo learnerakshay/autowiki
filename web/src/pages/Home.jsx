@@ -6,8 +6,6 @@ import { GithubMark } from '../components/hero/GithubMark.jsx'
 import { WikiGenerationProgress } from '../components/WikiGenerationProgress.jsx'
 import { Button, Page, PageHeader, StatusPill, Surface, TextField } from '../components/ui/kit/index.js'
 import { heroSample } from '../data/heroSample.js'
-import { useJobNotifications } from '../hooks/useJobNotifications.js'
-import { toast } from '../components/ui/kit/toastStore.js'
 import { checkRepoInput } from '../lib/repoInput.js'
 import { useJobPoll } from '../useJobPoll.js'
 import './workspace.css'
@@ -31,12 +29,14 @@ function requestError(error) {
 }
 function jobState(id, job, submitting, error) {
   if (submitting) return 'submitting'
-  if (error) return 'failed'
+  if (error) return 'check-error'
   if (!id) return 'idle'
   return job?.status === 'completed' ? 'succeeded' : job?.status === 'failed' ? 'failed' : 'pending'
 }
-function Pill({ state }) {
-  return <StatusPill state={state === 'submitting' ? 'pending' : state}>{state === 'submitting' ? 'Starting' : undefined}</StatusPill>
+function Pill({ state, saved }) {
+  if (state === 'succeeded' && saved !== undefined && saved !== true) return <StatusPill state="idle">Finished, not saved</StatusPill>
+  if (state === 'check-error') return <StatusPill state="info">Status unavailable</StatusPill>
+  return <StatusPill state={state === 'submitting' ? 'pending' : state}>{state === 'submitting' ? 'Starting' : state === 'succeeded' && saved === undefined ? 'Generated' : undefined}</StatusPill>
 }
 
 function SamplePanel() {
@@ -53,11 +53,11 @@ function SamplePanel() {
   </Surface>
 }
 
-function LivePanel({ state, job, jobId, repo, error, retry, retryPoll, reset, edit }) {
+function LivePanel({ state, job, jobId, repo, error, requestFailed, errorStatus, retry, retryPoll, reset, edit }) {
   const chapters = Array.isArray(job?.chapters) ? job.chapters : []
   return <Surface variant="dark" as="section" className="workspace-preview workspace-preview--live" aria-labelledby="live-job-title" data-job-state={state}>
     <div className="workspace-preview__top"><span>{jobId ? 'Live job' : 'Wiki request'}</span><Pill state={state} /></div>
-    <h2 id="live-job-title">{state === 'succeeded' ? 'Wiki is ready' : state === 'failed' ? jobId ? 'Wiki generation failed' : 'Wiki generation could not start' : 'Generating your technical wiki'}</h2>
+    <h2 id="live-job-title">{state === 'succeeded' ? 'Wiki is ready' : state === 'check-error' ? requestFailed ? 'Wiki generation could not start' : requestFailed ? 'Wiki generation could not start' : errorStatus === 404 ? 'Job not found' : jobId ? 'Status check failed' : 'Wiki generation could not start' : state === 'failed' ? 'Wiki generation failed' : 'Generating your technical wiki'}</h2>
     {repo ? <code className="workspace-preview__repo">{repo}</code> : null}
     {state === 'pending' ? <WikiGenerationProgress progress={job?.progress} repo={repo} compact /> : null}
     {state === 'submitting' ? <p role="status">Starting the job</p> : null}
@@ -66,12 +66,12 @@ function LivePanel({ state, job, jobId, repo, error, retry, retryPoll, reset, ed
       <ol className="workspace-preview__chapters workspace-preview__chapters--result">{chapters.map((chapter, index) => <li key={`${chapter.title}-${index}`}><span>{String(index + 1).padStart(2, '0')}</span><strong>{chapter.title}</strong></li>)}</ol>
       <div className="workspace-preview__actions"><Button as={Link} to={`/wiki?jobId=${encodeURIComponent(jobId)}`} state={{ justGenerated: true }} iconTrailing={ArrowRight}>Open wiki</Button><Button variant="secondary" onClick={reset}>Generate another</Button></div>
     </> : null}
-    {state === 'failed' ? <>
-      <p className="workspace-preview__error" role="alert"><AlertCircle aria-hidden="true" size={17} />{error || job?.error || 'The backend could not complete this request.'}</p>
+    {state === 'failed' || state === 'check-error' ? <>
+      <p className="workspace-preview__error"><AlertCircle aria-hidden="true" size={17} />{error || job?.error || 'The backend could not complete this request.'}</p>
       <p className="workspace-preview__help">Repository fetching reads up to 200 eligible files and skips files larger than 200 KB.</p>
-      <div className="workspace-preview__actions"><Button onClick={error && jobId ? retryPoll : retry} iconLeading={RefreshCw}>{error && jobId ? 'Retry status check' : 'Try again'}</Button><Button variant="secondary" onClick={edit}>Edit repository</Button></div>
+      <div className="workspace-preview__actions"><Button onClick={errorStatus === 404 && !requestFailed ? reset : error && jobId && !requestFailed ? retryPoll : retry} iconLeading={RefreshCw}>{errorStatus === 404 && !requestFailed ? 'Start over' : error && jobId && !requestFailed ? 'Retry status check' : 'Try again'}</Button><Button variant="secondary" onClick={edit}>Edit repository</Button></div>
     </> : null}
-    <span className="ui-sr-only" aria-live="polite" aria-atomic="true">{state === 'pending' ? job?.progress?.stage?.replaceAll('_', ' ') || 'Wiki generation pending' : state === 'succeeded' ? 'Wiki generation completed' : state === 'failed' ? 'Wiki generation failed' : ''}</span>
+    <span className="ui-sr-only" aria-live="polite" aria-atomic="true">{state === 'pending' ? '' : state === 'succeeded' ? 'Wiki generation completed' : state === 'failed' ? `Wiki generation failed. ${job?.error || ''}` : state === 'check-error' ? `${requestFailed ? 'Wiki generation could not start' : errorStatus === 404 ? 'Job not found' : jobId ? 'Status check failed' : 'Wiki generation could not start'}. ${error}` : ''}</span>
   </Surface>
 }
 
@@ -97,8 +97,6 @@ export default function Home() {
   const indexState = jobState(indexJobId, index.job, submitting.index, submitErrors.index || index.error)
   const busy = submitting.wiki || submitting.index || wikiState === 'pending' || indexState === 'pending'
 
-  useJobNotifications(wiki.job, wikiJobId, { completed: 'Wiki is ready', failed: 'Wiki generation failed' })
-  useJobNotifications(index.job, indexJobId, { completed: 'Repository index is ready', failed: 'Repository indexing failed' })
 
   async function submit(kind, input = repo) {
     const checked = checkRepoInput(input)
@@ -113,7 +111,6 @@ export default function Home() {
     } catch (error) {
       const message = requestError(error)
       setSubmitErrors((value) => ({ ...value, [kind]: message }))
-      toast.error(kind === 'wiki' ? 'Wiki generation could not start' : 'Repository indexing could not start', { description: message })
     }
     finally { setSubmitting((value) => ({ ...value, [kind]: false })) }
   }
@@ -134,16 +131,17 @@ export default function Home() {
           </form>
         </Surface>
         <Surface as="section" className="workspace-index" aria-labelledby="index-workflow-title" data-job-state={indexState}>
-          <div className="workspace-index__heading"><div><Database aria-hidden="true" /><h2 id="index-workflow-title">Index for grounded Q&amp;A</h2></div><Pill state={indexState} /></div>
+          <div className="workspace-index__heading"><div><Database aria-hidden="true" /><h2 id="index-workflow-title">Index for grounded Q&amp;A</h2></div><Pill state={indexState} saved={index.job?.saved === true} /></div>
           <p>Build a searchable source index for Chat. Indexing is independent from wiki generation and does not create chapters.</p>
           <Button iconLeading={Database} disabled={indexDisabled} disabledReason={indexReason} loading={submitting.index} onClick={() => void submit('index')}>Index Repository</Button>
           {indexReason ? <p className="workspace-index__reason">{indexReason}</p> : null}
-          {indexState === 'pending' ? <p role="status">Repository indexing is in progress.</p> : null}
-          {indexState === 'failed' ? <><p role="alert" className="workspace-index__error">{submitErrors.index || index.error || index.job?.error}</p><Button variant="secondary" iconLeading={RefreshCw} onClick={index.error && indexJobId ? index.retry : () => void submit('index', indexRepo || repo)}>{index.error && indexJobId ? 'Retry status check' : 'Try again'}</Button></> : null}
-          {indexState === 'succeeded' ? <div className="workspace-index__result"><p><strong>{index.job?.fileCount}</strong> source files read · <strong>{index.job?.chunkCount}</strong> searchable chunks</p><p>{index.job?.saved === false ? 'The index was processed but was not saved for repository-grounded Q&A.' : index.job?.truncated ? 'The searchable index was saved, with large source content truncated to service limits.' : 'The searchable index was saved and is ready for repository-grounded Q&A.'}</p>{index.job?.saved !== false ? <Button as={Link} to={`/chat?repo=${encodeURIComponent(indexRepo)}`} variant="secondary" iconTrailing={ArrowRight}>Open Chat</Button> : null}</div> : null}
+          {indexState === 'pending' ? <p>Repository indexing is in progress.</p> : null}
+          {indexState === 'failed' || indexState === 'check-error' ? <><p className="workspace-index__error">{index.errorStatus === 404 ? 'Job not found. ' : index.error ? 'Status check failed. ' : index.job?.status === 'failed' ? 'Repository indexing failed. ' : 'Repository indexing could not start. '}{submitErrors.index || index.error || index.job?.error}</p><Button variant="secondary" iconLeading={RefreshCw} onClick={index.errorStatus === 404 ? () => { setIndexJobId(''); repoRef.current?.focus() } : index.error && indexJobId ? index.retry : () => void submit('index', indexRepo || repo)}>{index.errorStatus === 404 ? 'Start over' : index.error && indexJobId ? 'Retry status check' : 'Try again'}</Button></> : null}
+          {indexState === 'succeeded' ? <div className="workspace-index__result"><p><strong>{index.job?.fileCount}</strong> source files read · <strong>{index.job?.chunkCount}</strong> searchable chunks</p><p>{index.job?.saved === false ? 'The index was processed but was not saved for repository-grounded Q&A.' : index.job?.truncated ? 'The searchable index was saved from a limited file list: the 200-file cap was reached or GitHub returned an incomplete tree.' : 'The searchable index was saved and is ready for repository-grounded Q&A.'}</p>{index.job?.saved === true ? <Button as={Link} to={`/chat?repo=${encodeURIComponent(indexRepo)}`} variant="secondary" iconTrailing={ArrowRight}>Open Chat</Button> : null}</div> : null}
+          <span className="ui-sr-only" role="status" aria-live="polite" aria-atomic="true">{indexState === 'pending' ? 'Repository indexing is in progress.' : indexState === 'succeeded' ? index.job?.saved === true ? 'Repository index is ready' : 'Finished, not saved' : indexState === 'check-error' ? `${index.errorStatus === 404 ? 'Job not found' : index.error ? 'Status check failed' : 'Repository indexing could not start'}. ${submitErrors.index || index.error}` : indexState === 'failed' ? `Repository indexing failed. ${index.job?.error}` : ''}</span>
         </Surface>
       </div>
-      <aside className="workspace-layout__side" aria-label="Wiki preview or live job">{wikiState === 'idle' ? <SamplePanel /> : <LivePanel state={wikiState} job={wiki.job} jobId={wikiJobId} repo={wikiRepo || validation.repo || repo} error={submitErrors.wiki || wiki.error} retry={() => void submit('wiki', wikiRepo || repo)} retryPoll={wiki.retry} reset={() => { setWikiJobId(''); setWikiRepo('') }} edit={() => repoRef.current?.focus()} />}</aside>
+      <aside className="workspace-layout__side" aria-label="Wiki preview or live job">{wikiState === 'idle' ? <SamplePanel /> : <LivePanel state={wikiState} job={wiki.job} jobId={wikiJobId} repo={wikiRepo || validation.repo || repo} error={submitErrors.wiki || wiki.error} errorStatus={wiki.errorStatus} requestFailed={Boolean(submitErrors.wiki)} retry={() => void submit('wiki', wikiRepo || repo)} retryPoll={wiki.retry} reset={() => { setWikiJobId(''); setWikiRepo(''); setSubmitErrors((value) => ({ ...value, wiki: '' })); repoRef.current?.focus() }} edit={() => repoRef.current?.focus()} />}</aside>
     </div>
     <section className="workspace-benefits" aria-label="Workspace capabilities">{benefits.map(({ icon: Icon, title, detail }) => <Surface key={title} padding="sm"><Icon aria-hidden="true" size={18} /><p><strong>{title}</strong><span>{detail}</span></p></Surface>)}</section>
   </Page>

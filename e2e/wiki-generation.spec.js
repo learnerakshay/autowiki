@@ -64,12 +64,12 @@ test('Workspace reports real generation stages and settles cleanly on completion
   await expect(progress).toContainText('No percentage or completion estimate is available.')
   await expect(page.locator('body')).not.toContainText('%')
   await page.waitForTimeout(700)
-  await page.screenshot({ path: 'screenshots/prompt-08-generation-desktop.png', fullPage: true })
-  await page.screenshot({ path: 'screenshots/prompt-08-generation-pending.png', fullPage: true })
+  await page.screenshot({ path: 'test-results/captures/prompt-08-generation-desktop.png', fullPage: true })
+  await page.screenshot({ path: 'test-results/captures/prompt-08-generation-pending.png', fullPage: true })
 
   await expect(progress.getByText('Planning the wiki structure')).toBeVisible()
   await expect(progress.getByText('Generating chapter 2 of 4')).toBeVisible()
-  await page.screenshot({ path: 'screenshots/prompt-08-generation-stage.png', fullPage: true })
+  await page.screenshot({ path: 'test-results/captures/prompt-08-generation-stage.png', fullPage: true })
   await expect(progress.getByText('Saving the generated wiki')).toBeVisible()
 
   await expect(jobRegion).toContainText('Wiki is ready')
@@ -77,7 +77,7 @@ test('Workspace reports real generation stages and settles cleanly on completion
   await expect(progress).toHaveCount(0)
   await expect(page.locator('.workspace-activity')).toHaveCount(0)
   await expect(jobRegion.getByRole('link', { name: 'Open wiki' })).toHaveAttribute('href', '/wiki?jobId=prompt-08-progress')
-  await page.screenshot({ path: 'screenshots/prompt-08-generation-completed.png', fullPage: true })
+  await page.screenshot({ path: 'test-results/captures/prompt-08-generation-completed.png', fullPage: true })
 
   expect(requests.filter((request) => request === 'POST /api/wiki')).toHaveLength(1)
   expect(requests.every((request) => request === 'POST /api/wiki' || request === 'GET /api/wiki/jobs/prompt-08-progress')).toBe(true)
@@ -99,7 +99,7 @@ test('Wiki generation state is responsive, reduced-motion safe, and uses actual 
     await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
 
     if (width === 390) {
-      await page.screenshot({ path: 'screenshots/prompt-08-generation-mobile.png', fullPage: true })
+      await page.screenshot({ path: 'test-results/captures/prompt-08-generation-mobile.png', fullPage: true })
     }
   }
 })
@@ -121,5 +121,5 @@ test('missing stage metadata stays honest and terminal failure replaces activity
   await expect(page.getByRole('heading', { name: 'Wiki generation failed' })).toBeVisible()
   await expect(page.getByRole('alert')).toContainText('Generation retries were exhausted.')
   await expect(page.getByRole('region', { name: 'Wiki generation activity' })).toHaveCount(0)
-  await page.screenshot({ path: 'screenshots/prompt-08-generation-failed.png', fullPage: true })
+  await page.screenshot({ path: 'test-results/captures/prompt-08-generation-failed.png', fullPage: true })
 })

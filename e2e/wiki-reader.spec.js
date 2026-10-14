@@ -104,9 +104,10 @@ test('completed Wiki renders semantic Markdown and keeps one current Mermaid SVG
   await expect(page.locator('.wiki-markdown script')).toHaveCount(0)
   expect(await page.evaluate(() => window.__unsafeExecuted)).toBeUndefined()
   await expect(page.getByRole('link', { name: 'unsafe' })).not.toHaveAttribute('href', /javascript:/i)
+  await page.locator('#wiki-diagram').scrollIntoViewIfNeeded()
   await expect(page.locator('.diagram svg')).toHaveCount(1)
 
-  await expect(page.locator('[data-sonner-toast]')).toHaveCount(0, { timeout: 7000 })
+  await expect(page.locator('.ui-toast')).toHaveCount(0, { timeout: 7000 })
   await page.evaluate(() => window.scrollTo(0, 0))
   await page.screenshot({ path: testInfo.outputPath('prompt-07-wiki-desktop.png'), fullPage: true })
   await page.locator('.diagram-card').screenshot({ path: testInfo.outputPath('prompt-07-mermaid-diagram.png') })
@@ -120,6 +121,7 @@ test('completed Wiki renders semantic Markdown and keeps one current Mermaid SVG
   await chapterButtons.nth(2).click()
   await chapterButtons.nth(0).click()
   await expect(page.getByRole('heading', { level: 2, name: 'Overview' })).toBeVisible()
+  await page.locator('#wiki-diagram').scrollIntoViewIfNeeded()
   await expect(page.locator('.diagram svg')).toHaveCount(1)
   await expect(page.locator('.chapter')).not.toContainText('Only the latest chapter render')
 
@@ -127,6 +129,7 @@ test('completed Wiki renders semantic Markdown and keeps one current Mermaid SVG
   await chapterButtons.nth(0).press('ArrowDown')
   await expect(page.getByRole('heading', { level: 2, name: 'Data flow' })).toBeVisible()
   await expect(chapterButtons.nth(1)).toHaveAttribute('aria-current', 'page')
+  await page.locator('#wiki-diagram').scrollIntoViewIfNeeded()
   await expect(page.locator('.diagram svg')).toHaveCount(1)
 
   await page.evaluate(() => window.scrollTo(0, 0))
@@ -153,11 +156,12 @@ test('mobile chapter navigation and reduced motion remain functional', async ({ 
       await page.locator('.wiki-mobile-bar').getByRole('button', { name: /Overview/ }).click()
       await page.getByRole('dialog', { name: 'Chapters' }).getByRole('button', { name: /Rendering safety/ }).click()
       await expect(page.getByRole('heading', { level: 2, name: 'Rendering safety' })).toBeVisible()
+      await page.locator('#wiki-diagram').scrollIntoViewIfNeeded()
       await expect(page.locator('.diagram svg')).toHaveCount(1)
     }
 
     if (viewport.width === 390) {
-      await expect(page.locator('[data-sonner-toast]')).toHaveCount(0, { timeout: 7000 })
+      await expect(page.locator('.ui-toast')).toHaveCount(0, { timeout: 7000 })
       await page.evaluate(() => window.scrollTo(0, 0))
       await page.screenshot({ path: testInfo.outputPath('prompt-07-wiki-mobile.png'), fullPage: true })
     }
@@ -169,7 +173,7 @@ test('pending Wiki shows honest indeterminate status', async ({ page }, testInfo
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.goto('/wiki?jobId=wiki-pending')
 
-  await expect(page.getByText('generating...', { exact: true })).toBeVisible()
+  await expect(page.getByText('Generating…', { exact: true })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Generating your technical wiki' })).toBeVisible()
   await expect(page.getByText(/not live stage progress/i)).toBeVisible()
   await expect(page.locator('body')).not.toContainText('%')
@@ -184,8 +188,9 @@ test('failed and unknown Wiki jobs explain recovery honestly', async ({ page }, 
   await page.screenshot({ path: testInfo.outputPath('prompt-07-wiki-failed.png'), fullPage: true })
 
   await page.goto('/wiki?jobId=missing-job')
-  await expect(page.getByRole('heading', { name: 'Wiki job unavailable' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Job not found' })).toBeVisible()
   await page.getByText('Job details', { exact: true }).click()
   await expect(page.getByText(/stored in memory/i)).toBeVisible()
-  await expect(page.getByRole('link', { name: 'Back to Workspace' })).toHaveAttribute('href', '/workspace')
+  await expect(page.getByRole('link', { name: 'Start over' })).toHaveAttribute('href', '/workspace')
+  await expect(page.getByRole('button', { name: 'Retry status check' })).toHaveCount(0)
 })

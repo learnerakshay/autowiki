@@ -147,34 +147,21 @@ Web Animations only.
 light and dark), toast triggers, dialog / sheet, and the nav, footer and background in frames. `/dev/brand` is the logo board.
 Both are behind `import.meta.env.DEV`, so production bundles do not contain them; both set `noindex`.
 
-## Migration map after Pass A
+## Migration map after Pass B
 
-Workspace and Wiki now use `<Page>` and kit controls directly. Their page styling lives in `pages/workspace.css` and
-`pages/wiki-reader.css`; the old `.workspace-*`, Wiki reader `.wiki-*`, `.diagram-*` and `.chapter-*` blocks were removed
-from `index.css`. The remaining `.wiki-pipeline-*` and `.wiki-stage-*` selectors there belong to Architecture. Shared Wiki
-generation progress styling is in `components/wiki-generation-progress.css`.
-
-`useJobNotifications` now calls kit `toast()`. `sonner.jsx`, its package and `LegacyToaster` are gone, with zero sonner call
-sites. The Workspace label-in-name defect is fixed by exposing the visible sample-link text as its accessible name.
-
-Pass B still owns legacy tokens in the second block of `styles/tokens.css` (`--canvas`, `--background`, `--foreground`,
-`--border`, `--primary*`, `--cyan-*`, etc.) and Tailwind's `@theme inline` colour map in `index.css`. Chat, Architecture,
-and a few shared components still use those values. The shared generation-progress CSS also needs its legacy token names
-replaced when the remaining pages are migrated.
-
-Legacy primitives still imported: `button.jsx` by Chat, Architecture and the landing hero; `input.jsx` and `label.jsx` by
-Chat; `tabs.jsx` by the landing preview; `card.jsx` by the shared `ErrorNotice`, `JobSkeleton`, and legacy `EmptyState`;
-`badge.jsx` by `JobStatus`; `skeleton.jsx` by `JobSkeleton`. No legacy primitive is currently safe to delete without
-also migrating those out-of-scope consumers. None is imported by Workspace or the Wiki pages.
-
-`index.css` blocks (line ranges approximate; `grep -n` the prefix):
-
-| Page | Prefix (rules) | Notes |
+| Page | Scoped styling | Controls |
 |---|---|---|
-| Workspace (`Home.jsx`) | removed | New scoped `workspace.css` and kit controls |
-| Chat (`Chat.jsx`) | `.chat-*` | Pass B owns composer, answer and sources |
-| Wiki reader (`WikiReader.jsx`) | removed | New scoped `wiki-reader.css`; both sample and generated use the same reader |
-| Architecture | `.architecture-*`, `.wiki-pipeline-*`, `.wiki-stage-*` | Pass B owns these |
-| Shared and landing | `.job-*`, `.page-stack`, `.landing-*`, `.product-*` | Retain while their consumers remain |
+| Workspace | pages/workspace.css | Kit Page, Surface, fields, buttons and status pills |
+| Chat | pages/chat.css | Kit composer, answer, source chips and error states |
+| Wiki reader | pages/wiki-reader.css | Shared reader for sample/generated Wiki; kit overlays and code |
+| Architecture | pages/architecture.css | Kit tracks, tabs, disclosures, source chips and surfaces |
+| Landing | styles/landing.css and component styles | Existing live hero Button/Radix Tabs retained |
 
-`components/shell/shell.css` still has Architecture and Chat adoption overrides. The Workspace override was removed.
+index.css contains global foundation only; preserved landing rules live in styles/legacy-landing.css before the current landing layer. Shared generation activity styling remains components/wiki-generation-progress.css. Shell page overrides and obsolete page selectors have been removed. Legacy input, label, card, badge, skeleton, JobStatus, ErrorNotice, page helper components and useJobNotifications are deleted. Failure announcements are inline; completion is page-local because polling stops on route departure. Legacy token aliases remain for the existing landing layers and global Tailwind map.
+
+## Pass B migration
+
+Chat now uses Page/PageHeader, Surface, TextField, capped autosizing TextareaField, Chip, Kbd, SkeletonText and stable Button. Its scoped styles live in pages/chat.css; request state derives only from submission and job responses. Source ref is not returned by the API, so Chat does not invent GitHub blob links.
+Architecture now uses the same width tracks and heading scale, kit surfaces/tabs/disclosures/code blocks/file chips/buttons. pages/architecture.css owns its layout; ArchitectureSections is split and bodies mount near the viewport with reserved geometry. The SVG uses orthogonal routing around node rectangles and a vertical node list at 768px. Shared source chips copy with kit toasts.
+index.css contains global foundation only. Existing landing rules moved unchanged into styles/legacy-landing.css before the current landing layer; obsolete Chat, Architecture, wiki-pipeline and wiki-stage selectors were removed. Legacy input/label/card/badge/skeleton and unused page components were deleted. Landing still uses the legacy Button and Radix Tabs; those two files are live and retained to preserve pixels.
+Button always keeps its element tree and uses aria-disabled; its described reason is stable. Callers expose visible helper text. The ineffective :has fallback was replaced with data-route-ready. Failure notifications are page-local inline regions; polling does not survive route departure.

@@ -1,3 +1,4 @@
+import { motionPreference } from '../../lib/motion.js'
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowUp } from 'lucide-react'
@@ -28,7 +29,7 @@ function useEntered(ref) {
 export function LandingFooter() {
   const ref = useRef(null)
   const entered = useEntered(ref)
-  const backToTop = () => window.scrollTo({ top: 0, behavior: window.matchMedia(reducedMotionQuery).matches ? 'auto' : 'smooth' })
+  const backToTop = () => window.scrollTo({ top: 0, behavior: motionPreference(reducedMotionQuery).matches ? 'auto' : 'smooth' })
 
   return (
     <footer ref={ref} className="lf" data-entered={entered} data-logo-surface="dark">

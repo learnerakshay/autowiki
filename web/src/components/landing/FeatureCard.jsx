@@ -1,3 +1,5 @@
+import { useReducedMotion } from '../ui/kit/hooks.js'
+import { motionPreference } from '../../lib/motion.js'
 import { useEffect, useRef, useState } from 'react'
 import { reducedMotionQuery } from '../../lib/motion.js'
 
@@ -12,6 +14,7 @@ const finePointer = '(hover: hover) and (pointer: fine)'
  * so a miniature can restart itself by keying on it.
  */
 export function FeatureCard({ className = '', title, text, icon: Icon, children }) {
+  const reducedMotion = useReducedMotion()
   const ref = useRef(null)
   const orbRef = useRef(null)
   const [played, setPlayed] = useState(false)
@@ -31,14 +34,14 @@ export function FeatureCard({ className = '', title, text, icon: Icon, children 
     }, { threshold: 0.35 })
     observer.observe(card)
     return () => observer.disconnect()
-  }, [])
+  }, [reducedMotion])
 
   // Spotlight: only on devices with a real hover pointer, never under reduced motion.
   useEffect(() => {
     const card = ref.current
     const orb = orbRef.current
     if (!card || !orb) return undefined
-    if (!window.matchMedia(finePointer).matches || window.matchMedia(reducedMotionQuery).matches) return undefined
+    if (!window.matchMedia(finePointer).matches || motionPreference(reducedMotionQuery).matches) return undefined
     let frame = 0
     let last = 0
     const state = { x: 0, y: 0, tx: 0, ty: 0, seeded: false }
@@ -71,7 +74,7 @@ export function FeatureCard({ className = '', title, text, icon: Icon, children 
       card.removeEventListener('pointermove', onMove)
       card.removeEventListener('pointerenter', onEnter)
     }
-  }, [])
+  }, [reducedMotion])
 
   return (
     <article ref={ref} className={`fc ${className}`.trim()} data-reveal="item" data-played={played}>

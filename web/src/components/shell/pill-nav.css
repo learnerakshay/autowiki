@@ -193,3 +193,5 @@
 .ln[data-variant="app"] .ln__bar { width: var(--content); max-width: none; }
 .ln__primary[data-hidden="true"] { opacity: 0; transform: translate3d(0, 8px, 0) scale(0.96); visibility: hidden; transition-delay: 0s, 0s, 0s, 0.25s; }
 @media (prefers-reduced-motion: reduce) { .ln__primary[data-hidden="true"] { transform: none; } }
+
+@media (forced-colors: active) { .ln a[aria-current] { border-bottom: 2px solid Highlight; color: LinkText; } }

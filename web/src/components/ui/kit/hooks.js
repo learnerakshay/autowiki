@@ -1,14 +1,46 @@
+import { motionPreference } from '../../../lib/motion.js'
 import { useEffect, useLayoutEffect, useRef, useSyncExternalStore } from 'react'
-import { reducedMotionQuery } from '../../../lib/motion.js'
+import { prefersReducedMotion, reduced, reducedMotionQuery, springs } from '../../../lib/motion.js'
+import { createSpringValue } from '../../../lib/spring.js'
 
 const subscribeReduced = (callback) => {
-  const query = window.matchMedia(reducedMotionQuery)
+  const query = motionPreference(reducedMotionQuery)
   query.addEventListener('change', callback)
   return () => query.removeEventListener('change', callback)
 }
 
 /** Live `prefers-reduced-motion: reduce`. */
-export const useReducedMotion = () => useSyncExternalStore(subscribeReduced, () => window.matchMedia(reducedMotionQuery).matches, () => false)
+export const useReducedMotion = () => useSyncExternalStore(subscribeReduced, prefersReducedMotion, () => false)
+
+/** Retarget a content reveal while preserving spring velocity. Reduced motion is opacity-only. */
+export function useSpringReveal(ref, key, { stagger = false } = {}) {
+  const calm = useReducedMotion()
+  const spring = useRef(null)
+  useEffect(() => {
+    const element = ref.current
+    if (!element) return undefined
+    spring.current = createSpringValue({ value: 1, spring: springs.default, onUpdate: (value) => {
+      const node = ref.current
+      if (!node) return
+      node.style.opacity = String(value)
+      node.style.transform = prefersReducedMotion() ? '' : `translate3d(0, ${(1 - value) * 12}px, 0)`
+    } })
+    return () => { spring.current?.destroy(); spring.current = null; element.style.opacity = ''; element.style.transform = '' }
+  }, [ref])
+  useEffect(() => {
+    const element = ref.current
+    if (!element) return undefined
+    if (calm) {
+      spring.current?.jump(1)
+      const animation = element.animate([{ opacity: 0 }, { opacity: 1 }], { duration: reduced.fade * 1000 })
+      return () => animation.cancel()
+    }
+    spring.current?.reveal()
+    const children = stagger ? [...element.querySelectorAll('[data-step]')] : []
+    const animations = children.map((child, index) => child.animate([{ opacity: 0 }, { opacity: 1 }], { duration: reduced.fade * 1000, delay: index * 40 }))
+    return () => animations.forEach((animation) => animation.cancel())
+  }, [key, calm, ref, stagger])
+}
 
 /**
  * Positions a sliding indicator under the element marked `data-active="true"` inside `listRef`. It writes

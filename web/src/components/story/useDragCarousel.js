@@ -1,3 +1,4 @@
+import { motionPreference } from '../../lib/motion.js'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import gsap from 'gsap'
@@ -39,7 +40,7 @@ export function useDragCarousel({ rootRef, count, onActive }) {
   useEffect(() => {
     const root = rootRef.current
     if (!root) return undefined
-    const query = window.matchMedia(ENHANCED_QUERY)
+    const query = motionPreference(ENHANCED_QUERY)
     let teardown = null
 
     const enhance = () => {

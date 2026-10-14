@@ -1,5 +1,5 @@
 import { stepSpring } from './spring.js'
-import { FLICK_VELOCITY, springs } from './motion.js'
+import { FLICK_VELOCITY, prefersReducedMotion, springs } from './motion.js'
 
 // Pure carousel physics. Position is measured in slides (0 = first, count-1 = last) so nothing here
 // knows a pixel size: callers pass the measured `step` (px per slide) and `dimension` (viewport width).
@@ -112,6 +112,7 @@ export function createCarouselEngine({ count }) {
     /** Advance the spring. Returns true while there is still motion to render. */
     tick(dt) {
       if (engine.mode === 'drag') return false
+      if (prefersReducedMotion()) { engine.position = engine.target; engine.velocity = 0; engine.mode = 'scroll'; return false }
       const [d, v] = stepSpring(engine.position - engine.target, engine.velocity, dt, engine.spring)
       engine.position = engine.target + d
       engine.velocity = v

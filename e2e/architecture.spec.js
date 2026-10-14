@@ -46,6 +46,7 @@ test('architecture explorer exposes real workflows, evidence, and keyboard inter
   await expect(page).toHaveURL(/\/architecture$/)
 
   await expect(page.getByRole('heading', { level: 1, name: 'Understand the system behind the Wiki.' })).toBeVisible()
+  await page.evaluate(() => window.dispatchEvent(new Event('architecture:load-all')))
   await expect(page.getByRole('heading', { name: 'How AutoWiki builds technical knowledge.' })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Grounded answers from repository context.' })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'The shared asynchronous backbone.' })).toBeVisible()
@@ -56,9 +57,10 @@ test('architecture explorer exposes real workflows, evidence, and keyboard inter
   await expect(pineconeNode).toHaveAttribute('aria-pressed', 'true')
   await expect(page.getByRole('heading', { name: 'Pinecone index' })).toBeVisible()
   await expect(page.getByText('Supports Index and Chat only. Wiki generation never depends on this vector path.')).toBeVisible()
-  const vectorPath = page.getByRole('button', { name: 'Copy source path src/service/vectorStore.js' })
+  const vectorPath = page.locator('.arch-detail').getByRole('button', { name: 'Copy source path src/service/vectorStore.js' })
   await vectorPath.click()
-  await expect(vectorPath.getByRole('status')).toHaveText('Copied')
+  await expect(page.locator('.ui-toast')).toContainText('Source path copied')
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('src/service/vectorStore.js')
 
   const reactNode = page.getByRole('button', { name: /React client/ })
   await reactNode.focus()
@@ -82,12 +84,12 @@ test('architecture explorer exposes real workflows, evidence, and keyboard inter
   await expect(page.getByRole('progressbar')).toHaveCount(0)
 
   await page.evaluate(() => window.scrollTo(0, 0))
-  await page.screenshot({ path: 'screenshots/prompt-10-architecture-desktop.png', fullPage: true })
-  await page.locator('.architecture-overview').screenshot({ path: 'screenshots/prompt-10-system-overview.png' })
-  await page.locator('.architecture-section--wiki').screenshot({ path: 'screenshots/prompt-10-wiki-pipeline.png' })
-  await page.locator('.architecture-section--rag').screenshot({ path: 'screenshots/prompt-10-rag-pipeline.png' })
-  await page.locator('.architecture-section--jobs').screenshot({ path: 'screenshots/prompt-10-job-architecture.png' })
-  await page.locator('.architecture-section--decisions').screenshot({ path: 'screenshots/prompt-10-reliability.png' })
+  await page.screenshot({ path: 'test-results/captures/prompt-10-architecture-desktop.png', fullPage: true })
+  await page.locator('.arch-overview').screenshot({ path: 'test-results/captures/prompt-10-system-overview.png' })
+  await page.locator('.arch-section--WikiPipeline').screenshot({ path: 'test-results/captures/prompt-10-wiki-pipeline.png' })
+  await page.locator('.arch-section--RagExplorer').screenshot({ path: 'test-results/captures/prompt-10-rag-pipeline.png' })
+  await page.locator('.arch-section--JobArchitecture').screenshot({ path: 'test-results/captures/prompt-10-job-architecture.png' })
+  await page.locator('.arch-section--EngineeringDecisions').screenshot({ path: 'test-results/captures/prompt-10-reliability.png' })
 
   await page.getByRole('link', { name: 'Open Workspace' }).first().click()
   await expect(page).toHaveURL(/\/workspace$/)
@@ -104,12 +106,13 @@ test('architecture explorer remains visible with reduced motion and does not ove
     await page.goto('/architecture')
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
     await expect(page.getByRole('button', { name: /React client/ })).toBeVisible()
+    await page.locator('.arch-section--WikiPipeline').scrollIntoViewIfNeeded()
     await expect(page.getByRole('button', { name: /Write chapters \+ diagrams/ })).toBeVisible()
     await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
 
     if (width === 390) {
       await page.evaluate(() => window.scrollTo(0, 0))
-      await page.screenshot({ path: 'screenshots/prompt-10-architecture-mobile.png', fullPage: true })
+      await page.screenshot({ path: 'test-results/captures/prompt-10-architecture-mobile.png', fullPage: true })
     }
   }
 })

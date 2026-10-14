@@ -45,6 +45,7 @@ export function useJobPoll(resource, jobId) {
           key,
           job: previous.key === key ? previous.job : { status: 'pending' },
           error: pollError.message,
+          errorStatus: pollError.status || 0,
         }))
       }
     }
@@ -56,5 +57,5 @@ export function useJobPoll(resource, jobId) {
     }
   }, [jobId, key, resource, retryKey])
 
-  return { job: current.job, error: current.error, retry }
+  return { job: current.job, error: current.error, errorStatus: current.errorStatus, retry }
 }

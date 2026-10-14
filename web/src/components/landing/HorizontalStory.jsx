@@ -1,3 +1,5 @@
+import { useReducedMotion } from '../ui/kit/hooks.js'
+import { motionPreference } from '../../lib/motion.js'
 import { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -50,18 +52,19 @@ function Artifact({ slide }) {
  * are soft and move with the page instead of cutting. Static when motion is reduced.
  */
 function useBoundaryBridges(rootRef) {
+  const reducedMotion = useReducedMotion()
   useEffect(() => {
     const root = rootRef.current
     if (!root) return undefined
     const top = root.querySelector('.hs__bridge--top')
     const bottom = root.querySelector('.hs__bridge--bottom')
-    if (window.matchMedia(reducedMotionQuery).matches) { gsap.set([top, bottom], { opacity: 1 }); return undefined }
+    if (motionPreference(reducedMotionQuery).matches) { gsap.set([top, bottom], { opacity: 1 }); return undefined }
     const context = gsap.context(() => {
       gsap.fromTo(top, { opacity: 0 }, { opacity: 1, ease: 'none', scrollTrigger: { trigger: root, start: 'top bottom', end: 'top 45%', scrub: 0.4 } })
       gsap.fromTo(bottom, { opacity: 0 }, { opacity: 1, ease: 'none', scrollTrigger: { trigger: root, start: 'bottom 90%', end: 'bottom 40%', scrub: 0.4 } })
     }, root)
     return () => context.revert()
-  }, [rootRef])
+  }, [rootRef, reducedMotion])
 }
 
 export default function HorizontalStory() {

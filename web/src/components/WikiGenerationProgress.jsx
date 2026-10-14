@@ -1,3 +1,4 @@
+import { useReducedMotion } from './ui/kit/hooks.js'
 import { useRef } from 'react'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
@@ -10,7 +11,7 @@ import {
   ListTree,
   Save,
 } from 'lucide-react'
-import { prefersReducedMotion } from '../lib/motion.js'
+import { prefersReducedMotion, reduced, springDuration, springEases } from '../lib/motion.js'
 
 const stages = [
   {
@@ -66,6 +67,7 @@ function describeProgress(progress) {
 }
 
 export function WikiGenerationProgress({ progress, repo, compact = false }) {
+  const reducedMotion = useReducedMotion()
   const surfaceRef = useRef(null)
   const activeStage = describeProgress(progress)
   const stageKey = activeStage
@@ -77,7 +79,7 @@ export function WikiGenerationProgress({ progress, repo, compact = false }) {
     if (!active) return
 
     if (prefersReducedMotion()) {
-      gsap.set(active, { clearProps: 'all' })
+      gsap.fromTo(active, { opacity: 0 }, { opacity: 1, duration: reduced.fade, clearProps: 'all' })
       return
     }
 
@@ -87,12 +89,12 @@ export function WikiGenerationProgress({ progress, repo, compact = false }) {
       {
         autoAlpha: 1,
         filter: 'blur(0px)',
-        duration: 0.24,
-        ease: 'power3.out',
+        duration: springDuration.default,
+        ease: springEases.default,
         clearProps: 'filter',
       },
     )
-  }, { scope: surfaceRef, dependencies: [stageKey] })
+  }, { scope: surfaceRef, dependencies: [stageKey, reducedMotion], revertOnUpdate: true })
 
   const ActiveIcon = activeStage?.icon || Clock3
   const activeIndex = stages.findIndex((item) => item.id === activeStage?.id)

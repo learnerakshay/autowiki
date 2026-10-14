@@ -2,10 +2,9 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { ArrowLeft, ArrowRight, BookOpenText, Check, ChevronLeft, ChevronRight, Clipboard, Clock3, ExternalLink, FileCode2, GitFork, MessageSquareText } from 'lucide-react'
 import { Badge, Button, Chip, Disclosure, Kbd, Page, Sheet, StatusPill } from '../components/ui/kit/index.js'
-import { prefersReducedMotion, springCss, springDuration } from '../lib/motion.js'
+import { prefersReducedMotion, reduced, springCss, springDuration } from '../lib/motion.js'
 import { MarkdownDocument } from './MarkdownDocument.jsx'
 import MermaidDiagram from './MermaidDiagram.jsx'
-import { prefetchDiagramSource } from './mermaidRuntime.js'
 import './wiki-reader.css'
 
 function generatedAt(value) {
@@ -52,6 +51,7 @@ export function WikiReader({ job, jobId, sample = false, provenance }) {
   const [activeHeading, setActiveHeading] = useState('')
   const [progress, setProgress] = useState(0)
   const [chaptersOpen, setChaptersOpen] = useState(false)
+  const [failedSource, setFailedSource] = useState('')
   const [copyStatus, setCopyStatus] = useState('idle')
   const articleRef = useRef(null)
   const readerRef = useRef(null)
@@ -75,8 +75,8 @@ export function WikiReader({ job, jobId, sample = false, provenance }) {
     if (direction) {
       window.scrollTo({ top: article.getBoundingClientRect().top + window.scrollY - 105, behavior: prefersReducedMotion() ? 'instant' : 'smooth' })
       transition.current = article.animate(
-        [{ opacity: 0.65, transform: `translateY(${direction * 16}px)` }, { opacity: 1, transform: 'translateY(0)' }],
-        { duration: prefersReducedMotion() ? 180 : springDuration.default * 1000, easing: prefersReducedMotion() ? 'ease-out' : springCss.default },
+        prefersReducedMotion() ? [{ opacity: 0 }, { opacity: 1 }] : [{ opacity: 0.65, transform: `translateY(${direction * 16}px)` }, { opacity: 1, transform: 'translateY(0)' }],
+        { duration: prefersReducedMotion() ? reduced.fade * 1000 : springDuration.default * 1000, easing: prefersReducedMotion() ? 'ease-out' : springCss.default },
       )
     }
     return () => transition.current?.cancel()
@@ -85,24 +85,12 @@ export function WikiReader({ job, jobId, sample = false, provenance }) {
   useEffect(() => { try { sessionStorage.setItem(`wiki-visited:${job.repo}`, JSON.stringify(visited)) } catch { /* session storage can be unavailable */ } }, [visited, job.repo])
 
   useEffect(() => {
-    const next = chapters[selected + 1]?.mermaid
-    if (!next) return undefined
-    const run = () => prefetchDiagramSource(next)
-    if (window.requestIdleCallback) {
-      const id = window.requestIdleCallback(run, { timeout: 3000 })
-      return () => window.cancelIdleCallback(id)
-    }
-    const id = window.setTimeout(run, 500)
-    return () => window.clearTimeout(id)
-  }, [chapters, selected])
-
-  useEffect(() => {
     if (!justGenerated) return undefined
     try { sessionStorage.setItem(`wiki-arrived:${jobId}`, 'true') } catch { /* session storage can be unavailable */ }
     const elements = [...(readerRef.current?.querySelectorAll('.wiki-reader-grid > .wiki-chapter-nav .wiki-chapter-button, .wiki-article__header') ?? [])]
     const animations = elements.map((element, index) => element.animate(
-      [{ opacity: 0, transform: 'translateY(12px)' }, { opacity: 1, transform: 'translateY(0)' }],
-      { duration: prefersReducedMotion() ? 180 : springDuration.default * 1000, delay: prefersReducedMotion() ? 0 : index * 55, easing: prefersReducedMotion() ? 'ease-out' : springCss.default },
+      prefersReducedMotion() ? [{ opacity: 0 }, { opacity: 1 }] : [{ opacity: 0, transform: 'translateY(12px)' }, { opacity: 1, transform: 'translateY(0)' }],
+      { duration: prefersReducedMotion() ? reduced.fade * 1000 : springDuration.default * 1000, delay: prefersReducedMotion() ? 0 : index * 55, easing: prefersReducedMotion() ? 'ease-out' : springCss.default },
     ))
     return () => animations.forEach((animation) => animation.cancel())
   }, [justGenerated, jobId])
@@ -162,9 +150,9 @@ export function WikiReader({ job, jobId, sample = false, provenance }) {
     <section className="wiki-context-section"><span className="wiki-kicker">Reading now</span><strong>{chapter.title}</strong>{chapter.description ? <p>{chapter.description}</p> : null}</section>
     {files ? <section className="wiki-context-section"><h2>Source context</h2>{files}</section> : null}
     <section className="wiki-context-section"><h2>On this page</h2>{toc}</section>
-    {chapter.mermaid ? <button type="button" className="wiki-context-diagram" onClick={() => document.querySelector('.diagram-header button')?.click()}><GitFork size={17} aria-hidden="true" /><span><strong>Generated diagram</strong><small>Expand this chapter’s diagram</small></span><ArrowRight size={16} aria-hidden="true" /></button> : null}
+    {chapter.mermaid && chapter.diagramValid && failedSource !== chapter.mermaid ? <button type="button" className="wiki-context-diagram" onClick={() => document.querySelector('.diagram-header button')?.click()}><GitFork size={17} aria-hidden="true" /><span><strong>Generated diagram</strong><small>Expand this chapter’s diagram</small></span><ArrowRight size={16} aria-hidden="true" /></button> : null}
   </>
-  const chapterList = <><div className="wiki-chapter-nav__header"><h2>Chapters</h2><span>{selected + 1} / {chapters.length}</span></div><nav aria-label="Wiki chapters"><ol>{chapters.map((item, index) => <li key={index}><button ref={(node) => { chapterButtons.current[index] = node }} type="button" className="wiki-chapter-button" aria-current={index === selected ? 'page' : undefined} tabIndex={index === selected ? 0 : -1} onClick={() => selectChapter(index)} onKeyDown={(event) => chapterKey(event, index)}><span className="wiki-chapter-number">{String(index + 1).padStart(2, '0')}</span><span>{item.title}</span>{visited.includes(index) && index !== selected ? <Check size={14} aria-label="Visited" /> : null}</button></li>)}</ol></nav><p>Use <Kbd>↑</Kbd> <Kbd>↓</Kbd> to move between chapters.</p></>
+  const chapterList = <><div className="wiki-chapter-nav__header">{chaptersOpen ? null : <h2>Chapters</h2>}<span>{selected + 1} / {chapters.length}</span></div><nav aria-label="Wiki chapters"><ol>{chapters.map((item, index) => <li key={index}><button ref={(node) => { chapterButtons.current[index] = node }} type="button" className="wiki-chapter-button" aria-current={index === selected ? 'page' : undefined} tabIndex={index === selected ? 0 : -1} onClick={() => selectChapter(index)} onKeyDown={(event) => chapterKey(event, index)}><span className="wiki-chapter-number">{String(index + 1).padStart(2, '0')}</span><span>{item.title}</span>{visited.includes(index) && index !== selected ? <Check size={14} aria-label="Visited" /> : null}</button></li>)}</ol></nav><p>Use <Kbd>↑</Kbd> <Kbd>↓</Kbd> to move between chapters.</p></>
 
   return (
     <Page ref={readerRef} track="wide" as="section" className="wiki-reader" aria-label={`Generated wiki for ${job.repo}`}>
@@ -175,18 +163,19 @@ export function WikiReader({ job, jobId, sample = false, provenance }) {
         {sample ? <div className="wiki-sample-provenance"><Badge tone="accent">Demo-safe</Badge><p>{provenance}</p></div> : null}
         <div className="wiki-document-meta"><span><Clock3 size={15} aria-hidden="true" />{generatedAt(job.generatedAt)}</span><span><BookOpenText size={15} aria-hidden="true" />{chapters.length} {chapters.length === 1 ? 'chapter' : 'chapters'}</span><span><GitFork size={15} aria-hidden="true" />Repository-generated</span>{justGenerated ? <Badge tone="accent">Generated just now</Badge> : null}{!sample && jobId ? <details className="wiki-job-details"><summary>Job details</summary><code>{jobId}</code></details> : null}</div>
       </header>
+      <div className="wiki-mobile-bar"><Button type="button" variant="secondary" onClick={() => setChaptersOpen(true)}>{chapter.title} · {selected + 1}/{chapters.length}</Button><Button type="button" variant="ghost" disabled={selected === 0} aria-label="Previous chapter" iconLeading={ChevronLeft} onClick={() => selectChapter(selected - 1)} /><Button type="button" variant="ghost" disabled={selected === chapters.length - 1} aria-label="Next chapter" iconLeading={ChevronRight} onClick={() => selectChapter(selected + 1)} /></div>
       <div className="wiki-reader-grid">
         <aside className="wiki-chapter-nav">{chapterList}</aside>
         <article ref={articleRef} className="wiki-article" aria-labelledby="wiki-chapter-title">
           <header className="wiki-article__header"><span className="wiki-kicker">Chapter {String(selected + 1).padStart(2, '0')} · {chapters.length}</span><h2 id="wiki-chapter-title">{chapter.title}</h2>{chapter.description ? <p>{chapter.description}</p> : null}</header>
           <div className="wiki-article__toolbar"><span>Explanations and diagrams are generated from repository context and may contain errors.</span><Button type="button" variant="ghost" size="sm" iconLeading={copyStatus === 'copied' ? Check : Clipboard} onClick={copyMarkdown}>{copyStatus === 'copied' ? 'Copied' : 'Copy Markdown'}</Button><span className="ui-sr-only" role="status" aria-live="polite">{copyStatus === 'failed' ? 'Copy failed. Select the chapter text and copy it manually.' : ''}</span></div>
           <MarkdownDocument markdown={chapter.markdown} title={chapter.title} />
-          {chapter.mermaid ? <section id="wiki-diagram" className="wiki-diagram-section" aria-label="Chapter diagram"><MermaidDiagram key={chapter.mermaid} titleId="diagram-title" source={chapter.mermaid} valid={chapter.diagramValid} label={`${chapter.title} architecture diagram`} /></section> : null}
+          {chapter.mermaid ? <section id="wiki-diagram" className="wiki-diagram-section" aria-label="Chapter diagram"><MermaidDiagram key={chapter.mermaid} titleId="diagram-title" onFailure={setFailedSource} source={chapter.mermaid} valid={chapter.diagramValid} label={`${chapter.title} architecture diagram`} /></section> : null}
           <nav className="wiki-chapter-pagination" aria-label="Adjacent chapters"><Button type="button" variant="secondary" disabled={selected === 0} iconLeading={ChevronLeft} onClick={() => selectChapter(selected - 1)}>{selected ? `Previous: ${chapters[selected - 1].title}` : 'Previous'}</Button><span>Chapter {selected + 1} of {chapters.length}</span><Button type="button" variant="secondary" disabled={selected === chapters.length - 1} iconTrailing={ChevronRight} onClick={() => selectChapter(selected + 1)}>{selected < chapters.length - 1 ? `Next: ${chapters[selected + 1].title}` : 'Next'}</Button></nav>
         </article>
         <aside className="wiki-context-rail" aria-label="Chapter context">{context}</aside>
       </div>
-      <div className="wiki-mobile-bar"><Button type="button" variant="secondary" onClick={() => setChaptersOpen(true)}>{chapter.title} · {selected + 1}/{chapters.length}</Button><Button type="button" variant="ghost" disabled={selected === 0} aria-label="Previous chapter" iconLeading={ChevronLeft} onClick={() => selectChapter(selected - 1)} /><Button type="button" variant="ghost" disabled={selected === chapters.length - 1} aria-label="Next chapter" iconLeading={ChevronRight} onClick={() => selectChapter(selected + 1)} /></div>
+
       <Sheet open={chaptersOpen} onOpenChange={setChaptersOpen} title="Chapters" side="bottom" className="wiki-chapter-sheet"><div className="wiki-chapter-nav">{chapterList}</div></Sheet>
       <div className="wiki-mobile-details"><Disclosure title="Details">{context}</Disclosure></div>
     </Page>

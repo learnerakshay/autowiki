@@ -26,7 +26,8 @@ export function renderSource(source, id) {
   if (prepared.has(source)) return prepared.get(source)
   const result = renderQueue.then(async () => {
     const mermaid = await loadMermaid()
-    return (await mermaid.render(id, source)).svg
+    try { return (await mermaid.render(id, source)).svg }
+    finally { document.getElementById(`d${id}`)?.remove() }
   })
   renderQueue = result.catch(() => {})
   prepared.set(source, result)

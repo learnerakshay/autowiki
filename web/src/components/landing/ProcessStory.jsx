@@ -1,3 +1,4 @@
+import { motionPreference } from '../../lib/motion.js'
 import { createRef, useEffect, useMemo, useRef, useState } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -16,9 +17,9 @@ const clamp01 = (value) => Math.min(1, Math.max(0, value))
 const pad = (value) => String(value).padStart(2, '0')
 
 function useEnhanced() {
-  const [enhanced, setEnhanced] = useState(() => window.matchMedia(ENHANCED_QUERY).matches)
+  const [enhanced, setEnhanced] = useState(() => motionPreference(ENHANCED_QUERY).matches)
   useEffect(() => {
-    const query = window.matchMedia(ENHANCED_QUERY)
+    const query = motionPreference(ENHANCED_QUERY)
     const update = () => setEnhanced(query.matches)
     query.addEventListener('change', update)
     return () => query.removeEventListener('change', update)

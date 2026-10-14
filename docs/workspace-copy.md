@@ -59,7 +59,7 @@ The live stage names, stage text and chapter counters are rendered by `WikiGener
 - Repository indexing is in progress.
 - source files read · searchable chunks
 - The index was processed but was not saved for repository-grounded Q&A.
-- The searchable index was saved, with large source content truncated to service limits.
+- The searchable index was saved from a limited file list: the 200-file cap was reached or GitHub returned an incomplete tree.
 - The searchable index was saved and is ready for repository-grounded Q&A.
 - Open Chat
 - Independent jobs
@@ -69,15 +69,17 @@ The live stage names, stage text and chapter counters are rendered by `WikiGener
 - Grounded answers
 - Indexing prepares repository context for Chat.
 
-## Request and notification errors
+## Request and job errors
 
 - Enter a repository before starting a job.
 - The service is rate-limited. Try again later.
-- The requested job was not found. Start a new job from this workspace.
+- The job was not found. Job records are process-local and may be gone after a server restart. Start over from Workspace.
 - The service could not be reached. Check your connection and try again.
 - The request could not be completed.
 - Repository indexing could not start
 - Repository index is ready
 - Repository indexing failed
 
-Repository validation errors are reused verbatim from `lib/repoInput.js`. Successful Wiki and Index notification headings are the real job result states.
+Repository validation errors are reused verbatim from `lib/repoInput.js`. Completion is shown on the page only. Polling stops on route departure; there are no completion toasts.
+
+Pass B: Status check failed describes a polling error; Job not found offers Start over because records are process-local. Only an API failed job is called a generation failure. Finished, not saved is neutral; Succeeded requires saved:true. Failure announcements use one inline live region, without a duplicate toast.

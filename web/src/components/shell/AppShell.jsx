@@ -12,7 +12,7 @@ import './shell.css'
  */
 export function AppShell() {
   return (
-    <div className="app-shell">
+    <div className="app-shell" data-route-ready="false">
       <a className="skip-link" href="#main-content">Skip to content</a>
       <AppBackground />
       <AppNav />

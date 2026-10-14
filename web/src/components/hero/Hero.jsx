@@ -1,3 +1,4 @@
+import { motionPreference } from '../../lib/motion.js'
 import { lazy, Suspense, useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { FileCode2, Network } from 'lucide-react'
 import { brand } from '../../config/brand.js'
@@ -33,11 +34,11 @@ const FACTS = [
 ]
 
 const subscribeReducedMotion = (notify) => {
-  const query = window.matchMedia(reducedMotionQuery)
+  const query = motionPreference(reducedMotionQuery)
   query.addEventListener('change', notify)
   return () => query.removeEventListener('change', notify)
 }
-const getReducedMotion = () => window.matchMedia(reducedMotionQuery).matches
+const getReducedMotion = () => motionPreference(reducedMotionQuery).matches
 
 export function Hero() {
   const heroRef = useRef(null)

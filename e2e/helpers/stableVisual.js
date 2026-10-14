@@ -9,6 +9,11 @@ export async function stableVisual(page, { loadLandingSections = false } = {}) {
     const sections = page.locator('[data-lazy-section]')
     await expect.poll(async () => sections.count()).toBe(5)
     await expect(page.locator('[data-lazy-section][data-ready="false"]')).toHaveCount(0)
+    for (const section of await sections.all()) {
+      await section.scrollIntoViewIfNeeded()
+      await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))))
+    }
+    await page.evaluate(() => window.scrollTo(0, 0))
   }
   await page.evaluate(async () => {
     await document.fonts.ready

@@ -29,6 +29,7 @@ test('sample entry points open an authentic backend-independent Wiki', async ({ 
   await expect(page.getByText('3 chapters', { exact: true })).toBeVisible()
   await expect(page.getByText(/does not start a new AI generation job/i)).toBeVisible()
   await expect(page.locator('.wiki-markdown p').first()).toBeVisible()
+  await page.locator('#wiki-diagram').scrollIntoViewIfNeeded()
   await expect(page.locator('.diagram svg')).toHaveCount(1)
   await expect(page.locator('.wiki-job-details')).toHaveCount(0)
 
@@ -39,16 +40,19 @@ test('sample entry points open an authentic backend-independent Wiki', async ({ 
   await chapterButtons.nth(2).click()
   await expect(page.getByRole('heading', { level: 2, name: 'Styling' })).toBeVisible()
   await expect(chapterButtons.nth(2)).toHaveAttribute('aria-current', 'page')
+  await page.locator('#wiki-diagram').scrollIntoViewIfNeeded()
   await expect(page.locator('.diagram svg')).toHaveCount(1)
 
   await chapterButtons.nth(2).focus()
   await chapterButtons.nth(2).press('Home')
   await expect(chapterButtons.nth(0)).toBeFocused()
   await expect(page.getByRole('heading', { level: 2, name: 'Introduction' })).toBeVisible()
+  await page.locator('#wiki-diagram').scrollIntoViewIfNeeded()
   await expect(page.locator('.diagram svg')).toHaveCount(1)
 
   await page.reload()
   await expect(page.getByRole('heading', { level: 1, name: REPO })).toBeVisible()
+  await page.locator('#wiki-diagram').scrollIntoViewIfNeeded()
   await expect(page.locator('.diagram svg')).toHaveCount(1)
   await expect(page.getByRole('link', { name: 'Generate your own' })).toHaveAttribute('href', '/workspace')
   expect(forbiddenRequests).toEqual([])
@@ -78,6 +82,7 @@ test('diagram expansion reuses the active SVG and restores keyboard focus', asyn
 
   await page.setViewportSize({ width: 1280, height: 900 })
   await page.goto(SAMPLE_URL)
+  await page.locator('#wiki-diagram').scrollIntoViewIfNeeded()
   await expect(page.locator('.diagram svg')).toHaveCount(1)
 
   const expand = page.getByRole('button', { name: 'Expand diagram' })
@@ -87,13 +92,15 @@ test('diagram expansion reuses the active SVG and restores keyboard focus', asyn
   const viewer = page.getByRole('dialog', { name: 'Architecture diagram' })
   await expect(viewer).toBeVisible()
   await expect(viewer.getByRole('button', { name: 'Close' })).toBeFocused()
+  await page.locator('#wiki-diagram').scrollIntoViewIfNeeded()
   await expect(page.locator('.diagram svg')).toHaveCount(1)
   await expect.poll(() => page.evaluate(() => document.documentElement.style.overflow)).toBe('hidden')
-  await page.screenshot({ path: 'screenshots/prompt-12-diagram-expanded.png' })
+  await page.screenshot({ path: 'test-results/captures/prompt-12-diagram-expanded.png' })
 
   await page.keyboard.press('Escape')
   await expect(viewer).toHaveCount(0)
   await expect(page.getByRole('button', { name: 'Expand diagram' })).toBeFocused()
+  await page.locator('#wiki-diagram').scrollIntoViewIfNeeded()
   await expect(page.locator('.diagram svg')).toHaveCount(1)
   await expect.poll(() => page.evaluate(() => document.documentElement.style.overflow)).toBe('')
   expect(apiRequests).toEqual([])
@@ -112,7 +119,8 @@ test('sample reader is responsive and complete with reduced motion', async ({ pa
     await page.setViewportSize(viewport)
     await page.goto(SAMPLE_URL)
     await expect(page.getByRole('heading', { level: 1, name: REPO })).toBeVisible()
-    await expect(page.locator('.diagram svg')).toHaveCount(1)
+    await page.locator('#wiki-diagram').scrollIntoViewIfNeeded()
+  await expect(page.locator('.diagram svg')).toHaveCount(1)
     await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
 
     if (viewport.width === 390) {
@@ -131,7 +139,8 @@ test('sample reader is responsive and complete with reduced motion', async ({ pa
       const sheet = page.getByRole('dialog', { name: 'Chapters' })
       await sheet.getByRole('button', { name: /Web Structure/ }).click()
       await expect(page.getByRole('heading', { level: 2, name: 'Web Structure' })).toBeVisible()
-      await expect(page.locator('.diagram svg')).toHaveCount(1)
+      await page.locator('#wiki-diagram').scrollIntoViewIfNeeded()
+  await expect(page.locator('.diagram svg')).toHaveCount(1)
     }
   }
 })

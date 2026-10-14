@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test'
 async function capture(page, name, fullPage = true) {
   await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
   await page.evaluate(() => window.scrollTo(0, 0))
-  await page.screenshot({ path: `screenshots/${name}.png`, fullPage })
+  await page.screenshot({ path: `test-results/captures/${name}.png`, fullPage })
 }
 
 test('Prompt 13 landing reset is responsive, interactive, and uses only local sample data', async ({ page }) => {
@@ -18,8 +18,8 @@ test('Prompt 13 landing reset is responsive, interactive, and uses only local sa
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
   await expect(page.getByText('octocat / Spoon-Knife')).toBeVisible()
   await capture(page, 'prompt-13-after-landing-desktop')
-  await page.screenshot({ path: '../.impeccable/review/desktop.png', fullPage: true })
-  await page.locator('.product-window').screenshot({ path: 'screenshots/prompt-13-after-documentation-preview.png' })
+  await page.screenshot({ path: 'test-results/captures/desktop.png', fullPage: true })
+  await page.locator('.product-window').screenshot({ path: 'test-results/captures/prompt-13-after-documentation-preview.png' })
 
   const tabs = page.getByRole('tab')
   await expect(tabs).toHaveCount(3)
@@ -54,7 +54,7 @@ test('Prompt 13 landing reset is responsive, interactive, and uses only local sa
   await page.keyboard.press('Escape')
   await expect(page.getByRole('dialog', { name: 'Menu' })).toBeHidden()
   await capture(page, 'prompt-13-after-landing-mobile')
-  await page.screenshot({ path: '../.impeccable/review/mobile.png', fullPage: true })
+  await page.screenshot({ path: 'test-results/captures/mobile.png', fullPage: true })
 
   await page.setViewportSize({ width: 320, height: 800 })
   await page.goto('/')
@@ -67,11 +67,12 @@ test('Prompt 13 landing reset is responsive, interactive, and uses only local sa
   await capture(page, 'prompt-13-after-workspace-shell', false)
 
   await page.goto('/wiki/sample/spoon-knife')
+  await page.locator('#wiki-diagram').scrollIntoViewIfNeeded()
   await expect(page.locator('.diagram svg')).toHaveCount(1)
   await capture(page, 'prompt-13-after-wiki-shell', false)
 
   await page.setViewportSize({ width: 1586, height: 992 })
   await page.goto('/')
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
-  await page.screenshot({ path: '../.impeccable/review/hero-1586x992.png', fullPage: false })
+  await page.screenshot({ path: 'test-results/captures/hero-1586x992.png', fullPage: false })
 })

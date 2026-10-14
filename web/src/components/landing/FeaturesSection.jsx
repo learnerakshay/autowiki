@@ -1,3 +1,4 @@
+import { motionPreference } from '../../lib/motion.js'
 import { useEffect, useRef, useState } from 'react'
 import { BookOpenText, FileCode2, Network } from 'lucide-react'
 import { DiagramGraph } from '../hero/DiagramGraph.jsx'
@@ -11,7 +12,7 @@ import { useReveal } from './useReveal.js'
 import './features.css'
 
 const pad = (value) => String(value).padStart(2, '0')
-const calm = () => window.matchMedia(reducedMotionQuery).matches
+const calm = () => motionPreference(reducedMotionQuery).matches
 
 /** Chapter rows slide in one by one, then the featured row highlights. */
 function ChaptersMini({ played, run }) {

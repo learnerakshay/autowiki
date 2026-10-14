@@ -19,6 +19,8 @@ test('record route mount long tasks and layout shifts at 1× and 4× CPU', async
         if (path !== '/') await expect(page.locator('.route-viewport')).toHaveAttribute('data-ready', 'true')
         await page.waitForTimeout(1200)
         const metrics = await page.evaluate(() => window.__mountMetrics)
+        expect(metrics.cls, `${path} ${visit} CLS`).toBe(0)
+        expect(Math.max(0, ...metrics.tasks), `${path} ${visit} catastrophic mount regression`).toBeLessThan(throttle === 4 ? 1200 : 300)
         rows.push({ route: path, visit, cpu: throttle, maxTaskMs: Math.max(0, ...metrics.tasks), tasksOver50Ms: metrics.tasks.length, cls: Number(metrics.cls.toFixed(4)) })
         if (visit === 'first') await page.goto(path === '/' ? '/workspace' : '/')
       }

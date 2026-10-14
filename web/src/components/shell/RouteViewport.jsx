@@ -2,7 +2,7 @@ import { createElement, useEffect, useRef, useState } from 'react'
 import { flushSync } from 'react-dom'
 import { Route, Routes, useLocation, useNavigationType } from 'react-router-dom'
 import { brand } from '../../config/brand.js'
-import { prefersReducedMotion, reduced, springCss, springDuration } from '../../lib/motion.js'
+import { subscribeMotion, prefersReducedMotion, reduced, springCss, springDuration } from '../../lib/motion.js'
 import { Logo } from '../brand/Logo.jsx'
 import { appRoutes, loadRoute, loadedPage, routeFor } from './routes.js'
 import './route-viewport.css'
@@ -74,6 +74,13 @@ export function RouteViewport() {
   const fade = useRef(null)
   const scrollAt = useRef(new Map())
 
+  useEffect(() => subscribeMotion(() => {
+    if (prefersReducedMotion()) {
+      regionRef.current?.getAnimations({ subtree: true }).forEach((animation) => { try { animation.finish() } catch { animation.cancel() } })
+      playEnter(regionRef.current, true)
+    }
+  }), [])
+
   useEffect(() => {
     const previous = window.history.scrollRestoration
     window.history.scrollRestoration = 'manual'
@@ -106,6 +113,7 @@ export function RouteViewport() {
       const reducedMotion = prefersReducedMotion()
 
       const apply = (moveFocus) => {
+        document.querySelector('.app-shell')?.setAttribute('data-route-ready', 'true')
         flushSync(() => { setShown({ location: target, route }); setLoading(false) })
         shownRef.current = { location: target, route }
         restoreScroll(target, type, scrollAt.current)

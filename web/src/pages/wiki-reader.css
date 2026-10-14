@@ -57,7 +57,7 @@
 .wiki-table-scroll th { background: var(--mint-50); }
 .wiki-image-note { display: inline-flex; border: 1px solid var(--line); padding: .2rem .4rem; color: var(--ink-3); font-size: .8rem; }
 .wiki-diagram-section { border-top: 1px solid var(--line); background: var(--mint-50); padding: clamp(1rem, 2vw, 2rem); content-visibility: auto; contain-intrinsic-size: auto 400px; }
-.diagram-card { min-width: 0; overflow: hidden; border: 1px solid var(--line-strong); border-radius: var(--r-m); background: var(--paper); }
+.diagram-card { position: relative; min-width: 0; overflow: hidden; border: 1px solid var(--line-strong); border-radius: var(--r-m); background: var(--paper); }
 .diagram-header { display: flex; justify-content: space-between; align-items: center; gap: 1rem; border-bottom: 1px solid var(--line); padding: .9rem 1rem; }
 .diagram-header h3 { margin: 0; color: var(--ink); font-size: 1rem; }
 .diagram-header p { margin: .25rem 0 0; color: var(--ink-3); font-size: .75rem; line-height: 1.5; }
@@ -77,7 +77,7 @@
 .diagram-footer { border-top: 1px solid var(--line); padding: .4rem .8rem; }
 .diagram-footer button:not(.ui-btn) { display: inline-flex; min-height: 44px; align-items: center; gap: .3rem; border: 0; background: none; color: var(--accent-ink); font: inherit; font-size: .73rem; cursor: pointer; }
 .diagram-controls > span { min-width: 3rem; color: var(--ink-3); font-family: var(--font-mono); font-size: .7rem; text-align: center; }
-.wiki-diagram-loading { padding: 1rem; }
+.wiki-diagram-loading { position: absolute; z-index: 1; top: 5rem; right: 1rem; left: 1rem; pointer-events: none; }
 .wiki-diagram-error { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: .75rem; padding: 1rem; color: var(--status-danger); }
 .wiki-diagram-error .ui-code { margin-top: 1rem; }
 .wiki-diagram-overlay { width: min(94vw, 80rem); height: min(90dvh, 55rem); }
@@ -166,4 +166,22 @@ html[data-reduced-motion="true"] .diagram-stage { transition-duration: .18s; }
   .wiki-article, .diagram-card, .wiki-mobile-bar, .wiki-context-diagram { border: 1px solid CanvasText; }
   .wiki-chapter-button[aria-current="page"], .wiki-context-section nav button[aria-current] { outline: 2px solid Highlight; }
   .wiki-reading-progress span { background: Highlight; }
+}
+
+.diagram { height: 26rem; }
+.diagram--expanded { height: auto; }
+@media (max-width: 640px) { .diagram { height: 18rem; } .diagram--expanded { height: auto; } }
+
+.diagram-stage { height: 100%; display: grid; place-items: center; }
+.diagram svg { height: 100%; max-height: 100%; }
+
+@keyframes diagram-fade { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .diagram-stage { transition: opacity var(--dur-fast) var(--ease-out); } .diagram svg { animation: diagram-fade var(--dur-fast) var(--ease-out); } }
+html[data-reduced-motion="true"] .diagram-stage { transition: opacity var(--dur-fast) var(--ease-out); }
+html[data-reduced-motion="true"] .diagram svg { animation: diagram-fade var(--dur-fast) var(--ease-out); }
+
+@media (max-width: 850px) {
+  .wiki-mobile-bar { position: sticky; top: var(--nav-h); right: auto; bottom: auto; left: auto; margin: 1.5rem auto 0; }
+  .wiki-reader > .ui-container { padding-bottom: 0; }
+  .wiki-markdown :is(h3,h4,h5,h6) { scroll-margin-top: calc(var(--nav-h) + 5rem); }
 }

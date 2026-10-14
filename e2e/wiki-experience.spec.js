@@ -5,6 +5,7 @@ const sample = '/wiki/sample/spoon-knife'
 test('reader navigation, actual headings, deep link, source and code actions', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.goto(sample)
+  await page.locator('#wiki-diagram').scrollIntoViewIfNeeded()
   await expect(page.locator('.diagram svg')).toHaveCount(1)
   await page.locator('.wiki-chapter-nav').getByRole('button', { name: /Web Structure/ }).click()
   await expect(page).toHaveURL(/#chapter-2$/)
@@ -19,11 +20,13 @@ test('reader navigation, actual headings, deep link, source and code actions', a
   await expect(page.locator('.wiki-code-block').first().getByRole('button', { name: 'Copy' })).toBeVisible()
   await page.reload()
   await expect(page.getByRole('heading', { level: 2, name: 'Styling' })).toBeVisible()
+  await page.locator('#wiki-diagram').scrollIntoViewIfNeeded()
   await expect(page.locator('.diagram svg')).toHaveCount(1)
 })
 
 test('diagram controls keep exactly one SVG while zooming, panning and expanding', async ({ page }) => {
   await page.goto(sample)
+  await page.locator('#wiki-diagram').scrollIntoViewIfNeeded()
   const svg = page.locator('.diagram svg')
   await expect(svg).toHaveCount(1)
   await page.getByRole('button', { name: 'Zoom in' }).click()
@@ -50,9 +53,10 @@ test('reader renders without horizontal scroll at required widths', async ({ pag
   for (const width of [1440, 1366, 1280, 768, 390, 360]) {
     await page.setViewportSize({ width, height: 900 })
     await page.goto(sample)
-    await expect(page.locator('.diagram svg')).toHaveCount(1)
+    await page.locator('#wiki-diagram').scrollIntoViewIfNeeded()
+  await expect(page.locator('.diagram svg')).toHaveCount(1)
     await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
-    await page.screenshot({ path: `screenshots/wiki-review-${width}.png`, fullPage: true })
+    await page.screenshot({ path: `test-results/captures/wiki-review-${width}.png`, fullPage: true })
   }
 })
 
@@ -64,6 +68,7 @@ test('generated Wiki uses the same reader and arrival hint', async ({ page }) =>
   await page.route('**/api/wiki/jobs/generated-review', (route) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(data) }))
   await page.goto('/wiki?jobId=generated-review')
   await expect(page.getByRole('heading', { level: 1, name: 'octocat/Spoon-Knife' })).toBeVisible()
+  await page.locator('#wiki-diagram').scrollIntoViewIfNeeded()
   await expect(page.locator('.diagram svg')).toHaveCount(1)
   await expect(page.getByRole('link', { name: 'Open Chat' })).toHaveAttribute('href', '/chat?repo=octocat%2FSpoon-Knife')
 })

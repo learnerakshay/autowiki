@@ -1,9 +1,7 @@
 /* The page region: the only part of the shell that changes between routes. */
 .route-viewport { position: relative; min-height: 55vh; }
 /* The footer stays hidden (still laid out) until the first page has rendered, so it never visibly jumps as the page arrives. */
-.app-shell:has(.route-viewport[data-ready="false"]) .app-footer { visibility: hidden; }
-/* Browsers without :has() retain the visible footer, rather than hiding it permanently. */
-@supports not selector(:has(*)) { .app-shell .app-footer { visibility: visible; } }
+.app-shell[data-route-ready="false"] .app-footer { visibility: hidden; }
 
 /* "Loading" pill, shown only for pages slower than 150ms. Fixed, so it never moves any layout. */
 .route-loader {

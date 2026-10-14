@@ -25,5 +25,5 @@ test("chat moves from pending to an answer rendered in the DOM", async ({ page, 
   await expect(page.locator(".chat-answer-markdown")).not.toBeEmpty();
   await expect(page.getByRole("heading", { name: "Sources" })).toBeVisible();
   await expect.poll(() => page.locator("article li").count()).toBeGreaterThan(0);
-  await page.screenshot({ path: "screenshots/chat-completed.png", fullPage: true });
+  await page.screenshot({ path: "test-results/captures/chat-completed.png", fullPage: true });
 });

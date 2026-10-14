@@ -1,9 +1,10 @@
 import { defineConfig } from "@playwright/test";
 
-const executablePath = process.env.PLAYWRIGHT_EXECUTABLE_PATH;
+const executablePath = process.env.PLAYWRIGHT_EXECUTABLE_PATH ?? 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
 
 export default defineConfig({
   testDir: ".",
+  snapshotPathTemplate: '{testDir}/screenshots/{arg}{ext}',
   testMatch: /.*\.spec\.js/,
   timeout: 180_000,
   expect: { timeout: 120_000 },

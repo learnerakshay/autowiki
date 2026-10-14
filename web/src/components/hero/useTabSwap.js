@@ -1,6 +1,7 @@
+import { motionPreference } from '../../lib/motion.js'
 import { useEffect, useLayoutEffect, useRef } from 'react'
 import gsap from 'gsap'
-import { reduced, reducedMotionQuery, springDuration, springEases } from '../../lib/motion.js'
+import { reduced, prefersReducedMotion, subscribeMotion, reducedMotionQuery, springDuration, springEases } from '../../lib/motion.js'
 
 const SHIFT = 20 // px the outgoing/incoming content travels
 const OUT = 0.14 // outgoing fade: fast enough that old and new text never overlap readably
@@ -48,7 +49,16 @@ export function useTabSwap({ containerRef, mode, order }) {
   useEffect(() => {
     const container = containerRef.current
     context.current = gsap.context(() => {}, container)
-    return () => { delayed.current?.kill(); context.current.revert() }
+    const unsubscribe = subscribeMotion(() => {
+      if (!prefersReducedMotion()) return
+      delayed.current?.kill()
+      gsap.killTweensOf([container, ...container.querySelectorAll('*')])
+      container.querySelectorAll(PANEL).forEach((panel) => { delete panel.dataset.swap; gsap.set([panel, ...panel.children], { clearProps: 'all' }) })
+      container.style.height = ''
+      const active = container.querySelector('[data-state="active"]')
+      if (active) gsap.fromTo(active, { opacity: 0 }, { opacity: 1, duration: reduced.fade, ease: reduced.ease, clearProps: 'opacity' })
+    })
+    return () => { unsubscribe(); delayed.current?.kill(); context.current.revert() }
   }, [containerRef])
 
   useLayoutEffect(() => {
@@ -60,7 +70,7 @@ export function useTabSwap({ containerRef, mode, order }) {
     if (from === mode) return
 
     const direction = Math.sign(order.indexOf(mode) - order.indexOf(from)) || 1
-    const calm = !window.matchMedia(reducedMotionQuery).matches
+    const calm = !motionPreference(reducedMotionQuery).matches
 
     context.current.add(() => {
       const panels = [...container.querySelectorAll(PANEL)]

@@ -64,5 +64,29 @@ export function installMotionTokens(root = document.documentElement) {
 }
 
 export function prefersReducedMotion() {
-  return document.documentElement.dataset.reducedMotion === 'true' || window.matchMedia(reducedMotionQuery).matches
+  return typeof document !== 'undefined' && (document.documentElement.dataset.reducedMotion === 'true' || window.matchMedia(reducedMotionQuery).matches)
+}
+
+// The dev override and the OS preference share the same subscription, including enhanced-layout gates.
+export function motionPreference(query = reducedMotionQuery) {
+  const media = window.matchMedia(query)
+  const listeners = new Map()
+  return {
+    get matches() {
+      if (document.documentElement.dataset.reducedMotion !== 'true') return media.matches
+      return query.includes('no-preference') ? false : query.includes('prefers-reduced-motion: reduce') ? true : media.matches
+    },
+    addEventListener(type, callback) {
+      const observer = new MutationObserver(callback)
+      observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-reduced-motion'] })
+      media.addEventListener(type, callback)
+      listeners.set(callback, observer)
+    },
+    removeEventListener(type, callback) { media.removeEventListener(type, callback); listeners.get(callback)?.disconnect(); listeners.delete(callback) },
+  }
+}
+export function subscribeMotion(callback) {
+  const query = motionPreference()
+  query.addEventListener('change', callback)
+  return () => query.removeEventListener('change', callback)
 }

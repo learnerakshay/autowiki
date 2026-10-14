@@ -1,3 +1,5 @@
+import { useReducedMotion } from './hooks.js'
+import { motionPreference } from '../../../lib/motion.js'
 import { useEffect, useRef } from 'react'
 import clsx from 'clsx'
 import { reducedMotionQuery } from '../../../lib/motion.js'
@@ -14,6 +16,7 @@ const finePointer = '(hover: hover) and (pointer: fine)'
  *   interactive  adds spring hover lift and pointer-down press. Leave it off for non-clickable cards.
  */
 export function Surface({ variant = 'flat', spotlight = false, interactive = false, padding = 'md', as: Tag = 'div', className, children, ...rest }) {
+  const reducedMotion = useReducedMotion()
   const ref = useRef(null)
   const orbRef = useRef(null)
 
@@ -21,7 +24,7 @@ export function Surface({ variant = 'flat', spotlight = false, interactive = fal
     const card = ref.current
     const orb = orbRef.current
     if (!spotlight || !card || !orb) return undefined
-    if (!window.matchMedia(finePointer).matches || window.matchMedia(reducedMotionQuery).matches) return undefined
+    if (!window.matchMedia(finePointer).matches || motionPreference(reducedMotionQuery).matches) return undefined
     let frame = 0
     let last = 0
     const state = { x: 0, y: 0, tx: 0, ty: 0, seeded: false }
@@ -46,7 +49,7 @@ export function Surface({ variant = 'flat', spotlight = false, interactive = fal
       if (frame) cancelAnimationFrame(frame)
       card.removeEventListener('pointermove', onMove)
     }
-  }, [spotlight])
+  }, [spotlight, reducedMotion])
 
   return (
     <Tag

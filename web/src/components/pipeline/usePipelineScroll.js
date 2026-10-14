@@ -1,3 +1,4 @@
+import { motionPreference } from '../../lib/motion.js'
 import { useEffect } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -30,7 +31,7 @@ export function usePipelineScroll({ wrapRef, count }) {
     const path = wrap.querySelector('.pipeline__path')
     const glint = wrap.querySelector('.pipeline__glint')
     const nodes = [...wrap.querySelectorAll('.pipeline li')]
-    const reduced = window.matchMedia(reducedMotionQuery)
+    const reduced = motionPreference(reducedMotionQuery)
     let teardown = null
 
     const showFinal = () => {

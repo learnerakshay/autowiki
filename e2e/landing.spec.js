@@ -57,6 +57,10 @@ test("landing motion: tab swaps stay consistent, carousel takes drag and keys, p
   await page.goto("/");
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
 
+  await page.evaluate(async () => {
+    await document.fonts.ready
+    await Promise.all(document.querySelector('.landing-hero').getAnimations({ subtree: true }).filter((animation) => animation.effect.getComputedTiming().iterations !== Infinity).map((animation) => animation.finished.catch(() => {})))
+  })
   // Hero tab swap: rapid, interrupting clicks end on the last tab with one visible panel and no leftovers.
   await page.evaluate(() => window.scrollTo(0, 330));
   const names = ["Architecture diagrams", "Source context", "Wiki chapters", "Source context", "Architecture diagrams"];

@@ -1,16 +1,14 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { ArrowLeft, BookOpenText, RefreshCw } from 'lucide-react'
 import { postJson } from '../api.js'
 import { WikiGenerationProgress } from '../components/WikiGenerationProgress.jsx'
 import { Button, EmptyState, Page, Skeleton, SkeletonText, StatusPill, Surface, TextField } from '../components/ui/kit/index.js'
-import { useJobNotifications } from '../hooks/useJobNotifications.js'
 import { checkRepoInput } from '../lib/repoInput.js'
 import { useJobPoll } from '../useJobPoll.js'
 import { WikiReader } from './WikiReader.jsx'
 import './wiki-reader.css'
 
-export { WikiReader } from './WikiReader.jsx'
 
 function WikiEntry({ repo, setRepo, generate, submitting, submitError }) {
   const validation = repo.trim() ? checkRepoInput(repo) : null
@@ -22,10 +20,12 @@ function WikiEntry({ repo, setRepo, generate, submitting, submitError }) {
   </Page>
 }
 
-function WikiPending({ jobId, repo, progress }) {
-  return <Page track="content" as="section" className="wiki-state-page" aria-labelledby="wiki-pending-title">
+function WikiPending({ jobId, repo, progress, focusTransfer }) {
+  const view = useRef(null)
+  useLayoutEffect(() => { const node = view.current; return () => { focusTransfer.current = node?.contains(document.activeElement) } }, [focusTransfer])
+  return <Page track="content" ref={view} as="section" className="wiki-state-page" aria-labelledby="wiki-pending-title">
     <Link className="wiki-back-link" to="/workspace"><ArrowLeft size={16} aria-hidden="true" />Back to Workspace</Link>
-    <header className="wiki-state-intro"><StatusPill state="pending">generating...</StatusPill><div><h1 id="wiki-pending-title">Generating your technical wiki</h1><p>AutoWiki is analyzing the repository, organizing its architecture, and writing the generated document. The activity below comes from real worker boundaries rather than a simulated percentage.</p></div></header>
+    <header className="wiki-state-intro"><StatusPill state="pending">Generating…</StatusPill><div><h1 id="wiki-pending-title">Generating your technical wiki</h1><p>AutoWiki is analyzing the repository, organizing its architecture, and writing the generated document. The activity below comes from real worker boundaries rather than a simulated percentage.</p></div></header>
     <WikiGenerationProgress progress={progress} repo={repo} />
     <p>When generation finishes, this route becomes the chaptered Wiki reader with its source references and diagrams intact.</p>
     <details className="wiki-job-details"><summary>Job details</summary><code>{jobId}</code></details>
@@ -45,7 +45,7 @@ function WikiFailure({ title, error, jobId, onRetry }) {
   return <Page track="content" as="section" className="wiki-state-page" aria-labelledby="wiki-failure-title">
     <Link className="wiki-back-link" to="/workspace"><ArrowLeft size={16} aria-hidden="true" />Back to Workspace</Link>
     <h1 id="wiki-failure-title">{title}</h1>
-    <div role="alert"><EmptyState icon={RefreshCw} title="AutoWiki could not open this generated document" description={String(error || 'The job is unavailable.')} action={onRetry ? <Button type="button" variant="secondary" onClick={onRetry}>Retry status check</Button> : <Button as={Link} to="/workspace">Back to Workspace</Button>} /></div>
+    <div role="alert"><EmptyState icon={RefreshCw} title="AutoWiki could not open this generated document" description={String(error || 'The job is unavailable.')} action={onRetry ? <Button type="button" variant="secondary" onClick={onRetry}>Retry status check</Button> : <Button as={Link} to="/workspace">Start over</Button>} /></div>
     {jobId ? <details className="wiki-job-details"><summary>Job details</summary><code>{jobId}</code><p>Job records are stored in memory and can disappear when the server restarts.</p></details> : null}
   </Page>
 }
@@ -56,8 +56,14 @@ export default function Wiki() {
   const [submitError, setSubmitError] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const jobId = searchParams.get('jobId') ?? ''
-  const { job, error: pollError, retry: retryPoll } = useJobPoll('wiki', jobId)
-  useJobNotifications(job, jobId, { completed: 'Repository wiki is ready', failed: 'Wiki generation failed' })
+  const focusTransfer = useRef(false)
+  useLayoutEffect(() => {
+    if (focusTransfer.current) {
+      const heading = document.querySelector('.wiki-reader h1, #wiki-failure-title')
+      if (heading) { heading.tabIndex = -1; heading.focus({ preventScroll: true }); focusTransfer.current = false }
+    }
+  })
+  const { job, error: pollError, errorStatus, retry: retryPoll } = useJobPoll('wiki', jobId)
 
   async function generate(event) {
     event.preventDefault()
@@ -70,9 +76,9 @@ export default function Wiki() {
     finally { setSubmitting(false) }
   }
   if (!jobId) return <WikiEntry repo={repo} setRepo={setRepo} generate={generate} submitting={submitting} submitError={submitError} />
-  if (pollError) return <WikiFailure title="Wiki job unavailable" error={pollError} jobId={jobId} onRetry={retryPoll} />
+  if (pollError) return <WikiFailure title={errorStatus === 404 ? "Job not found" : "Status check failed"} error={pollError} jobId={jobId} onRetry={errorStatus === 404 ? undefined : retryPoll} />
   if (!job) return <WikiLoading />
-  if (job.status === 'pending') return <WikiPending jobId={jobId} repo={job.repo || repo} progress={job.progress} />
+  if (job.status === 'pending') return <WikiPending focusTransfer={focusTransfer} jobId={jobId} repo={job.repo || repo} progress={job.progress} />
   if (job.status === 'failed') return <WikiFailure title="Wiki generation failed" error={job.error} jobId={jobId} />
   if (!job.chapters?.length) return <WikiFailure title="No chapters were generated" error="The completed job did not contain readable chapters." jobId={jobId} />
   return <WikiReader key={jobId} job={job} jobId={jobId} />

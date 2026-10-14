@@ -1,3 +1,4 @@
+import { motionPreference } from '../../lib/motion.js'
 import { useEffect, useState } from 'react'
 import { reducedMotionQuery } from '../../lib/motion.js'
 
@@ -35,7 +36,7 @@ export function useHeroMotion({ heroRef, stageRef, planeRef, spotRef, sheenRef, 
     const plane = planeRef.current
     if (!hero || !plane || !active) return undefined
 
-    const reduced = window.matchMedia(reducedMotionQuery).matches
+    const reduced = motionPreference(reducedMotionQuery).matches
     if (reduced) return undefined
 
     const fine = window.matchMedia(finePointerQuery).matches

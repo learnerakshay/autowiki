@@ -2,6 +2,7 @@ import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
 import { AlertTriangle, Download, Maximize2, Minus, Plus, RotateCcw } from 'lucide-react'
 import { CodeBlock, Dialog, IconButton, Sheet, Skeleton } from '../components/ui/kit/index.js'
 import { projectDistance } from '../lib/carouselEngine.js'
+import { prefersReducedMotion } from '../lib/motion.js'
 import { renderSource } from './mermaidRuntime.js'
 
 function svgNode(markup, label) {
@@ -29,6 +30,8 @@ function DiagramCanvas({ hostRef, view, setView, interacted, setInteracted, expa
   const pointers = useRef(new Map())
   const gesture = useRef(null)
   const [dragging, setDragging] = useState(false)
+  const [wheelHint, setWheelHint] = useState(false)
+  const wheelHandler = useRef(null)
   const zoom = (factor, clientX, clientY) => {
     const rect = canvasRef.current?.getBoundingClientRect()
     if (!rect) return
@@ -38,6 +41,22 @@ function DiagramCanvas({ hostRef, view, setView, interacted, setInteracted, expa
     setView({ scale: next, x: x - (x - view.x) * next / view.scale, y: y - (y - view.y) * next / view.scale })
     setInteracted(true)
   }
+  useLayoutEffect(() => { wheelHandler.current = (event) => {
+    if (!expanded && !event.ctrlKey && !event.metaKey) { setWheelHint(true); return }
+    event.preventDefault()
+    zoom(Math.exp(-event.deltaY * 0.002), event.clientX, event.clientY)
+  } })
+  useEffect(() => {
+    const canvas = canvasRef.current
+    const wheel = (event) => wheelHandler.current(event)
+    canvas.addEventListener('wheel', wheel, { passive: false })
+    return () => canvas.removeEventListener('wheel', wheel)
+  }, [])
+  useEffect(() => {
+    if (!wheelHint) return undefined
+    const timer = setTimeout(() => setWheelHint(false), 2200)
+    return () => clearTimeout(timer)
+  }, [wheelHint])
   const onPointerDown = (event) => {
     if (event.button !== 0 && event.pointerType === 'mouse') return
     event.currentTarget.setPointerCapture(event.pointerId)
@@ -78,7 +97,7 @@ function DiagramCanvas({ hostRef, view, setView, interacted, setInteracted, expa
     setView((current) => {
       const boundX = rect.width * Math.max(0, current.scale - 1) / 2 + 72
       const boundY = rect.height * Math.max(0, current.scale - 1) / 2 + 72
-      return { ...current, x: Math.max(-boundX, Math.min(boundX, current.x + projectDistance(state.velocityX))), y: Math.max(-boundY, Math.min(boundY, current.y + projectDistance(state.velocityY))) }
+      return { ...current, x: Math.max(-boundX, Math.min(boundX, current.x + (prefersReducedMotion() ? 0 : projectDistance(state.velocityX)))), y: Math.max(-boundY, Math.min(boundY, current.y + (prefersReducedMotion() ? 0 : projectDistance(state.velocityY)))) }
     })
   }
   const onKeyDown = (event) => {
@@ -110,19 +129,20 @@ function DiagramCanvas({ hostRef, view, setView, interacted, setInteracted, expa
     svg?.querySelectorAll('.is-related').forEach((part) => part.classList.remove('is-related'))
   }
   return (
-    <div ref={canvasRef} className={`diagram${expanded ? ' diagram--expanded' : ''}`} role="group" aria-label="Diagram canvas. Drag to pan; use wheel or plus and minus to zoom; press 0 to fit." tabIndex={0}
+    <div ref={canvasRef} className={`diagram${expanded ? ' diagram--expanded' : ''}`} role="group" aria-label={expanded ? 'Diagram canvas. Drag to pan; use wheel or plus and minus to zoom; press 0 to fit.' : 'Diagram canvas. Drag to pan; use Ctrl/Command plus wheel, or plus and minus to zoom; press 0 to fit.'} tabIndex={0}
       onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerCancel={onPointerUp}
-      onWheel={(event) => { event.preventDefault(); zoom(event.deltaY < 0 ? 1.12 : 1 / 1.12, event.clientX, event.clientY) }}
       onDoubleClick={(event) => zoom(1.5, event.clientX, event.clientY)} onKeyDown={onKeyDown} onMouseOver={onMouseOver} onMouseOut={onMouseOut}>
       <div ref={hostRef} className="diagram-stage" data-dragging={dragging} style={{ transform: `translate3d(${view.x}px, ${view.y}px, 0) scale(${view.scale})` }} />
-      {!interacted ? <span className="diagram-hint">Drag to pan · scroll to zoom</span> : null}
+      {!interacted || wheelHint ? <span className="diagram-hint">{expanded ? 'Drag to pan · scroll to zoom' : 'Drag to pan · Ctrl/⌘ + scroll to zoom'}</span> : null}
     </div>
   )
 }
 
-export default function MermaidDiagram({ source, valid, titleId, label = 'Repository architecture diagram' }) {
+export default function MermaidDiagram({ source, valid, titleId, label = 'Repository architecture diagram', onFailure }) {
   const renderId = `mermaid-${useId().replaceAll(':', '')}`
   const inlineHostRef = useRef(null)
+  const cardRef = useRef(null)
+  const renderRef = useRef(null)
   const expandedHostRef = useRef(null)
   const triggerRef = useRef(null)
   const [svg, setSvg] = useState(null)
@@ -139,21 +159,33 @@ export default function MermaidDiagram({ source, valid, titleId, label = 'Reposi
   useEffect(() => {
     if (!source || !valid) return undefined
     let active = true
+    let requested = false
     let currentSvg
     async function render() {
+      if (requested || !active) return
+      requested = true
       try {
         const markup = await renderSource(source, renderId)
         if (!active || !inlineHostRef.current) return
         currentSvg = svgNode(markup, label)
         inlineHostRef.current.replaceChildren(currentSvg)
         setSvg(currentSvg)
-      } catch (reason) {
-        if (active) setError(reason.message)
+      } catch {
+        if (active) { setError('The generated Mermaid source could not be rendered. Review the source below.'); onFailure?.(source) }
       }
     }
-    render()
-    return () => { active = false; currentSvg?.remove() }
-  }, [renderId, source, valid, label])
+    renderRef.current = render
+    let idle
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) return
+      observer.disconnect()
+      idle = window.requestIdleCallback ? requestIdleCallback(render, { timeout: 500 }) : setTimeout(render, 0)
+    }, { rootMargin: '150px' })
+    observer.observe(cardRef.current.closest('.wiki-diagram-section') || cardRef.current)
+    return () => { active = false; renderRef.current = null; observer.disconnect(); if (window.cancelIdleCallback) cancelIdleCallback(idle); else clearTimeout(idle); currentSvg?.remove() }
+  }, [renderId, source, valid, label, onFailure])
+
+  useEffect(() => { if (expanded && !svg) void renderRef.current?.() }, [expanded, svg])
 
   useLayoutEffect(() => {
     if (!svg) return
@@ -192,7 +224,7 @@ export default function MermaidDiagram({ source, valid, titleId, label = 'Reposi
   }
 
   return (
-    <div className="diagram-card">
+    <div ref={cardRef} className="diagram-card">
       <div className="diagram-header">
         <div><h3 id={titleId}>Architecture diagram</h3><p>Relationships described by this chapter’s generated Mermaid definition.</p></div>
         {!failure ? <IconButton ref={triggerRef} label="Expand diagram" icon={Maximize2} tooltip={false} onClick={() => setExpanded(true)} /> : null}

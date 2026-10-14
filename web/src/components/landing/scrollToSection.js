@@ -1,3 +1,4 @@
+import { motionPreference } from '../../lib/motion.js'
 import { loadAllSections } from './loadAll.js'
 import { reducedMotionQuery } from '../../lib/motion.js'
 
@@ -28,7 +29,7 @@ export async function scrollToSection(id, { updateHash = true } = {}) {
   const sections = [...document.querySelectorAll('[data-lazy-section]')]
   await Promise.all(sections.slice(0, sections.indexOf(target) + 1).map(whenReady))
   await frames(2) // let measured layouts (pinned stages) settle
-  const calm = window.matchMedia(reducedMotionQuery).matches
+  const calm = motionPreference(reducedMotionQuery).matches
   target.scrollIntoView({ behavior: calm ? 'auto' : 'smooth', block: 'start' })
   if (updateHash) history.replaceState(null, '', `#${id}`)
 }

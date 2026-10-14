@@ -20,9 +20,8 @@ export function Button({ variant = 'primary', size = 'md', loading = false, disa
     ...rest,
     className: clsx('ui-btn', `ui-btn--${variant}`, `ui-btn--${size}`, loading && 'is-loading', disabled && 'is-disabled', className),
     'aria-busy': loading || undefined,
-    'aria-disabled': inert && (explained || loading || Tag !== 'button') ? true : undefined,
-    'aria-describedby': explained ? reasonId : rest['aria-describedby'],
-    disabled: disabled && !explained && Tag === 'button' ? true : undefined,
+    'aria-disabled': inert || undefined,
+    'aria-describedby': rest['aria-describedby'] || (explained ? reasonId : undefined),
     onClick: (event) => { if (inert) { event.preventDefault(); return } onClick?.(event) },
   }
   if (Tag === 'button') props.type = type ?? 'button'
@@ -35,11 +34,10 @@ export function Button({ variant = 'primary', size = 'md', loading = false, disa
       {Trailing ? <Trailing className="ui-btn__icon ui-btn__icon--trailing" aria-hidden="true" /> : null}
     </Tag>
   )
-  if (!explained) return element
   return (
     <>
-      <Tooltip content={disabledReason}>{element}</Tooltip>
-      <span id={reasonId} className="ui-sr-only">{disabledReason}</span>
+      <Tooltip unwrapped content={explained ? disabledReason : ''}>{element}</Tooltip>
+      <span id={reasonId} className="ui-sr-only">{explained ? disabledReason : ''}</span>
     </>
   )
 }

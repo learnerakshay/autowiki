@@ -11,7 +11,7 @@ function json(route, body, status = 200) {
 async function capture(page, name, fullPage = true) {
   await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
   await page.evaluate(() => window.scrollTo(0, 0))
-  await page.screenshot({ path: `screenshots/${name}.png`, fullPage })
+  await page.screenshot({ path: `test-results/captures/${name}.png`, fullPage })
 }
 
 test('capture Prompt 12 crafted product states', async ({ page }) => {
@@ -28,11 +28,12 @@ test('capture Prompt 12 crafted product states', async ({ page }) => {
   await capture(page, 'prompt-12-workspace-desktop')
 
   await page.goto('/wiki?jobId=prompt-12-reader')
+  await page.locator('#wiki-diagram').scrollIntoViewIfNeeded()
   await expect(page.locator('.diagram svg')).toHaveCount(1)
   await capture(page, 'prompt-12-wiki-desktop')
 
   await page.goto('/architecture')
-  const openAiNode = page.locator('.architecture-node').filter({ hasText: 'OpenAI models' })
+  const openAiNode = page.locator('.arch-node').filter({ hasText: 'OpenAI models' })
   await openAiNode.evaluate((node) => node.click())
   await expect(openAiNode).toHaveAttribute('aria-pressed', 'true')
   await capture(page, 'prompt-12-architecture-active')
@@ -52,11 +53,13 @@ test('capture Prompt 12 crafted product states', async ({ page }) => {
   await capture(page, 'prompt-12-chat-answer')
 
   await page.goto('/wiki/sample/spoon-knife')
+  await page.locator('#wiki-diagram').scrollIntoViewIfNeeded()
   await expect(page.locator('.diagram svg')).toHaveCount(1)
   await capture(page, 'prompt-12-sample-wiki')
 
   await page.setViewportSize({ width: 390, height: 844 })
   await page.goto('/wiki/sample/spoon-knife')
+  await page.locator('#wiki-diagram').scrollIntoViewIfNeeded()
   await expect(page.locator('.diagram svg')).toHaveCount(1)
   await capture(page, 'prompt-12-mobile')
 })

@@ -1,3 +1,4 @@
+import { useReducedMotion } from '../ui/kit/hooks.js'
 import { useMemo, useRef, useState } from 'react'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
@@ -37,6 +38,7 @@ function streamPlan(chapter) {
 }
 
 export function PreviewWindow({ demo, sheenRef }) {
+  const reducedMotion = useReducedMotion()
   const [activeMode, setActiveMode] = useState('chapters')
   const [activeChapter, setActiveChapter] = useState(heroSample.featuredChapter)
   const documentRef = useRef(null)
@@ -57,7 +59,7 @@ export function PreviewWindow({ demo, sheenRef }) {
     if (prefersReducedMotion() || !panelsRef.current) return
     const active = panelsRef.current.querySelector('[data-state="active"]')
     if (active) gsap.fromTo(active.children, { autoAlpha: 0.3, y: 8 }, { autoAlpha: 1, y: 0, duration: motion.selection, stagger: 0.025, ease: motion.ease, clearProps: 'all' })
-  }, { scope: documentRef, dependencies: [activeChapter], revertOnUpdate: true })
+  }, { scope: documentRef, dependencies: [activeChapter, reducedMotion], revertOnUpdate: true })
 
   // Any deliberate interaction with the mockup ends the autoplay so it never fights the reader.
   const selectChapter = (index) => { demo.stop(); setActiveChapter(index) }

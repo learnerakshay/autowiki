@@ -76,10 +76,12 @@ test('Sample Wiki uses the flagship reader at desktop and mobile sizes', async (
 
   await expect(page.getByRole('heading', { level: 1, name: 'octocat/Spoon-Knife' })).toBeVisible()
   await expect(page.getByRole('complementary', { name: 'Chapter context' })).toBeVisible()
+  await page.locator('#wiki-diagram').scrollIntoViewIfNeeded()
   await expect(page.locator('.diagram svg')).toHaveCount(1)
 
   await page.locator('.wiki-chapter-button').nth(1).click()
   await expect(page.getByRole('heading', { level: 2, name: 'Web Structure' })).toBeVisible()
+  await page.locator('#wiki-diagram').scrollIntoViewIfNeeded()
   await expect(page.locator('.diagram svg')).toHaveCount(1)
 
   await page.setViewportSize({ width: 390, height: 844 })

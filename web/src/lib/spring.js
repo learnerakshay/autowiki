@@ -1,3 +1,4 @@
+import { prefersReducedMotion } from './motion.js'
 // Spring math shared by every interactive motion on the landing page.
 //
 // A spring is described the way fluid-interface systems describe it: a damping ratio and a
@@ -64,6 +65,7 @@ export function createSpringValue({ value = 0, spring, onUpdate }) {
   let last = 0
 
   const frameStep = (now) => {
+    if (prefersReducedMotion()) { state.value = state.target; state.velocity = 0; onUpdate(state.value); frame = 0; return }
     const dt = Math.min(0.05, (now - last) / 1000)
     last = now
     const [d, v] = stepSpring(state.value - state.target, state.velocity, dt, spring)
@@ -84,7 +86,8 @@ export function createSpringValue({ value = 0, spring, onUpdate }) {
   return {
     get value() { return state.value },
     setTarget(target) { state.target = target; wake() },
-    jump(next) { state.value = next; state.target = next; state.velocity = 0; onUpdate(next) },
+    reveal() { state.value = Math.min(state.value, 0.65); state.target = 1; onUpdate(state.value); wake() },
+    jump(next) { if (frame) cancelAnimationFrame(frame); frame = 0; state.value = next; state.target = next; state.velocity = 0; onUpdate(next) },
     destroy() { if (frame) cancelAnimationFrame(frame); frame = 0 },
   }
 }

@@ -39,7 +39,7 @@ async function capture(page, name, width) {
   for (let attempt = 0; attempt < 3; attempt += 1) {
     try {
       await page.screenshot({
-        path: `screenshots/prompt-11-${phase}-${name}-${width === 390 ? 'mobile' : 'desktop'}.png`,
+        path: `test-results/captures/prompt-11-${phase}-${name}-${width === 390 ? 'mobile' : 'desktop'}.png`,
         fullPage: true,
       })
       return
@@ -77,6 +77,7 @@ test('capture Prompt 11 visual baseline and final states', async ({ page }) => {
     await capture(page, 'workspace', width)
 
     await page.goto('/wiki?jobId=prompt-11-reader')
+    await page.locator('#wiki-diagram').scrollIntoViewIfNeeded()
     await expect(page.locator('.diagram svg')).toHaveCount(1)
     await capture(page, 'wiki', width)
 
@@ -111,13 +112,14 @@ test('capture Prompt 11 visual baseline and final states', async ({ page }) => {
     if (phase === 'after') {
       await page.goto('/wiki/sample/spoon-knife')
       await expect(page.getByText('Pre-generated sample', { exact: true })).toBeVisible()
+      await page.locator('#wiki-diagram').scrollIntoViewIfNeeded()
       await expect(page.locator('.diagram svg')).toHaveCount(1)
       await page.evaluate(() => window.scrollTo(0, 0))
       let lastError
       for (let attempt = 0; attempt < 3; attempt += 1) {
         try {
           await page.screenshot({
-            path: `screenshots/prompt-11-sample-${width === 390 ? 'mobile' : 'wiki'}.png`,
+            path: `test-results/captures/prompt-11-sample-${width === 390 ? 'mobile' : 'wiki'}.png`,
             fullPage: true,
           })
           lastError = undefined

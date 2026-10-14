@@ -39,7 +39,7 @@ test('Chat loads with accessible empty state, query prefill, and non-submitting 
   await expect(page.getByLabel('Question', { exact: true })).toHaveValue('')
   await expect(page.getByRole('button', { name: 'Ask', exact: true })).toBeDisabled()
   await expect(page.getByText('Entering a repository does not index it.')).toBeVisible()
-  await capture(page, { path: 'screenshots/prompt-09-chat-empty.png', fullPage: true })
+  await capture(page, { path: 'test-results/captures/prompt-09-chat-empty.png', fullPage: true })
 
   const suggestion = page.getByRole('button', { name: 'How is the application structured?' })
   await suggestion.focus()
@@ -49,8 +49,8 @@ test('Chat loads with accessible empty state, query prefill, and non-submitting 
   expect(requests).toBe(0)
 
   await page.evaluate(() => window.scrollTo(0, 0))
-  await capture(page, { path: 'screenshots/prompt-09-chat-desktop.png', fullPage: true })
-  await capture(page, { path: '../.impeccable/review/desktop.png', fullPage: true })
+  await capture(page, { path: 'test-results/captures/prompt-09-chat-desktop.png', fullPage: true })
+  await capture(page, { path: 'test-results/captures/desktop.png', fullPage: true })
 })
 
 test('Chat renders a secure Markdown answer, real sources, copy action, and honest empty sources', async ({ page, context }) => {
@@ -89,8 +89,8 @@ test('Chat renders a secure Markdown answer, real sources, copy action, and hone
   await ask.press('Enter')
 
   await expect(page.getByText('pending...', { exact: true })).toBeVisible()
-  await expect(page.locator('.chat-request-state .chat-submitted-question')).toHaveText('How does a Chat request move through the system?')
-  await capture(page, { path: 'screenshots/prompt-09-chat-pending.png', fullPage: true })
+  await expect(page.locator('.qa-answer-header p')).toHaveText('How does a Chat request move through the system?')
+  await capture(page, { path: 'test-results/captures/prompt-09-chat-pending.png', fullPage: true })
 
   complete = true
   await expect(page.getByRole('heading', { name: 'Answer', exact: true })).toBeVisible()
@@ -103,22 +103,23 @@ test('Chat renders a secure Markdown answer, real sources, copy action, and hone
   expect(await page.evaluate(() => window.__chatUnsafe)).toBeUndefined()
   await expect(page.getByRole('link', { name: 'unsafe' })).not.toHaveAttribute('href', /javascript:/i)
   await expect(page.getByRole('heading', { name: 'Sources', exact: true })).toBeVisible()
-  await expect(page.locator('.chat-source-item')).toHaveCount(2)
-  await expect(page.locator('.chat-source-item').first()).toContainText('src/routes/chat.routes.js')
+  await expect(page.locator('.qa-sources li')).toHaveCount(2)
+  await expect(page.locator('.qa-sources li').first()).toContainText('src/routes/chat.routes.js')
 
   await page.getByRole('button', { name: 'Copy Answer' }).click()
   await expect(page.getByRole('button', { name: 'Copied' })).toBeVisible()
   expect(await page.evaluate(() => navigator.clipboard.readText())).toContain('The request enters through')
 
-  await expect(page.locator('[data-sonner-toast]')).toHaveCount(0, { timeout: 7000 })
+  await expect(page.locator('.ui-toast')).toHaveCount(0, { timeout: 7000 })
   await page.evaluate(() => window.scrollTo(0, 0))
-  await capture(page, { path: 'screenshots/prompt-09-chat-answer.png', fullPage: true })
-  await page.locator('.chat-sources').screenshot({ path: 'screenshots/prompt-09-chat-sources.png' })
+  await capture(page, { path: 'test-results/captures/prompt-09-chat-answer.png', fullPage: true })
+  await page.locator('.qa-sources').screenshot({ path: 'test-results/captures/prompt-09-chat-sources.png' })
 
   await page.getByLabel('Question', { exact: true }).fill('Show an empty source response')
   await page.getByRole('button', { name: 'Ask', exact: true }).click()
-  await expect(page.getByText('No source paths were returned for this answer. No citations have been inferred.')).toBeVisible()
-  await expect(page.locator('.chat-source-item')).toHaveCount(0)
+  await expect(page.getByRole('heading', { name: 'Repository is not indexed' })).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Open Workspace' })).toHaveAttribute('href', '/workspace?repo=acme%2Fplatform')
+  await expect(page.locator('.qa-sources li')).toHaveCount(0)
   expect(activeJob).toBe('empty-sources')
 })
 
@@ -135,17 +136,18 @@ test('Chat presents failed and unknown jobs with their submitted context', async
   await page.getByLabel('Repository', { exact: true }).fill(REPO)
   await page.getByLabel('Question', { exact: true }).fill('Where is the request validated?')
   await page.getByRole('button', { name: 'Ask', exact: true }).click()
-  await expect(page.getByRole('alert')).toContainText('The retrieval provider rejected this request.')
-  await expect(page.getByRole('heading', { name: 'Where is the request validated?', exact: true })).toBeVisible()
-  await expect(page.locator('[data-sonner-toast]')).toHaveCount(0, { timeout: 7000 })
+  await expect(page.locator('.qa-error')).toContainText('The retrieval provider rejected this request.')
+  await expect(page.locator('.qa-answer-header p')).toHaveText('Where is the request validated?')
+  await expect(page.locator('.ui-toast')).toHaveCount(0, { timeout: 7000 })
   await page.evaluate(() => window.scrollTo(0, 0))
-  await capture(page, { path: 'screenshots/prompt-09-chat-error.png', fullPage: true })
+  await capture(page, { path: 'test-results/captures/prompt-09-chat-error.png', fullPage: true })
 
   nextJob = 'missing-job'
   await page.getByLabel('Question', { exact: true }).fill('Where is the worker registered?')
   await page.getByRole('button', { name: 'Ask', exact: true }).click()
-  await expect(page.getByRole('alert')).toContainText('job not found')
-  await expect(page.getByRole('heading', { name: 'Where is the worker registered?', exact: true })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Job not found' })).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Start over' })).toBeVisible()
+  await expect(page.locator('.qa-answer-header p')).toHaveText('Where is the worker registered?')
   await expect(page.locator('body')).not.toContainText('Where is the request validated?')
 })
 
@@ -176,13 +178,13 @@ test('newer Chat context wins over a late older response and draft edits do not 
   await expect(page.locator('.chat-answer-markdown')).toContainText('Current answer B')
   await page.waitForTimeout(1000)
   await expect(page.locator('.chat-answer-markdown')).not.toContainText('Late answer A')
-  await expect(page.locator('.chat-answer')).toContainText('acme/repository-b')
-  await expect(page.locator('.chat-answer')).toContainText('Question B')
+  await expect(page.locator('.qa-answer')).toContainText('acme/repository-b')
+  await expect(page.locator('.qa-answer')).toContainText('Question B')
 
   await page.getByLabel('Repository', { exact: true }).fill('acme/unsent-draft')
   await expect(page.getByText('Composer edits do not alter the active request. Select Ask to replace it.')).toBeVisible()
-  await expect(page.locator('.chat-answer')).toContainText('acme/repository-b')
-  await expect(page.locator('.chat-answer')).not.toContainText('acme/unsent-draft')
+  await expect(page.locator('.qa-answer')).toContainText('acme/repository-b')
+  await expect(page.locator('.qa-answer')).not.toContainText('acme/unsent-draft')
 })
 
 test('Chat remains usable without horizontal overflow at required widths and reduced motion', async ({ page }) => {
@@ -214,10 +216,10 @@ test('Chat remains usable without horizontal overflow at required widths and red
     await expect(page.getByRole('button', { name: 'Copy Answer' })).toBeVisible()
 
     if (width === 390) {
-      await expect(page.locator('[data-sonner-toast]')).toHaveCount(0, { timeout: 7000 })
+      await expect(page.locator('.ui-toast')).toHaveCount(0, { timeout: 7000 })
       await page.evaluate(() => window.scrollTo(0, 0))
-      await capture(page, { path: 'screenshots/prompt-09-chat-mobile.png', fullPage: true })
-      await capture(page, { path: '../.impeccable/review/mobile.png', fullPage: true })
+      await capture(page, { path: 'test-results/captures/prompt-09-chat-mobile.png', fullPage: true })
+      await capture(page, { path: 'test-results/captures/mobile.png', fullPage: true })
     }
   }
 
